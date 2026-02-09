@@ -1,0 +1,19 @@
+# Dependencies
+/vendor/
+
+# Environment / secrets
+.env
+.env.*
+
+# Logs & runtime
+/storage/logs/
+/storage/cache/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Docker
+**/node_modules/
