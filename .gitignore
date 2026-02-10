@@ -17,3 +17,6 @@ Thumbs.db
 
 # Docker
 **/node_modules/
+
+# DB sample data
+db/sample_data.sql
