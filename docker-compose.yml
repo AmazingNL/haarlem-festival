@@ -38,8 +38,7 @@ services:
                     "localhost",
                     "-u",
                     "root",
-                    "-p",
-                    "secret123",
+                    "-psecret123",
                 ]
             interval: 2s
             timeout: 2s
