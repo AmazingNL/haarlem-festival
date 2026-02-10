@@ -10,6 +10,7 @@ use App\Models\Enum\UserRole;
 final class User extends BaseEntity
 {
     public ?int $user_id = null;
+    public string $username = '';
     public string $email = '';
     public string $password_hash = '';
     public string $first_name = '';
@@ -17,12 +18,6 @@ final class User extends BaseEntity
     public UserRole $role = UserRole::customer;
 
     public ?string $phone = null;
-
-    public ?string $billing_street = null;
-    public ?string $billing_postal_code = null;
-    public ?string $billing_city = null;
-    public ?string $billing_country = null;
-
     public ?int $profile_image_id = null;
 
     public ?string $created_at = null;
