@@ -1,23 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
+
 use App\Models\User;
+use PDO;
 
-class UserRepository implements IUserRepository
+final class UserRepository implements IUserRepository
 {
-    protected \PDO $db;
+    private PDO $db;
 
-    public function __construct(\PDO $db)
+    public function __construct(PDO $db)
     {
         $this->db = $db;
     }
-    // David
-   public function findUserByEmail(string $identifier): ?User
+
+    public function findUserByEmail(string $identifier): ?User
     {
-        $stmt = $this->db->prepare("SELECT * FROM user WHERE email = :id OR username = :id LIMIT 1");
+        // NOTE: backticks around `user` because "user" can be reserved in MySQL
+        $stmt = $this->db->prepare(
+            "SELECT * FROM `user` WHERE email = :id OR username = :id LIMIT 1"
+        );
+
         $stmt->execute(['id' => $identifier]);
 
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$row) {
             return null;
@@ -26,47 +34,45 @@ class UserRepository implements IUserRepository
         return User::fromArray($row);
     }
 
-//
-
     public function findUserById(int $id): ?User
     {
-        // Implement database logic to find a user by ID
-        return null; // Placeholder return
+        // TODO: implement properly
+        return null;
     }
 
     public function createUser(User $user): User
     {
-        // Implement database logic to create a new user
-        return $user; // Placeholder return
+        // TODO: implement properly
+        return $user;
     }
 
     public function updateUser(User $user): User
     {
-        // Implement database logic to update an existing user
-        return $user; // Placeholder return
+        // TODO: implement properly
+        return $user;
     }
 
     public function deleteUser(int $id): bool
     {
-        // Implement database logic to delete a user by ID
-        return true; // Placeholder return
+        // TODO: implement properly
+        return true;
     }
 
     public function findAllUsers(): array
     {
-        // Implement database logic to retrieve all users
-        return []; // Placeholder return
+        // TODO: implement properly
+        return [];
     }
 
     public function findByRole(string $role): array
     {
-        // Implement database logic to find users by role
-        return []; // Placeholder return
+        // TODO: implement properly
+        return [];
     }
 
     public function findByName(string $name): array
     {
-        // Implement database logic to find users by name
-        return []; // Placeholder return
+        // TODO: implement properly
+        return [];
     }
 }

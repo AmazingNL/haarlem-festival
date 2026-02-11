@@ -15,7 +15,7 @@
 .left-panel {
     flex: 1;
     position: relative;
-    /* Changed to absolute path starting from / */
+
     background: url('/assets/images/shared/loginImage.avif') no-repeat center center; 
     background-size: cover;
     color: white;
@@ -24,7 +24,6 @@
     padding: 0 10%;
 }
 
-/* The Red Gradient Overlay from your image */
 .left-panel .overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -45,7 +44,7 @@
 }
 
 .left-content h1 span {
-    color: #ffc107; /* Golden yellow for 'Haarlem' */
+    color: #ffc107; 
 }
 
 .left-content p {
@@ -54,10 +53,10 @@
     opacity: 0.9;
 }
 
-/* RIGHT PANEL STYLES */
+
 .right-panel {
     flex: 1;
-    background: #fdf8f7; /* Slight off-white pinkish tint from image */
+    background: #fdf8f7; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -144,7 +143,7 @@
 .btn-signin {
     width: 100%;
     padding: 16px;
-    background: #7a1a0d; /* Deep red from the image */
+    background: #7a1a0d; 
     color: white;
     border: none;
     border-radius: 8px;
@@ -167,7 +166,7 @@
     font-weight: 600;
 }
 
-/* Responsive for Mobile */
+
 @media (max-width: 900px) {
     .left-panel { display: none; }
 }

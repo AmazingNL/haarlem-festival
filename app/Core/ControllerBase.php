@@ -6,11 +6,11 @@ namespace App\Core;
 
 abstract class ControllerBase
 {
-    protected ?\App\Repositories\UserRepository $userRepository = null;
+    protected ?\App\Services\UserService $userService = null;
 
-    public function __construct(?\App\Repositories\UserRepository $userRepository = null)
+    public function __construct(?\App\Services\UserService $userService = null)
     {
-        $this->userRepository = $userRepository;
+        $this->userService = $userService;
 
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();

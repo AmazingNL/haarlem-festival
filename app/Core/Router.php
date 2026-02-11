@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace App\Core;
@@ -8,22 +7,25 @@ use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use function FastRoute\simpleDispatcher;
 
-class Router
+final class Router
 {
     public function dispatch(): void
     {
         $dispatcher = simpleDispatcher(function (RouteCollector $r) {
-            // login routes
-            $r->addRoute('GET', '/login', [\App\Controllers\AuthController::class, 'login']);
-            $r->addRoute('POST', '/login', [\App\Controllers\AuthController::class, 'processLogin']);
-            $r->addRoute('GET', '/logout', [\App\Controllers\AuthController::class, 'logout']);
+            $r->addRoute('GET',  '/login',    [\App\Controllers\AuthController::class, 'login']);
+            $r->addRoute('POST', '/login',    [\App\Controllers\AuthController::class, 'processLogin']);
+            $r->addRoute('GET',  '/logout',   [\App\Controllers\AuthController::class, 'logout']);
+            $r->addRoute('GET',  '/register', [\App\Controllers\AuthController::class, 'register']);
         });
 
         $httpMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        $uri = $_SERVER['REQUEST_URI'] ?? '/';
+        $uri        = $_SERVER['REQUEST_URI'] ?? '/';
 
-        if (false !== $pos = strpos($uri, '?'))
+        $pos = strpos($uri, '?');
+        if ($pos !== false) {
             $uri = substr($uri, 0, $pos);
+        }
+
         $uri = rawurldecode($uri);
 
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
@@ -31,12 +33,12 @@ class Router
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
                 http_response_code(404);
-                echo "404 - Page not found";
+                echo '404 - Page not found';
                 return;
 
             case Dispatcher::METHOD_NOT_ALLOWED:
                 http_response_code(405);
-                echo "405 - Method not allowed";
+                echo '405 - Method not allowed';
                 return;
 
             case Dispatcher::FOUND:
@@ -45,45 +47,22 @@ class Router
 
                 if (!class_exists($class)) {
                     http_response_code(500);
-                    echo "Controller not found: " . htmlspecialchars($class);
+                    echo 'Controller not found: ' . htmlspecialchars($class);
                     return;
                 }
 
-                // Build controller (inject dependencies when needed)
-                switch ($class) {               
-                    case \App\Controllers\AuthController::class:
-                        // Pull the PDO from global scope and inject into the Repository
-                        $pdo = $GLOBALS['pdo'];
-                        $userRepo = new \App\Repositories\UserRepository($pdo);
-                        $controller = new $class($userRepo);
-                        break;
-                    default:
-                        $controller = new $class();
-                        break;
+                // Manual DI for AuthController
+                if ($class === \App\Controllers\AuthController::class) {
+                    $pdo = $GLOBALS['pdo'];
+                    $userRepo = new \App\Repositories\UserRepository($pdo);
+                    $userService = new \App\Services\UserService($userRepo);
+                    $controller = new $class($userService);
+                } else {
+                    $controller = new $class();
                 }
-
-                /* if (!method_exists($controller, $method)) {
-                    http_response_code(500);
-                    echo "Method not found: " . htmlspecialchars($class . '::' . $method);
-                    return;
-                }
-
-                // Ensure session exists
-                if (session_status() !== PHP_SESSION_ACTIVE) {
-                    session_start();
-                }
-
-                // Protect all admin routes
-                $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
-                if (str_starts_with($path, '/admin')) {
-                    \App\Core\Middleware::requireAdmin();
-                }
-                    */
-
 
                 call_user_func_array([$controller, $method], array_values($vars));
                 return;
-
         }
     }
 }
