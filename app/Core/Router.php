@@ -13,8 +13,10 @@ class Router
     public function dispatch(): void
     {
         $dispatcher = simpleDispatcher(function (RouteCollector $r) {
-
-
+            // login routes
+            $r->addRoute('GET', '/login', [\App\Controllers\AuthController::class, 'login']);
+            $r->addRoute('POST', '/login', [\App\Controllers\AuthController::class, 'processLogin']);
+            $r->addRoute('GET', '/logout', [\App\Controllers\AuthController::class, 'logout']);
         });
 
         $httpMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -49,12 +51,18 @@ class Router
 
                 // Build controller (inject dependencies when needed)
                 switch ($class) {               
+                    case \App\Controllers\AuthController::class:
+                        // Pull the PDO from global scope and inject into the Repository
+                        $pdo = $GLOBALS['pdo'];
+                        $userRepo = new \App\Repositories\UserRepository($pdo);
+                        $controller = new $class($userRepo);
+                        break;
                     default:
                         $controller = new $class();
                         break;
                 }
 
-               /* if (!method_exists($controller, $method)) {
+                /* if (!method_exists($controller, $method)) {
                     http_response_code(500);
                     echo "Method not found: " . htmlspecialchars($class . '::' . $method);
                     return;

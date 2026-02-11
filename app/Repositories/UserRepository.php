@@ -5,11 +5,28 @@ use App\Models\User;
 
 class UserRepository implements IUserRepository
 {
-    public function findUserByEmail(string $email): ?User
+    protected \PDO $db;
+
+    public function __construct(\PDO $db)
     {
-        // Implement database logic to find a user by email
-        return null; // Placeholder return
+        $this->db = $db;
     }
+    // David
+   public function findUserByEmail(string $identifier): ?User
+    {
+        $stmt = $this->db->prepare("SELECT * FROM user WHERE email = :id OR username = :id LIMIT 1");
+        $stmt->execute(['id' => $identifier]);
+
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return null;
+        }
+
+        return User::fromArray($row);
+    }
+
+//
 
     public function findUserById(int $id): ?User
     {

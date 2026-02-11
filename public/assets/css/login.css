@@ -1,0 +1,173 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.split-screen {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* LEFT PANEL STYLES */
+.left-panel {
+    flex: 1;
+    position: relative;
+    /* Changed to absolute path starting from / */
+    background: url('/assets/images/shared/loginImage.avif') no-repeat center center; 
+    background-size: cover;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 10%;
+}
+
+/* The Red Gradient Overlay from your image */
+.left-panel .overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(179, 44, 25, 0.85) 0%, rgba(60, 10, 5, 0.7) 100%);
+    z-index: 1;
+}
+
+.left-content {
+    position: relative;
+    z-index: 2;
+    max-width: 500px;
+}
+
+.left-content h1 {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+}
+
+.left-content h1 span {
+    color: #ffc107; /* Golden yellow for 'Haarlem' */
+}
+
+.left-content p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+/* RIGHT PANEL STYLES */
+.right-panel {
+    flex: 1;
+    background: #fdf8f7; /* Slight off-white pinkish tint from image */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #666;
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 2rem;
+}
+
+.form-container h2 {
+    font-size: 2rem;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 2.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    color: #999;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 14px 15px 14px 45px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    font-size: 1rem;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+}
+
+.forgot-link {
+    text-align: right;
+    margin-top: 8px;
+}
+
+.forgot-link a {
+    color: #b32c19;
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+
+.btn-signin {
+    width: 100%;
+    padding: 16px;
+    background: #7a1a0d; /* Deep red from the image */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.signup-prompt {
+    text-align: center;
+    margin-top: 2rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.signup-prompt a {
+    color: #b32c19;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Responsive for Mobile */
+@media (max-width: 900px) {
+    .left-panel { display: none; }
+}

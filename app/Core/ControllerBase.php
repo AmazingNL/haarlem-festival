@@ -3,13 +3,14 @@
 
 declare(strict_types=1);
 namespace App\Core;
-abstract class BaseController
-{
-    protected \PDO $db;
 
-    public function __construct(\PDO $db)
+abstract class ControllerBase
+{
+    protected ?\App\Repositories\UserRepository $userRepository = null;
+
+    public function __construct(?\App\Repositories\UserRepository $userRepository = null)
     {
-        $this->db = $db;
+        $this->userRepository = $userRepository;
 
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
@@ -22,16 +23,32 @@ abstract class BaseController
         http_response_code($status);
         extract($data, EXTR_SKIP);
 
-        // Example: views/events/index.php
-        $path = __DIR__ . '/../../views/' . ltrim($template, '/');
-        if (!str_ends_with($path, '.php')) $path .= '.php';
+        // Resolve view path from app directory (robust to casing)
+        $base = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+        $candidates = [
+            $base . 'Views' . DIRECTORY_SEPARATOR . ltrim($template, '/'),
+            $base . 'views' . DIRECTORY_SEPARATOR . ltrim($template, '/'),
+        ];
 
-        if (!is_file($path)) {
+        $path = null;
+        foreach ($candidates as $c) {
+            $p = $c;
+            if (!str_ends_with($p, '.php')) $p .= '.php';
+            if (is_file($p)) { $path = $p; break; }
+        }
+
+        if ($path === null) {
             $this->abort(500, "View not found: {$template}");
         }
 
         require $path;
         exit;
+    }
+
+    // Alias used by controllers
+    protected function render(string $template, array $data = [], int $status = 200): void
+    {
+        $this->view($template, $data, $status);
     }
 
     // ---------- JSON ----------
@@ -131,6 +148,23 @@ abstract class BaseController
         $token = (string)($_POST['_csrf'] ?? '');
         if ($token === '' || !hash_equals((string)($_SESSION['_csrf'] ?? ''), $token)) {
             $this->abort(419, 'CSRF token mismatch');
+        }
+    }
+
+    // Redirect users after login based on role
+    protected function handleRedirect(\App\Models\User $user): void
+    {
+        $role = $user->role->value ?? '';
+        switch ($role) {
+            case 'admin':
+                $this->redirect('/admin');
+                break;
+            case 'employee':
+                $this->redirect('/employee');
+                break;
+            default:
+                $this->redirect('/');
+                break;
         }
     }
 
