@@ -5,17 +5,6 @@ declare(strict_types=1);
 namespace App\Core;
 abstract class BaseController
 {
-    protected \PDO $db;
-
-    public function __construct(\PDO $db)
-    {
-        $this->db = $db;
-
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
-    }
-
     // ---------- Views ----------
     protected function view(string $template, array $data = [], int $status = 200): void
     {
@@ -51,14 +40,14 @@ abstract class BaseController
     }
 
     // ---------- Request helpers ----------
-    protected function method(): string
+    protected function httpMethod(): string
     {
         return strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
     }
 
     protected function isPost(): bool
     {
-        return $this->method() === 'POST';
+        return $this->httpMethod() === 'POST';
     }
 
     protected function input(string $key, mixed $default = null): mixed
@@ -70,8 +59,8 @@ abstract class BaseController
     protected function requireFields(array $keys): void
     {
         foreach ($keys as $k) {
-            $v = $this->input($k, null);
-            if ($v === null || (is_string($v) && trim($v) === '')) {
+            $value = $this->input($k, null);
+            if ($value === null || (is_string($value) && trim($value) === '')) {
                 $this->abort(422, "Missing field: {$k}");
             }
         }
@@ -95,6 +84,10 @@ abstract class BaseController
         return isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
     }
 
+    protected function adminId(): ?int
+    {
+        return isset($_SESSION['admin_user_id']) ? (int)$_SESSION['admin_user_id'] : null;
+    }
     protected function userRole(): ?string
     {
         return isset($_SESSION['role']) ? (string)$_SESSION['role'] : null;
@@ -126,7 +119,7 @@ abstract class BaseController
 
     protected function verifyCsrf(): void
     {
-        if ($this->method() !== 'POST') return;
+        if ($this->httpMethod() !== 'POST') return;
 
         $token = (string)($_POST['_csrf'] ?? '');
         if ($token === '' || !hash_equals((string)($_SESSION['_csrf'] ?? ''), $token)) {

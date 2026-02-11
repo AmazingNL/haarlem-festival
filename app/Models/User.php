@@ -30,16 +30,16 @@ final class User extends BaseEntity
         $rawRole = $row['role'] ?? null;
         unset($row['role']); // prevent parent from assigning a raw string to the enum-typed property
 
-        $u = parent::fromArray($row);
+        $user = parent::fromArray($row);
 
         if ($rawRole !== null) {
-            // Prefer tryFrom to avoid ValueError on invalid values (PHP 8.1+)
+            //  tryFrom to avoid ValueError on invalid values 
             $role = UserRole::tryFrom((string) $rawRole);
             if ($role !== null)
-                $u->role = $role;
+                $user->role = $role;
         }
 
-        return $u;
+        return $user;
     }
 
 }
