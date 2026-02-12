@@ -5,88 +5,121 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, width=device-width">
 
-    <link rel="stylesheet" href="./main.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arimo:wght@400&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" />
-
-
-
+    <link rel="stylesheet" href="./assets/css/main.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" />
 </head>
 
 <body>
 
-    <div class="component-72">
-        <div class="logo-parent">
-            <div class="logo" id="logoContainer">
-                <div class="ha">HA</div>
-                <div class="rlem">RLEM</div>
-                <img class="logo-child" alt="">
+    <header class="header">
+        <nav class="navbar">
+            <!-- Logo Section -->
+            <a href="#" class="logo-link">
+                <span class="logo-text">HA</span>
+                <img class="logo-icon" alt="logo" src="./assets/svg/main/Star 3.svg">
+                <span class="logo-text">RLEM</span>
+            </a>
 
+            <!-- Hamburger Menu Button (Mobile) -->
+            <button class="menu-toggle" aria-label="Toggle menu">
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+            </button>
+
+            <!-- Navigation Links -->
+            <ul class="nav-links">
+                <li><a href="#" class="nav-link">History</a></li>
+                <li><a href="#" class="nav-link">Stories</a></li>
+                <li><a href="#" class="nav-link">Restaurants</a></li>
+                <li><a href="#" class="nav-link">Jazz</a></li>
+                <li><a href="#" class="nav-link">Dance</a></li>
+                <li><a href="#" class="nav-link">My Programs</a></li>
+            </ul>
+
+            <!-- Icon Actions (User Icons) -->
+            <div class="icon-actions">
+                <button class="icon-btn" aria-label="Search">
+                    <img class="icon-svg icon-search" alt="search icon" src="./assets/svg/main/search.svg">
+                </button>
+                <button class="icon-btn" aria-label="Favorites">
+                    <img class="icon-svg icon-favorites" alt="favorites icon" src="/assets/svg/main/heart.svg">
+                </button>
+                <button class="icon-btn" aria-label="location">
+                    <img class="icon-svg icon-location" alt="location icon" src="/assets/svg/main/location.svg">
+                </button>
             </div>
-            <div class="component-74-parent">
-                <div class="component-74">
-                    <b class="label">History</b>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="main-container">
+            <?php 
+            require $content; 
+            ?>
+        </div>
+    </main>
+
+    <footer class="footer">
+
+
+
+
+    <footer class="footer">
+        <div class="footer-content">
+            <!-- Footer Columns -->
+            <div class="footer-columns">
+                <!-- Culture Column -->
+                <div class="footer-column">
+                    <h3 class="footer-title">Culture</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">History of Haarlem</a></li>
+                        <li><a href="#" class="footer-link">Stories in Haarlem</a></li>
+                    </ul>
                 </div>
-                <div class="component-75">
-                    <b class="label">Stories</b>
+
+                <!-- What to do Column -->
+                <div class="footer-column">
+                    <h3 class="footer-title">What to do</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">Events</a></li>
+                        <li><a href="#" class="footer-link">Food and drinks</a></li>
+                        <li><a href="#" class="footer-link">Haarlem Tickets</a></li>
+                    </ul>
                 </div>
-                <div class="component-75">
-                    <b class="label3" id="labelText">Restaurants</b>
-                </div>
-                <div class="component-75">
-                    <b class="label">Jazz</b>
-                </div>
-                <div class="component-75">
-                    <b class="label">Dance</b>
-                </div>
-                <div class="component-75">
-                    <b class="label">My Programs</b>
+
+                <!-- Follow Us Column -->
+                <div class="footer-column">
+                    <h3 class="footer-title">Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <img class="social-icon" alt="Facebook" src="./assets/svg/main/facebook.svg">
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <img class="social-icon" alt="Instagram" src="./assets/svg/main/instagram.svg">
+                        </a>
+                        <a href="#" class="social-link" aria-label="Youtube">
+                            <img class="social-icon" alt="Youtube" src="./assets/svg/main/youtube.svg">
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div class="component-68-parent">
-                <div class="component-68">
-                    <div class="component-9">
-                        <img class="vector-icon" alt="">
 
-                    </div>
-                </div>
-                <div class="component-68">
-                    <div class="component-9">
-                        <img class="vector-icon2" alt="">
-
-                        <img class="vector-icon3" alt="">
-
-                    </div>
-                </div>
-                <div class="component-68">
-                    <div class="component-9">
-                        <img class="vector-icon4" alt="">
-
-                        <img class="vector-icon5" alt="">
-
-                    </div>
-                </div>
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <p class="footer-copyright">© 2025 Haarlem Marketing. All rights reserved.</p>
+                <nav class="footer-nav">
+                    <a href="#" class="footer-bottom-link">Privacy Policy</a>
+                    <a href="#" class="footer-bottom-link">Terms of Service</a>
+                </nav>
             </div>
         </div>
-    </div>
+    </footer>
 
 
-
-
-    <script>
-        var logoContainer = document.getElementById("logoContainer");
-        if (logoContainer) {
-            logoContainer.addEventListener("click", function (e) {
-                // Add your code here
-            });
-        }
-
-        var labelText = document.getElementById("labelText");
-        if (labelText) {
-            labelText.addEventListener("click", function (e) {
-                // Add your code here
-            });
-        }</script>
+    <script src="./assets/js/navbar.js"></script>
 </body>
 
 </html>
