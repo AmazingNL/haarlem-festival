@@ -6,6 +6,9 @@ namespace App\Core;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use function FastRoute\cachedDispatcher;
+use App\Core\Middleware;
+use App\Controllers\AuthController;
+use App\Controllers\HomeController;
 
 final class Router
 {
@@ -59,7 +62,21 @@ final class Router
         $cacheDisabled = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
 
         return cachedDispatcher(function (RouteCollector $r) {
-            // your routes here
+            // admin route 
+
+            $r->get('/admin/login', [AuthController::class, 'showLogin']);
+            $r->post('/admin/login', [AuthController::class, 'login']);
+            $r->get('/admin/logout', [AuthController::class, 'logout']);
+            //$r->get('/admin/dashboard', [AdminController::class, 'index']);
+
+            //app route
+            $r->get('/login', [AuthController::class, 'showLogin']);
+            $r->post('/login', [AuthController::class, 'login']);
+            $r->get('/logout', [AuthController::class, 'logout']);
+
+            $r->get('/', [HomeController::class, 'index']);
+
+            // Add more routes as needed
         }, [
             'cacheFile' => $cacheFile,
             'cacheDisabled' => $cacheDisabled,
@@ -99,11 +116,14 @@ final class Router
 
     private function isAdminPath(string $path): bool
     {
-        if ($this->isAdminPath($path)) {
+        if (str_starts_with($path, '/admin')) {
             Middleware::requireAdmin();
+            return true;
         }
-        return str_starts_with($path, '/admin');
+
+        return false;
     }
+
 
     private function isHttps(): bool
     {

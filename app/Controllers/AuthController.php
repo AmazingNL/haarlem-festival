@@ -86,10 +86,9 @@ final class AuthController extends BaseController
 
     private function switchSession(string $sessionName): void
     {
-        // Close any session that might already be open (important)
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            session_write_close();
-        }
+        // Close any session that might already be open
+        $this->ensureSession();
+        session_write_close();
 
         session_name($sessionName);
         session_start();
