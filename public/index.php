@@ -1,14 +1,28 @@
 <?php
 declare(strict_types=1);
 
-// Load Composer autoloader
 require __DIR__ . '/../vendor/autoload.php';
 
-// Load .env (simple version, no library)
+/**
+ * Load .env into $_ENV (simple version).
+ * INI_SCANNER_RAW avoids PHP auto-converting values in unexpected ways.
+ */
 $envFile = __DIR__ . '/../.env';
-if (file_exists($envFile)) {
-    $env = parse_ini_file($envFile);
-    foreach ($env as $key => $value) {
-        $_ENV[$key] = $value;
+if (is_file($envFile)) {
+    $env = parse_ini_file($envFile, false, INI_SCANNER_RAW);
+    foreach ($env as $k => $v) {
+        $_ENV[$k] = $v;
     }
 }
+
+$debug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
+error_reporting(E_ALL);
+ini_set('display_errors', $debug ? '1' : '0');
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+$router = new \App\Core\Router();
+$router->dispatch();
+

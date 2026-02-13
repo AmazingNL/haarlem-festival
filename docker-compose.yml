@@ -1,4 +1,3 @@
-
 services:
     nginx:
         image: nginx:latest
@@ -7,31 +6,63 @@ services:
         volumes:
             - ./nginx.conf:/etc/nginx/nginx.conf
             - ./:/app
-        depends_on: 
-        - php
+        depends_on:
+            - php
+
     php:
         build:
-            context: .           
+            context: .
             dockerfile: PHP.Dockerfile
         volumes:
             - ./:/app
         working_dir: /app
+
     mysql:
         image: mariadb:latest
         environment:
-            MYSQL_ROOT_PASSWORD: 'secret123'
-            MYSQL_USER: 'developer'
-            MYSQL_PASSWORD: 'secret123' 
-            MYSQL_DATABASE: 'haarlem_festival'
+            MARIADB_ROOT_PASSWORD: "secret123"
+            MARIADB_USER: "developer"
+            MARIADB_PASSWORD: "secret123"
+            MARIADB_DATABASE: "haarlem_festival"
         volumes:
             - mysqldata:/var/lib/mysql
         ports:
-            - 3306:3306
+            - "3306:3306"
+        healthcheck:
+            test:
+                [
+                    "CMD",
+                    "mariadb-admin",
+                    "ping",
+                    "-h",
+                    "localhost",
+                    "-u",
+                    "root",
+                    "-psecret123",
+                ]
+            interval: 2s
+            timeout: 2s
+            retries: 30
+
     phpmyadmin:
         image: phpmyadmin:latest
         ports:
-            - 8080:80
+            - "8080:80"
         environment:
             - PMA_HOST=mysql
+        depends_on:
+            - mysql
+
+    dbmate:
+        image: amacneil/dbmate:latest
+        depends_on:
+            mysql:
+                condition: service_healthy
+        environment:
+            DATABASE_URL: "mysql://developer:secret123@mysql:3306/haarlem_festival"
+        volumes:
+            - ./db:/db
+        working_dir: /db
+        # default command is fine; we usually run it with `docker compose run`
 volumes:
     mysqldata: {}
