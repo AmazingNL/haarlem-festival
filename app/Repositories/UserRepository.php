@@ -7,8 +7,8 @@ use App\Core\BaseRepository;
 use App\Repositories\IUserRepository;
 class UserRepository extends BaseRepository implements IUserRepository
 {
-    private const TABLE = 'users';
-    private const PK    = 'id';
+    private const TABLE = 'user';
+    private const PK    = 'user_id';
 
     public function __construct()
     {
@@ -194,5 +194,20 @@ class UserRepository extends BaseRepository implements IUserRepository
 
         // Fallback
         return get_object_vars($user);
+    }
+    public function existsByEmailOrUsername(string $email, string $username): bool
+    {
+        $sql = "SELECT 1
+            FROM " . self::TABLE . "
+            WHERE email = :email OR username = :username
+            LIMIT 1";
+
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute([
+            ':email' => $email,
+            ':username' => $username
+        ]);
+
+        return (bool)$stmt->fetchColumn();
     }
 }
