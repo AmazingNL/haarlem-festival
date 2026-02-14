@@ -8,7 +8,7 @@ use App\Repositories\IUserRepository;
 class UserRepository extends BaseRepository implements IUserRepository
 {
     private const TABLE = 'users';
-    private const PK    = 'id';
+    private const PK = 'user_id';
 
     public function __construct()
     {
@@ -18,34 +18,47 @@ class UserRepository extends BaseRepository implements IUserRepository
     public function findUserByEmail(string $email): ?User
     {
         // Login requirement says "username OR e-mail", so we search both.
-        $sql = "SELECT *
-                FROM " . self::TABLE . "
-                WHERE email = :value OR username = :value
-                LIMIT 1";
+        try {
+            $sql = "SELECT *
+                    FROM " . self::TABLE . "
+                    WHERE email = :value OR username = :value
+                    LIMIT 1";
 
-        $stmt = $this->getConnection()->prepare($sql);
-        $stmt->execute([':value' => $email]);
-        $row = $stmt->fetch();
-        return $row ? $this->rowToUser($row[0]) : null;
+            $stmt = $this->getConnection()->prepare($sql);
+            $stmt->execute([':value' => $email]);
+            $row = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            if ($row) {
+                return $this->rowToUser($row[0]);
+            } else {
+                return null;
+            }
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
+        }
     }
 
     public function findUserById(int $id): ?User
     {
-        $sql = "SELECT *
+        try {
+
+            $sql = "SELECT *
                 FROM " . self::TABLE . "
                 WHERE " . self::PK . " = :id
                 LIMIT 1";
 
-        $stmt = $this->getConnection()->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        $row = $stmt->fetch();
+            $stmt = $this->getConnection()->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            $row = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        return $row ? $this->rowToUser($row[0] ) : null;
+            return $row ? $this->rowToUser($row[0]) : null;
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
+        }
     }
 
     public function createUser(User $user): User
     {
-        // Expect password already hashed BEFORE calling this (service layer).
+        try {
         $sql = "INSERT INTO " . self::TABLE . "
                 (email, username, password_hash, first_name, last_name, role, created_at, updated_at)
                 VALUES
@@ -55,24 +68,29 @@ class UserRepository extends BaseRepository implements IUserRepository
 
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([
-            ':email'         => $data['email'],
-            ':username'      => $data['username'],
+            ':email' => $data['email'],
+            ':username' => $data['username'],
             ':password_hash' => $data['password_hash'],
-            ':first_name'    => $data['first_name'],
-            ':last_name'     => $data['last_name'],
-            ':role'          => $data['role'],
+            ':first_name' => $data['first_name'],
+            ':last_name' => $data['last_name'],
+            ':role' => $data['role'],
         ]);
 
-        $newId = (int)$this->getConnection()->lastInsertId();
+        $newId = (int) $this->getConnection()->lastInsertId();
 
         // Return freshly loaded user
         return $this->findUserById($newId) ?? $user;
+        } 
+        catch (\Exception $e) {
+            throw new \RuntimeException('Failed to create user. ' . $e->getMessage());
+        }
     }
 
     public function updateUser(User $user): User
     {
+        try {
         $data = $this->userToDbArray($user);
-        $id = (int)($data[self::PK] ?? 0);
+        $id = (int) ($data[self::PK] ?? 0);
 
         if ($id <= 0) {
             throw new \InvalidArgumentException("User id is required for update.");
@@ -87,18 +105,18 @@ class UserRepository extends BaseRepository implements IUserRepository
                     first_name = :first_name,
                     last_name = :last_name,
                     role = :role"
-                . ($setPassword ? ", password_hash = :password_hash" : "")
-                . ",
+            . ($setPassword ? ", password_hash = :password_hash" : "")
+            . ",
                     updated_at = NOW()
                 WHERE " . self::PK . " = :id";
 
         $params = [
-            ':email'      => $data['email'],
-            ':username'   => $data['username'],
+            ':email' => $data['email'],
+            ':username' => $data['username'],
             ':first_name' => $data['first_name'],
-            ':last_name'  => $data['last_name'],
-            ':role'       => $data['role'],
-            ':id'         => $id,
+            ':last_name' => $data['last_name'],
+            ':role' => $data['role'],
+            ':id' => $id,
         ];
 
         if ($setPassword) {
@@ -109,28 +127,41 @@ class UserRepository extends BaseRepository implements IUserRepository
         $stmt->execute($params);
 
         return $this->findUserById($id) ?? $user;
+        } 
+        catch (\Exception $e) {
+            throw new \RuntimeException('Failed to update user. ' . $e->getMessage());
+        }
     }
 
     public function deleteUser(int $id): bool
     {
+        try {
         $sql = "DELETE FROM " . self::TABLE . " WHERE " . self::PK . " = :id";
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([':id' => $id]);
 
         return $stmt->rowCount() > 0;
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to delete user. ' . $e->getMessage());
+        }
     }
 
     public function findAllUsers(): array
     {
+        try {
         $sql = "SELECT * FROM " . self::TABLE . " ORDER BY created_at DESC";
         $stmt = $this->getConnection()->query($sql);
 
-        $rows = $stmt->fetch();
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return array_map([$this, 'rowToUser'], $rows);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to retrieve users. ' . $e->getMessage());
+        }
     }
 
     public function findByRole(string $role): array
     {
+        try {
         $sql = "SELECT *
                 FROM " . self::TABLE . "
                 WHERE role = :role
@@ -139,13 +170,16 @@ class UserRepository extends BaseRepository implements IUserRepository
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([':role' => $role]);
 
-        $rows = $stmt->fetch();
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return array_map([$this, 'rowToUser'], $rows);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to retrieve users by role. ' . $e->getMessage());
+        }
     }
 
     public function findByName(string $name): array
     {
-        // Simple search across first+last; adjust if your model differs.
+        try {
         $sql = "SELECT *
                 FROM " . self::TABLE . "
                 WHERE first_name LIKE :q
@@ -156,8 +190,11 @@ class UserRepository extends BaseRepository implements IUserRepository
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([':q' => '%' . $name . '%']);
 
-        $rows = $stmt->fetch();
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return array_map([$this, 'rowToUser'], $rows);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to retrieve users by name. ' . $e->getMessage());
+        }
     }
 
     // ----------------------------

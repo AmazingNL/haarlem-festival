@@ -8,22 +8,20 @@ use PDO;
 class BaseRepository
 {
     protected PDO $connection;
-
-    /** @var PDO|null */
     private static ?PDO $sharedConnection = null;
 
     public function __construct()
     {
         if (self::$sharedConnection === null) {
-            $config = new Config();
+            // Use Config methods/constants for DB connection details
+            $dsn = 'mysql:host=' . Config::DB_SERVER_NAME
+                . ';dbname=' . Config::dbName()
+                . ';charset=utf8mb4';
 
-            self::$sharedConnection = new PDO(
-                'mysql:host=' . $config::DB_SERVER_NAME .
-                ';dbname=' . $config::DB_NAME .
-                ';charset=utf8mb4',
-                $config::DB_USERNAME,
-                $config::DB_PASSWORD
-            );
+            $username = Config::dbUser();
+            $password = Config::dbPassword();
+
+            self::$sharedConnection = new PDO($dsn, $username, $password);
 
             self::$sharedConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             self::$sharedConnection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);

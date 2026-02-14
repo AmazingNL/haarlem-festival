@@ -15,9 +15,11 @@ final class AuthController extends BaseController
         $this->userService = $userService;
     }
 
-    public function showLoginForm(): void
+    public function showLogin(): void
     {
-        $this->view('auth/login');
+        $this->view('auth/login', 
+        ['title' => 'Login'],
+        layout: '/auth');
     }
 
     public function login(): void
