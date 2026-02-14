@@ -10,4 +10,5 @@ interface IUserService
     public function updateUser(User $user): User;
     public function deleteUser(int $id): bool;
     public function listUsers(): array;
+    public function userExists(string $email, string $username): bool;
 }

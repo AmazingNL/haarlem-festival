@@ -15,7 +15,63 @@ final class AuthController extends BaseController
         $this->userService = $userService;
     }
 
-    public function showLogin(): void
+    //registration part from here
+    public function showRegisterForm(): void
+    {
+        $this->view('auth/register');
+    }
+
+    public function register(): void
+    {
+        if (!$this->isPost()) $this->abort(405, 'Method Not Allowed');
+        $this->verifyCsrf();
+        [$user, $plainPassword] = $this->hydrateRegistrationUser();
+        $this->ensureRegistrationIsUnique($user);
+        $created = $this->userService->registerUser($user, $plainPassword);
+        $this->loginAndRedirect($created);
+    }
+
+    private function hydrateRegistrationUser(): array
+    {
+        $this->requireFields(['first_name', 'last_name', 'username', 'email', 'password']);
+
+        $email = $this->str('email');
+        $password = $this->str('password');
+
+        $this->validateRegistrationInput($email, $password);
+
+        $user = new User();
+        $user->first_name = $this->str('first_name');
+        $user->last_name  = $this->str('last_name');
+        $user->username   = $this->str('username');
+        $user->email      = $email;
+        $user->phone      = isset($_POST['phone']) ? trim((string)$_POST['phone']) : null;
+        $user->role       = UserRole::customer;
+
+        return [$user, $password];
+    }
+
+    private function validateRegistrationInput(string $email, string $password): void
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->abort(422, 'Invalid email address');
+        }
+
+        if (mb_strlen($password) < 8) {
+            $this->abort(422, 'Password must be at least 8 characters');
+        }
+    }
+
+    private function ensureRegistrationIsUnique(User $user): void
+    {
+        if (method_exists($this->userService, 'userExists')
+            && $this->userService->userExists($user->email, $user->username)) {
+            $this->abort(409, 'Email or username already exists');
+        }
+    }
+
+    //login part from here
+    public function showLoginForm(): void
     {
         $this->view('auth/login', 
         ['title' => 'Login'],
