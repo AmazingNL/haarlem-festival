@@ -18,7 +18,9 @@ final class AuthController extends BaseController
     //registration part from here
     public function showRegisterForm(): void
     {
-        $this->view('auth/register');
+        $this->view('auth/register',
+        $data = ['title' => 'Registration'],
+        $layout ='auth'  );
     }
 
     public function register(): void
