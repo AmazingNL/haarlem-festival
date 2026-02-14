@@ -12,12 +12,6 @@ final class AdminPageController extends BaseController
 
     public function __construct(IAdminPageService $iAdminPageService)
     {
-        // Allow instantiation without DI: create defaults when none provided
-        if ($iAdminPageService === null) {
-            $repo = new AdminPageRepository();
-            $iAdminPageService = new AdminPageService($repo);
-        }
-
         $this->iAdminPageService = $iAdminPageService;
     }
     public function index(): void
