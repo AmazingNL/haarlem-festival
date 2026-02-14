@@ -9,6 +9,11 @@ use function FastRoute\cachedDispatcher;
 use App\Core\Middleware;
 use App\Controllers\AuthController;
 use App\Controllers\HomeController;
+use App\Controllers\AdminPageController;
+use App\Repositories\AdminPageRepository;
+use App\Services\AdminPageService;
+use App\Services\UserService;
+use App\Repositories\UserRepository;
 
 final class Router
 {
@@ -44,7 +49,19 @@ final class Router
                     Middleware::requireAdmin();
                 }
 
-                $controller = new $class();
+                if ($class === AdminPageController::class) {
+                    $repo = new AdminPageRepository();
+                    $service = new AdminPageService($repo);
+                    $controller = new $class($service);
+                } 
+                elseif ($class === AuthController::class) {
+                    $repo = new UserRepository();
+                    $service = new UserService($repo);
+                    $controller = new $class($service);
+                }
+                else {
+                    $controller = new $class();
+                }
 
                 if (!method_exists($controller, $method)) {
                     $this->respond(500, 'Method not found');
@@ -67,7 +84,7 @@ final class Router
             $r->get('/admin/login', [AuthController::class, 'showLogin']);
             $r->post('/admin/login', [AuthController::class, 'login']);
             $r->get('/admin/logout', [AuthController::class, 'logout']);
-            //$r->get('/admin/dashboard', [AdminController::class, 'index']);
+            $r->get('/admin/dashboard', [AdminPageController::class, 'index']);
 
             //app route
             $r->get('/login', [AuthController::class, 'showLogin']);

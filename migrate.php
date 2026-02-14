@@ -1,5 +1,5 @@
 <?php
-// migrate.php - Simple migration runner
+// migrate.php - Simple migrations runner
 
 if (!isset($argv[1]) || !in_array($argv[1], ['up', 'down'])) {
     die("Usage: php migrate.php [up|down]\n");
@@ -17,7 +17,7 @@ try {
     ]);
     
     if ($action === 'up') {
-        $migrations = glob(__DIR__ . '/db/migration/*.sql');
+        $migrations = glob(__DIR__ . '/db/migrations/*.sql');
         sort($migrations);
         
         foreach ($migrations as $file) {

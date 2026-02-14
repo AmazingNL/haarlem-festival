@@ -33,3 +33,9 @@ enum ProgramItemSource: string {
     case ticket='ticket'; 
     case saved='saved'; 
     }
+
+enum PageStatus: string { 
+    case draft='draft'; 
+    case published='published'; 
+    case archived='archived'; 
+    }

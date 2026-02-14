@@ -49,4 +49,9 @@ final class UserService implements IUserService
     {
         return $this->userRepo->findAllUsers();
     }
+
+    public function userExists(string $email, string $username): bool
+    {
+        return $this->userRepo->existsByEmailOrUsername($email, $username);
+    }
 }

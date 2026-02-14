@@ -20,3 +20,10 @@ Thumbs.db
 
 # DB sample data
 db/02_sample_data.sql
+
+# Local logs created by container
+/logs/php/
+
+# Ignore runtime php.ini if generated or copied locally
+docker/php.ini
+
