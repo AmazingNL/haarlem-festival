@@ -9,6 +9,7 @@ abstract class BaseController
     protected function view(string $template, array $data = [], ?string $layout = 'main', int $status = 200): void
     {
         $data['csrf'] ??= $this->csrfToken();
+        $data['flash'] ??= $this->getAllFlash();
         http_response_code($status);
         extract($data, EXTR_SKIP);
 
@@ -36,9 +37,10 @@ abstract class BaseController
     }
 
     // ---------- Redirect ----------
-    protected function redirect(string $to, int $status = 302): void
+    protected function redirect(string $to, $status = 302): void
     {
-        header('Location: ' . $to, true, $status);
+        header('Location: ' . $to, true,  $status);
+
         exit;
     }
 
@@ -139,6 +141,33 @@ abstract class BaseController
         if ($token === '' || !hash_equals((string) ($_SESSION['_csrf'] ?? ''), $token)) {
             $this->abort(419, 'CSRF token mismatch');
         }
+    }
+
+    // ---------- Flash messages (one-time session messages) ----------
+    protected function setFlash(string $key, mixed $value): void
+    {
+        $this->ensureSession();
+        $_SESSION['_flash'][$key] = $value;
+    }
+
+    protected function getFlash(string $key): mixed
+    {
+        $this->ensureSession();
+        if (!isset($_SESSION['_flash'][$key])) {
+            return null;
+        }
+        $val = $_SESSION['_flash'][$key];
+        unset($_SESSION['_flash'][$key]);
+        return $val;
+    }
+
+    protected function getAllFlash(): array
+    {
+        $this->ensureSession();
+        $all = $_SESSION['_flash'] ?? [];
+        // clear all flash messages after reading
+        unset($_SESSION['_flash']);
+        return is_array($all) ? $all : [];
     }
 
     // ---------- Errors ----------

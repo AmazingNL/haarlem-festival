@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Page;
 use App\Repositories\IAdminPageRepository;
+use App\Models\Enum\PageStatus;
 
 final class AdminPageService implements IAdminPageService
 {
@@ -32,9 +33,7 @@ final class AdminPageService implements IAdminPageService
         try {
             return $this->repository->createPage($pageData);
         } catch (\Throwable $e) {
-            throw new \RuntimeException(
-                'Failed creating page for slug ' 
-                . ($pageData['slug'] ?? 'n/a'), 0, $e);
+            throw new \RuntimeException($e);
         }
     }
 
@@ -47,4 +46,26 @@ final class AdminPageService implements IAdminPageService
     {
         return $this->repository->deletePage($id);
     }
+
+    public function getPublishedPages(): array
+    {
+        $pages = $this->repository->getAllPages();
+        return array_values(array_filter($pages,
+            fn($p) => (((isset($p->status) && $p->status instanceof PageStatus)
+                ? $p->status->value
+                : (string) ($p->status ?? '')) === PageStatus::published->value)
+        ));
+    }
+
+    public function getPageBySlug(string $slug): ?Page
+    {
+        $pages = $this->repository->getAllPages();
+        foreach ($pages as $page) {
+            if ($page->slug === $slug) {
+                return $page;
+            }
+        }
+        return null;
+    }
+
 }

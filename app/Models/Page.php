@@ -13,8 +13,6 @@ final class Page extends BaseEntity
     public string $title = '';
     public string $slug = '';
     public string $content = '';
-    public int $is_published = 0;
-
     public ?string $created_at = null;
     public ?string $updated_at = null;
     public PageStatus $status = PageStatus::draft;
@@ -25,18 +23,17 @@ final class Page extends BaseEntity
         $title = '',
         $slug = '',
         $content = '',
-        $is_published = 0,
         $created_at = null,
-        $updated_at = null
+        $updated_at = null,
+        $status = PageStatus::draft
     ) {
         $this->page_id = $page_id;
         $this->title = $title;
         $this->slug = $slug;
         $this->content = $content;
-        $this->is_published = $is_published;
         $this->created_at = $created_at;
         $this->updated_at = $updated_at;
-        $this->status = PageStatus::draft;
+        $this->status = $status;
     }
     public static function fromArray(array $row): static
     {

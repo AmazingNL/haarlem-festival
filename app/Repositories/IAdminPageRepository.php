@@ -10,4 +10,6 @@ interface IAdminPageRepository
     public function updatePage(int $id, array $pageData): bool;
     public function deletePage(int $id): bool;
 
+
+
 }
