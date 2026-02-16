@@ -34,6 +34,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- =========================
 CREATE TABLE `user` (
   user_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  username VARCHAR(50) NULL, -- Added for "Email OR Username" requirement
   email VARCHAR(255) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   first_name VARCHAR(100) NOT NULL,
@@ -46,13 +47,14 @@ CREATE TABLE `user` (
   billing_city VARCHAR(120) NULL,
   billing_country VARCHAR(120) NULL,
 
-  profile_image_id BIGINT UNSIGNED NULL, -- FK added after IMAGE exists
+  profile_image_id BIGINT UNSIGNED NULL,
 
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   PRIMARY KEY (user_id),
-  UNIQUE KEY uq_user_email (email)
+  UNIQUE KEY uq_user_email (email),
+  UNIQUE KEY uq_user_username (username) -- Added unique constraint for username
 ) ENGINE=InnoDB;
 
 -- =========================
@@ -153,7 +155,7 @@ CREATE TABLE ticket_type (
   event_id BIGINT UNSIGNED NOT NULL,
   name VARCHAR(120) NOT NULL,
   price DECIMAL(10,2) NOT NULL,
-  vat_rate DECIMAL(5,4) NOT NULL DEFAULT 0.2100, -- 0.2100 = 21%
+  vat_rate DECIMAL(5,4) NOT NULL DEFAULT 0.2100,
   max_quantity INT UNSIGNED NOT NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -208,7 +210,7 @@ CREATE TABLE `order` (
 ) ENGINE=InnoDB;
 
 -- =========================
--- ORDER_TICKET (order lines)
+-- ORDER_TICKET
 -- =========================
 CREATE TABLE order_ticket (
   order_ticket_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -237,12 +239,12 @@ CREATE TABLE order_ticket (
 ) ENGINE=InnoDB;
 
 -- =========================
--- TICKET (individual scan tickets)
+-- TICKET
 -- =========================
 CREATE TABLE ticket (
   ticket_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   order_ticket_id BIGINT UNSIGNED NOT NULL,
-  qr_token CHAR(64) NOT NULL, -- store 64 hex chars (e.g., SHA256), or any 64-length token
+  qr_token CHAR(64) NOT NULL,
   status ENUM('valid','scanned','cancelled') NOT NULL DEFAULT 'valid',
   scanned_at DATETIME NULL,
   scanned_by_user_id BIGINT UNSIGNED NULL,
@@ -268,7 +270,7 @@ CREATE TABLE ticket (
 CREATE TABLE payment (
   payment_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   order_id BIGINT UNSIGNED NOT NULL,
-  provider VARCHAR(50) NOT NULL, -- e.g., mollie, stripe
+  provider VARCHAR(50) NOT NULL,
   provider_payment_id VARCHAR(255) NULL,
   amount DECIMAL(10,2) NOT NULL,
   currency CHAR(3) NOT NULL DEFAULT 'EUR',
@@ -347,7 +349,7 @@ CREATE TABLE invoice_line (
 ) ENGINE=InnoDB;
 
 -- =========================
--- PROGRAM_ITEM (personal program)
+-- PROGRAM_ITEM
 -- =========================
 CREATE TABLE program_item (
   program_item_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

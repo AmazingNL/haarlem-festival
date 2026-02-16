@@ -5,32 +5,24 @@ declare(strict_types=1);
 namespace App\Core;
 abstract class BaseController
 {
-    protected \PDO $db;
-
-    public function __construct(\PDO $db)
-    {
-        $this->db = $db;
-
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
-    }
-
     // ---------- Views ----------
-    protected function view(string $template, array $data = [], int $status = 200): void
+    protected function view(string $template, array $data = [], ?string $layout = 'main', int $status = 200): void
     {
+        $data['csrf'] ??= $this->csrfToken();
         http_response_code($status);
         extract($data, EXTR_SKIP);
 
-        // Example: views/events/index.php
-        $path = __DIR__ . '/../../views/' . ltrim($template, '/');
-        if (!str_ends_with($path, '.php')) $path .= '.php';
-
-        if (!is_file($path)) {
+        $content = __DIR__ . '/../views/' . ltrim($template, '/') . '.php';
+        if (!is_file($content)) {
             $this->abort(500, "View not found: {$template}");
         }
 
-        require $path;
+        $layout = __DIR__ . '/../views/layout/' . ltrim($layout, '/') . '.php';
+        if (!is_file($layout)) {
+            $this->abort(500, "Layout not found: {$layout}");
+        }
+
+        require $layout;
         exit;
     }
 
@@ -51,14 +43,14 @@ abstract class BaseController
     }
 
     // ---------- Request helpers ----------
-    protected function method(): string
+    protected function httpMethod(): string
     {
         return strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
     }
 
     protected function isPost(): bool
     {
-        return $this->method() === 'POST';
+        return $this->httpMethod() === 'POST';
     }
 
     protected function input(string $key, mixed $default = null): mixed
@@ -70,8 +62,8 @@ abstract class BaseController
     protected function requireFields(array $keys): void
     {
         foreach ($keys as $k) {
-            $v = $this->input($k, null);
-            if ($v === null || (is_string($v) && trim($v) === '')) {
+            $value = $this->input($k, null);
+            if ($value === null || (is_string($value) && trim($value) === '')) {
                 $this->abort(422, "Missing field: {$k}");
             }
         }
@@ -80,24 +72,29 @@ abstract class BaseController
     protected function int(string $key, int $default = 0): int
     {
         $v = $this->input($key, null);
-        return ($v === null) ? $default : (int)$v;
+        return ($v === null) ? $default : (int) $v;
     }
 
     protected function str(string $key, string $default = ''): string
     {
         $v = $this->input($key, null);
-        return ($v === null) ? $default : trim((string)$v);
+        return ($v === null) ? $default : trim((string) $v);
     }
 
     // ---------- Auth helpers ----------
+
     protected function userId(): ?int
     {
-        return isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+        return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
     }
 
+    protected function adminId(): ?int
+    {
+        return isset($_SESSION['admin_user_id']) ? (int) $_SESSION['admin_user_id'] : null;
+    }
     protected function userRole(): ?string
     {
-        return isset($_SESSION['role']) ? (string)$_SESSION['role'] : null;
+        return isset($_SESSION['role']) ? (string) $_SESSION['role'] : null;
     }
 
     protected function requireLogin(): void
@@ -116,20 +113,30 @@ abstract class BaseController
     }
 
     // ---------- CSRF (simple) ----------
+
+    protected function ensureSession(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+    }
     protected function csrfToken(): string
     {
+        $this->ensureSession();
         if (empty($_SESSION['_csrf'])) {
             $_SESSION['_csrf'] = bin2hex(random_bytes(32));
         }
-        return (string)$_SESSION['_csrf'];
+        return (string) $_SESSION['_csrf'];
     }
 
     protected function verifyCsrf(): void
     {
-        if ($this->method() !== 'POST') return;
+        if ($this->httpMethod() !== 'POST')
+            return;
 
-        $token = (string)($_POST['_csrf'] ?? '');
-        if ($token === '' || !hash_equals((string)($_SESSION['_csrf'] ?? ''), $token)) {
+        $this->ensureSession();
+        $token = (string) ($_POST['_csrf'] ?? '');
+        if ($token === '' || !hash_equals((string) ($_SESSION['_csrf'] ?? ''), $token)) {
             $this->abort(419, 'CSRF token mismatch');
         }
     }

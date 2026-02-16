@@ -23,7 +23,7 @@ final class Payment extends BaseEntity
     public ?string $paid_at = null;
 
     /** @param array<string,mixed> $row */
-        public static function fromArray(array $row): static
+    public static function fromArray(array $row): static
     {
         $rawRole = $row['status'] ?? null;
         unset($row['status']); // prevent parent from assigning a raw string to the enum-typed property
@@ -31,12 +31,12 @@ final class Payment extends BaseEntity
         $p = parent::fromArray($row);
 
         if ($rawRole !== null) {
-            // Prefer tryFrom to avoid ValueError on invalid values (PHP 8.1+)
-            $role = PaymentStatus::tryFrom((string)$rawRole);
-            if ($role !== null) $p->status  = $role;
+            $role = PaymentStatus::tryFrom((string) $rawRole);
+            if ($role !== null)
+                $p->status = $role;
         }
 
         return $p;
-    
+
     }
 }

@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace App\Core;
 abstract class BaseEntity
 {
-    /** @param array<string,mixed> $row */
     public static function fromArray(array $row): static
     {
         $obj = new static();
-        foreach ($row as $k => $v) {
-            if (property_exists($obj, $k)) {
-                $obj->$k = $v;
+        foreach ($row as $key => $value) {
+            if (property_exists($obj, $key)) {
+                $obj->$key = $value;
             }
         }
         return $obj;
