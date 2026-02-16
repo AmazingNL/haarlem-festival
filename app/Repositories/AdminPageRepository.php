@@ -48,11 +48,12 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
     public function createPage(array $pageData): int
     {
         try {
-            $page = new Page($pageData);
+            // Build Page model from provided array
+            $page = Page::fromArray($pageData);
             $sql = "INSERT INTO " . self::TABLE . "
-                (title, slug, content, is_published, created_at, updated_at, status)
+                (title, slug, content, created_at, updated_at, status)
                 VALUES
-                (:title, :slug, :content, :is_published, NOW(), NOW(), :status)";
+                (:title, :slug, :content, NOW(), NOW(), :status)";
 
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute($this->pageToDbArray($page));
@@ -72,15 +73,15 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
             if ($existingPage === null) {
                 throw new \InvalidArgumentException("Page with ID {$id} does not exist.");
             }
-
-            $page = new Page($pageData);
-            $page->page_id = $id; // Ensure the ID is set for the update
+            // Build Page model from provided array and ensure id
+            $page = Page::fromArray($pageData);
+            $page->page_id = $id;
             $sql = "UPDATE " . self::TABLE . "
-                    SET title = :title, slug = :slug, content = :content, is_published = :is_published, updated_at = NOW(), status = :status
+                    SET title = :title, slug = :slug, content = :content, updated_at = NOW(), status = :status
                     WHERE " . self::PK . " = :id";
             $stmt = $this->getConnection()->prepare($sql);
-            $result = $this->pageToDbArray($page);
-            $stmt->execute($result);
+            $params = $this->pageToDbArray($page);
+            $stmt->execute($params);
             return (bool) $stmt->rowCount();
         } 
         catch (\Exception $e) {
@@ -107,16 +108,22 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
 
     private function pageToDbArray(Page $page): array
     {
-        return [
-            'id' => $page->page_id,
+        $status = $page->status;
+        $statusVal = is_object($status) && property_exists($status, 'value') ? $status->value : (string) $status;
+
+        $result = [
             'title' => $page->title,
             'slug' => $page->slug,
             'content' => $page->content,
-            'is_published' => $page->is_published,
-            'created_at' => $page->created_at,
-            'updated_at' => $page->updated_at,
-            'status' => $page->status->value,
+            'status' => $statusVal,
         ];
+
+        // include id only when present (> 0) as it's required for updates but not inserts
+        if (!empty($page->page_id) && (int)$page->page_id > 0) {
+            $result['id'] = (int) $page->page_id;
+        }
+
+        return $result;
     }
 
 }

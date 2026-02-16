@@ -62,7 +62,7 @@
         <?php endif; ?>
 
         <form action="/register" method="POST" autocomplete="on">
-          <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf_token ?? '') ?>">
+          <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf ?? '') ?>">
 
           <div class="two-col">
             <div class="form-group">

@@ -73,11 +73,11 @@ final class AuthController extends BaseController
     }
 
     //login part from here
-    public function showLoginForm(): void
+    public function showLogin(): void
     {
-        $this->view('auth/login', 
+        $this->view('auth/login', $data =
         ['title' => 'Login'],
-        layout: '/auth');
+        layout: 'auth');
     }
 
     public function login(): void
@@ -131,7 +131,7 @@ final class AuthController extends BaseController
 
         switch ($user->role) {
             case UserRole::customer:
-                $this->redirect('/customer/dashboard');
+                $this->redirect('/loginForm');
                 return;
 
             case UserRole::employee:

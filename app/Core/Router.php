@@ -14,6 +14,8 @@ use App\Repositories\AdminPageRepository;
 use App\Services\AdminPageService;
 use App\Services\UserService;
 use App\Repositories\UserRepository;
+use App\Repositories\PageSectionRepository;
+use App\Services\PageSectionService;
 
 final class Router
 {
@@ -50,16 +52,26 @@ final class Router
                 }
 
                 if ($class === AdminPageController::class) {
-                    $repo = new AdminPageRepository();
-                    $service = new AdminPageService($repo);
-                    $controller = new $class($service);
+                    $pageRepo = new AdminPageRepository();
+                    $pageService = new AdminPageService($pageRepo);
+                    $pageSectionRepo = new PageSectionRepository();
+                    $pageSectionService = new PageSectionService($pageSectionRepo);
+                    $userRepo = new UserRepository();
+                    $userService = new UserService($userRepo);
+                    $controller = new $class($pageService, $pageSectionService, $userService);
                 } 
                 elseif ($class === AuthController::class) {
                     $repo = new UserRepository();
                     $service = new UserService($repo);
                     $controller = new $class($service);
                 }
-                else {
+                elseif ($class === HomeController::class) {
+                    $pageRepo = new AdminPageRepository();
+                    $pageservice = new AdminPageService($pageRepo);
+                    $pageSectionRepo = new PageSectionRepository();
+                    $pageSectionService = new PageSectionService($pageSectionRepo);
+                    $controller = new $class($pageSectionService, $pageservice);
+                } else {
                     $controller = new $class();
                 }
 
@@ -81,13 +93,27 @@ final class Router
         return cachedDispatcher(function (RouteCollector $r) {
             // admin route 
 
+            $r->get('/admin/register', [AuthController::class, 'showRegisterForm']);
+            $r->post('/admin/register', [AuthController::class, 'register']);
             $r->get('/admin/login', [AuthController::class, 'showLogin']);
             $r->post('/admin/login', [AuthController::class, 'login']);
             $r->get('/admin/logout', [AuthController::class, 'logout']);
             $r->get('/admin/dashboard', [AdminPageController::class, 'index']);
+            $r->get('/admin/pages/createPage', [AdminPageController::class, 'createPageForm']);
+            $r->post('/admin/pages/create', [AdminPageController::class, 'createPage']);
+            $r->get('/admin/pages/{page_id:\d+}/edit', [AdminPageController::class, 'editPage']);
+            $r->post('/admin/pages/{page_id:\d+}/edit', [AdminPageController::class, 'editPage']);
+            $r->get('/admin/users', [AdminPageController::class, 'manageUsersPage']);
+            $r->get('/admin/events/{event_id:\d+}', [AdminPageController::class, 'viewEventPage']);
+            $r->get('/admin/events/{event_id:\d+}/delete', [AdminPageController::class, 'deleteEventPage']);
+            $r->get('/admin/events/{event_id:\d+}/edit', [AdminPageController::class, 'updateEventPage']);
+            $r->post('/admin/media/upload', [AdminPageController::class, 'upload']);
+
 
             //app route
-            $r->get('/login', [AuthController::class, 'showLogin']);
+            $r->get('/registerForm', [AuthController::class, 'showRegisterForm']);
+            $r->post('/register', [AuthController::class, 'register']);
+            $r->get('/loginForm', [AuthController::class, 'showLogin']);
             $r->post('/login', [AuthController::class, 'login']);
             $r->get('/logout', [AuthController::class, 'logout']);
 
