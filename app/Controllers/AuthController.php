@@ -122,6 +122,9 @@ final class AuthController extends BaseController
         // Store login info in that session only
         $_SESSION['user_id'] = $user->user_id;
         $_SESSION['role']    = $user->role->value;
+        $_SESSION['first_name'] = $user->first_name;
+        $_SESSION['last_name'] = $user->last_name;
+        $_SESSION['email'] = $user->email;
 
         // Redirect
         if ($isAdmin) {

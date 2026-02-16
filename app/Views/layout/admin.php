@@ -26,6 +26,23 @@
     function isActive($path, $currentPath) {
         return strpos($currentPath, $path) === 0 ? 'active' : '';
     }
+
+    // Helper function to get display name
+    function getDisplayName() {
+        $firstName = $_SESSION['first_name'] ?? '';
+        $lastName = $_SESSION['last_name'] ?? '';
+        $email = $_SESSION['email'] ?? '';
+
+        if (!empty($firstName)) {
+            return trim($firstName . ' ' . $lastName);
+        }
+
+        if (!empty($email)) {
+            return $email;
+        }
+
+        return 'Admin';
+    }
     ?>
 
     <div class="admin-wrapper">
@@ -68,14 +85,27 @@
             <nav class="admin-navbar navbar navbar-expand-lg navbar-light">
                 <div class="container-fluid">
                     <!-- Mobile toggle button -->
-                    <button class="btn btn-link d-lg-none" type="button" id="sidebarToggle">
+                    <button class="btn btn-link d-lg-none text-dark p-0" type="button" id="sidebarToggle">
                         <i class="bi bi-list fs-4"></i>
                     </button>
 
                     <span class="navbar-brand mb-0 h1"><?= $title ?? 'Dashboard' ?></span>
 
-                    <div class="ms-auto">
-                        <span class="text-muted">Admin user controls will be added here</span>
+                    <!-- User controls -->
+                    <div class="ms-auto d-flex align-items-center gap-3">
+                        <!-- User info (if logged in) -->
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <span class="text-muted d-none d-md-inline">
+                                <i class="bi bi-person-circle"></i>
+                                Hi, <?= htmlspecialchars(getDisplayName(), ENT_QUOTES, 'UTF-8') ?>
+                            </span>
+                        <?php endif; ?>
+
+                        <!-- Logout button -->
+                        <a href="/admin/logout" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span class="d-none d-sm-inline ms-1">Logout</span>
+                        </a>
                     </div>
                 </div>
             </nav>
