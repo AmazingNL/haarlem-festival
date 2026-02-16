@@ -110,6 +110,31 @@
                 </div>
             </nav>
 
+            <!-- Breadcrumb -->
+            <?php if (isset($breadcrumbs) && !empty($breadcrumbs)): ?>
+                <div class="breadcrumb-container bg-white border-bottom">
+                    <div class="container-fluid px-4 py-2">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <?php foreach ($breadcrumbs as $crumb): ?>
+                                    <?php if (isset($crumb['url']) && $crumb['url'] !== null): ?>
+                                        <li class="breadcrumb-item">
+                                            <a href="<?= htmlspecialchars($crumb['url'], ENT_QUOTES, 'UTF-8') ?>">
+                                                <?= htmlspecialchars($crumb['label'], ENT_QUOTES, 'UTF-8') ?>
+                                            </a>
+                                        </li>
+                                    <?php else: ?>
+                                        <li class="breadcrumb-item active" aria-current="page">
+                                            <?= htmlspecialchars($crumb['label'], ENT_QUOTES, 'UTF-8') ?>
+                                        </li>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <!-- Page Content -->
             <main class="admin-content">
                 <?php

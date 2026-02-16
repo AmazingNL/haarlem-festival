@@ -18,7 +18,12 @@ final class AdminPageController extends BaseController
     {
         // Dashboard homepage - no DB queries yet, just placeholders
         $this->view('admin/dashboard',
-            ['title' => 'Dashboard'],
+            [
+                'title' => 'Dashboard',
+                'breadcrumbs' => [
+                    ['label' => 'Dashboard', 'url' => null]
+                ]
+            ],
             layout: 'admin'
         );
     }

@@ -80,6 +80,27 @@ body {
     z-index: 999;
 }
 
+/* Breadcrumb */
+.breadcrumb-container {
+    position: sticky;
+    top: var(--navbar-height);
+    z-index: 998;
+}
+
+.breadcrumb-container .breadcrumb {
+    font-size: 0.875rem;
+}
+
+.breadcrumb-container .breadcrumb-item a {
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.breadcrumb-container .breadcrumb-item a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
 /* Content area */
 .admin-content {
     padding: 2rem;
