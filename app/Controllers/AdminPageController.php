@@ -16,13 +16,11 @@ final class AdminPageController extends BaseController
     }
     public function index(): void
     {
-        $pages = $this->iAdminPageService->getAllPages();
-        $data = $pages;
-        $this->view('admin_dashboard/index', 
-        ['page' => $data, 'title' => 'Admin Dashboard'],
-        layout:'/auth'
+        // Dashboard homepage - no DB queries yet, just placeholders
+        $this->view('admin/dashboard',
+            ['title' => 'Dashboard'],
+            layout: 'admin'
         );
-
     }
 
     public function dashboardPage(): void
