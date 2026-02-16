@@ -1,43 +1,68 @@
-<?php
-// Simple login form view
-/** @var string $title */
-/** @var string $csrf */
-?>
-<section class="auth-card">
-    <h1><?= htmlspecialchars($title ?? 'Login', ENT_QUOTES, 'UTF-8') ?></h1>
+<?php ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($title ?? 'Login - Haarlem Festival', ENT_QUOTES, 'UTF-8') ?></title>
 
-    <?php if (!empty($flash['error'])): ?>
-        <div class="flash flash-error"><?= htmlspecialchars($flash['error'], ENT_QUOTES, 'UTF-8') ?></div>
-    <?php endif; ?>
-
-    <form method="post" action="/login" class="auth-form">
-        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf ?? '', ENT_QUOTES, 'UTF-8') ?>">
-
-        <div class="form-row">
-            <label for="email_or_Username">Email or Username</label>
-            <input id="email_or_Username" name="email_or_Username" type="text" required autofocus />
+    <link rel="stylesheet" href="/assets/css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script defer src="/assets/js/login.js"></script>
+</head>
+<body>
+    <div class="split-screen">
+        <div class="left-panel">
+            <div class="overlay"></div>
+            <div class="left-content">
+                <h1>Welcome to <br><span>Haarlem</span></h1>
+                <p>Sign in to explore everything Haarlem has to offer—from stories and history to restaurants, dance, and jazz.</p>
+                <div class="brand-footer">THE CITY OF HAARLEM</div>
+            </div>
         </div>
 
-        <div class="form-row">
-            <label for="password">Password</label>
-            <input id="password" name="password" type="password" required />
+        <div class="right-panel">
+            <div class="form-container">
+                <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+
+                <h2>Welcome Back</h2>
+                <p class="subtitle">Sign in to access all of Haarlem's features.</p>
+
+                <?php if (!empty(($flash ?? [])['error'])): ?>
+                    <div class="error-msg"><?= htmlspecialchars(($flash ?? [])['error'], ENT_QUOTES, 'UTF-8') ?></div>
+                <?php endif; ?>
+
+                <form action="/login" method="POST">
+                    <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf ?? '', ENT_QUOTES, 'UTF-8') ?>">
+
+                    <div class="form-group">
+                        <label>Email or Username</label>
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-envelope input-icon"></i>
+                            <input type="text" name="email_or_Username" placeholder="you@example.com or username" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <input type="password" name="password" id="password" placeholder="••••••••" required>
+                            <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="forgot-link">
+                            <a href="/forgot-password">Forgot password?</a>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-signin">Sign In</button>
+
+                    <p class="signup-prompt">Don't have an account? <a href="/registerForm">Create one</a></p>
+                </form>
+            </div>
         </div>
-
-        <div class="form-actions">
-            <button class="btn-primary" type="submit">Log in</button>
-        </div>
-    </form>
-
-    <p class="muted">Don't have an account? <a href="/admin/registerForm">Register</a></p>
-</section>
-
-<style>
-.auth-card { max-width:420px; margin:40px auto; padding:20px; border:1px solid #eee; border-radius:6px; background:#fff; }
-.form-row { margin-bottom:12px; display:flex; flex-direction:column; }
-.form-row label { font-weight:600; margin-bottom:6px; }
-.form-row input { padding:8px 10px; border:1px solid #ddd; border-radius:4px; }
-.form-actions { margin-top:12px; }
-.btn-primary { background:#1f6feb; color:#fff; padding:8px 14px; border-radius:4px; border:none; cursor:pointer; }
-.muted { color:#666; font-size:0.95rem; }
-.flash-error { background:#ffecec; border:1px solid #f5b6b6; padding:8px; margin-bottom:12px; }
-</style>
+    </div>
+</body>
+</html>

@@ -16,7 +16,7 @@
     flex: 1;
     position: relative;
 
-    background: url('/assets/images/shared/loginImage.avif') no-repeat center center; 
+    background: url('/assets/images/shared/loginImage.avif') no-repeat center center;
     background-size: cover;
     color: white;
     display: flex;
@@ -44,7 +44,7 @@
 }
 
 .left-content h1 span {
-    color: #ffc107; 
+    color: #ffc107;
 }
 
 .left-content p {
@@ -53,10 +53,9 @@
     opacity: 0.9;
 }
 
-
 .right-panel {
     flex: 1;
-    background: #fdf8f7; 
+    background: #fdf8f7;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -143,7 +142,7 @@
 .btn-signin {
     width: 100%;
     padding: 16px;
-    background: #7a1a0d; 
+    background: #7a1a0d;
     color: white;
     border: none;
     border-radius: 8px;
@@ -166,6 +165,16 @@
     font-weight: 600;
 }
 
+.error-msg{
+  color: #d32f2f;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
 
 @media (max-width: 900px) {
     .left-panel { display: none; }
