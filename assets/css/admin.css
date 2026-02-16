@@ -1,13 +1,29 @@
 /* Admin Dashboard Styles */
 
 :root {
+    /* Layout */
     --sidebar-width: 260px;
     --navbar-height: 60px;
-    --primary-color: #0d6efd;
-    --sidebar-bg: #212529;
-    --sidebar-text: #adb5bd;
-    --sidebar-hover-bg: #2c3136;
-    --sidebar-active-bg: #0d6efd;
+
+    /* Colors - Matching main site theme */
+    --color-bg-dark: #0d0000;
+    --color-text-light: #fcf7f7;
+    --color-accent-pink: #f5abab;
+    --color-accent-yellow: #f7d117;
+    --color-border-light: rgba(255, 255, 255, 0.1);
+
+    /* Admin-specific colors */
+    --primary-color: #f5abab;
+    --sidebar-bg: #0d0000;
+    --sidebar-text: #fcf7f7;
+    --sidebar-hover-bg: #1a0000;
+    --sidebar-active-bg: #f5abab;
+    --navbar-bg: #0d0000;
+    --content-bg: #fcf7f7;
+
+    /* Fonts - Matching main site */
+    --font-primary: Arimo, sans-serif;
+    --font-secondary: Inter, sans-serif;
 }
 
 * {
@@ -17,7 +33,7 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-secondary);
     overflow-x: hidden;
 }
 
@@ -52,12 +68,13 @@ body {
 }
 
 .admin-sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-accent-pink);
     border-radius: 3px;
+    opacity: 0.5;
 }
 
 .admin-sidebar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--color-accent-yellow);
 }
 
 /* Sidebar header */
@@ -76,20 +93,21 @@ body {
     align-items: center;
     gap: 0.75rem;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 500;
+    font-family: var(--font-secondary);
 }
 
 .admin-nav-link:hover {
     background-color: var(--sidebar-hover-bg);
-    color: #fff;
-    border-left-color: rgba(255, 255, 255, 0.2);
+    color: var(--color-accent-pink);
+    border-left-color: var(--color-accent-pink);
 }
 
 .admin-nav-link.active {
-    background-color: var(--sidebar-active-bg);
-    color: #fff;
-    border-left-color: #fff;
+    background-color: rgba(245, 171, 171, 0.15);
+    color: var(--color-accent-yellow);
+    border-left-color: var(--color-accent-yellow);
     font-weight: 600;
 }
 
@@ -115,17 +133,30 @@ body {
 /* Top navbar */
 .admin-navbar {
     height: var(--navbar-height);
-    background-color: #fff;
-    border-bottom: 1px solid #dee2e6;
+    background-color: var(--navbar-bg);
+    border-bottom: 1px solid var(--color-border-light);
     position: sticky;
     top: 0;
     z-index: 1030;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.admin-navbar .navbar-brand {
+    color: var(--color-text-light) !important;
+    font-family: var(--font-primary);
+    font-weight: 700;
 }
 
 .admin-navbar .container-fluid {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+}
+
+/* Logout button hover effect */
+.admin-navbar .btn:hover {
+    background-color: var(--color-accent-pink) !important;
+    color: var(--color-bg-dark) !important;
+    border-color: var(--color-accent-pink) !important;
 }
 
 /* Breadcrumb */
@@ -134,28 +165,35 @@ body {
     top: var(--navbar-height);
     z-index: 1020;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    background-color: #fff;
+    border-bottom: 1px solid #dee2e6;
 }
 
 .breadcrumb-container .breadcrumb {
     font-size: 0.875rem;
+    font-family: var(--font-secondary);
 }
 
 .breadcrumb-container .breadcrumb-item a {
     color: #6c757d;
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .breadcrumb-container .breadcrumb-item a:hover {
-    color: var(--primary-color);
+    color: var(--color-accent-pink);
     text-decoration: underline;
+}
+
+.breadcrumb-container .breadcrumb-item.active {
+    color: var(--color-accent-yellow);
 }
 
 /* Content area */
 .admin-content {
     padding: 2rem 1.5rem;
     flex: 1;
-    background-color: #f8f9fa;
+    background-color: var(--content-bg);
     min-height: calc(100vh - var(--navbar-height));
 }
 

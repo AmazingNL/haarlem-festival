@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Admin Dashboard' ?> - Haarlem Festival</title>
 
+    <!-- Google Fonts - Matching main site -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -49,8 +53,8 @@
         <!-- Sidebar -->
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="p-3">
-                <h4 class="text-white mb-4">
-                    <i class="bi bi-star-fill text-warning"></i> Admin Panel
+                <h4 class="mb-4" style="color: var(--color-text-light); font-family: var(--font-primary);">
+                    <i class="bi bi-star-fill" style="color: var(--color-accent-yellow);"></i> Admin Panel
                 </h4>
 
                 <!-- Sidebar navigation -->
@@ -85,24 +89,24 @@
             <nav class="admin-navbar navbar navbar-expand-lg navbar-light">
                 <div class="container-fluid">
                     <!-- Mobile toggle button -->
-                    <button class="btn btn-link d-lg-none text-dark p-0" type="button" id="sidebarToggle">
+                    <button class="btn btn-link d-lg-none p-0" type="button" id="sidebarToggle" style="color: var(--color-text-light);">
                         <i class="bi bi-list fs-4"></i>
                     </button>
 
-                    <span class="navbar-brand mb-0 h1"><?= $title ?? 'Dashboard' ?></span>
+                    <span class="navbar-brand mb-0 h1" style="color: var(--color-text-light); font-family: var(--font-primary);"><?= $title ?? 'Dashboard' ?></span>
 
                     <!-- User controls -->
                     <div class="ms-auto d-flex align-items-center gap-3">
                         <!-- User info (if logged in) -->
                         <?php if (isset($_SESSION['user_id'])): ?>
-                            <span class="text-muted d-none d-md-inline">
-                                <i class="bi bi-person-circle"></i>
+                            <span class="d-none d-md-inline" style="color: var(--color-text-light); font-family: var(--font-secondary);">
+                                <i class="bi bi-person-circle" style="color: var(--color-accent-pink);"></i>
                                 Hi, <?= htmlspecialchars(getDisplayName(), ENT_QUOTES, 'UTF-8') ?>
                             </span>
                         <?php endif; ?>
 
                         <!-- Logout button -->
-                        <a href="/admin/logout" class="btn btn-outline-danger btn-sm">
+                        <a href="/admin/logout" class="btn btn-sm" style="background-color: transparent; border: 1px solid var(--color-accent-pink); color: var(--color-accent-pink); transition: all 0.3s;">
                             <i class="bi bi-box-arrow-right"></i>
                             <span class="d-none d-sm-inline ms-1">Logout</span>
                         </a>
