@@ -12,12 +12,17 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Users
 -- Password for all: password123
 -- -------------------------
-INSERT INTO `user` (username, email, password_hash, first_name, last_name, role, phone, profile_image_id, is_active)
+-- -------------------------
+-- Users
+-- Password for all: Test12345!
+-- -------------------------
+INSERT INTO `user`
+(user_id, role, username, email, password_hash, first_name, last_name, phone, profile_image_id, is_active, created_at, updated_at)
 VALUES
-('admin',  'admin@haarlemfest.test',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin', 'User',    'admin',    NULL, NULL, 1),
-('eline',  'employee@haarlemfest.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Eline', 'Scanner', 'employee', NULL, NULL, 1),
-('samj',   'customer1@haarlemfest.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Sam',   'Jansen',  'customer', '+31 6 11111111', NULL, 1),
-('noordv', 'customer2@haarlemfest.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Noor',  'de Vries','customer', '+31 6 22222222', NULL, 1);
+(1, 'admin',    'admin',  'admin@haarlemfest.test',     '$2y$12$vIvVL6qdxkHgsNXQ6lbzZePy973snNNAnbRP5jegW6O40R6mXHpHG', 'Admin', 'User',     NULL,             NULL, 1, NOW(), NOW()),
+(2, 'employee', 'eline',  'employee@haarlemfest.test',  '$2y$12$vIvVL6qdxkHgsNXQ6lbzZePy973snNNAnbRP5jegW6O40R6mXHpHG', 'Eline', 'Scanner',  NULL,             NULL, 1, NOW(), NOW()),
+(3, 'customer', 'samj',   'customer1@haarlemfest.test', '$2y$12$vIvVL6qdxkHgsNXQ6lbzZePy973snNNAnbRP5jegW6O40R6mXHpHG', 'Sam',   'Jansen',   '+31 6 11111111', NULL, 1, NOW(), NOW()),
+(4, 'customer', 'noordv', 'customer2@haarlemfest.test', '$2y$12$vIvVL6qdxkHgsNXQ6lbzZePy973snNNAnbRP5jegW6O40R6mXHpHG', 'Noor',  'de Vries', '+31 6 22222222', NULL, 1, NOW(), NOW());
 
 -- -------------------------
 -- Images
@@ -179,7 +184,7 @@ VALUES
 (3, 2),
 (4, 5);
 
--- migrate:down
+/* -- migrate:down
 SET FOREIGN_KEY_CHECKS = 0;
 
 DELETE FROM program_item;
@@ -201,3 +206,4 @@ DELETE FROM image;
 DELETE FROM `user`;
 
 SET FOREIGN_KEY_CHECKS = 1;
+ */
