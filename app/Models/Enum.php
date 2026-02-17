@@ -4,7 +4,7 @@
 declare(strict_types=1);
 namespace App\Models\Enum;
 
-enum UserRole: string { 
+enum UserRole: string {
     case admin='admin'; 
     case customer='customer'; 
     case employee='employee'; 

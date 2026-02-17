@@ -27,7 +27,6 @@ final class AuthController extends BaseController
 
     public function register(): void
     {
-        if (!$this->isPost()) $this->abort(405, 'Method Not Allowed');
         $this->verifyCsrf();
         [$user, $plainPassword] = $this->hydrateRegistrationUser();
         $this->ensureRegistrationIsUnique($user);
@@ -35,6 +34,7 @@ final class AuthController extends BaseController
         $this->loginAndRedirect($created);
     }
 
+    // do in constructor / base controller method>
     private function hydrateRegistrationUser(): array
     {
         $this->requireFields(['first_name', 'last_name', 'username', 'email', 'password']);
@@ -68,8 +68,7 @@ final class AuthController extends BaseController
 
     private function ensureRegistrationIsUnique(User $user): void
     {
-        if (method_exists($this->userService, 'userExists')
-            && $this->userService->userExists($user->email, $user->username)) {
+        if ($this->userService->userExists($user->email, $user->username)) {
             $this->abort(409, 'Email or username already exists');
         }
     }

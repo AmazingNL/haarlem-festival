@@ -73,7 +73,7 @@ class UserRepository extends BaseRepository implements IUserRepository
             ':password_hash' => $data['password_hash'],
             ':first_name' => $data['first_name'],
             ':last_name' => $data['last_name'],
-            ':role' => $data['role'],
+            ':role' => $data['role']->value,
         ]);
 
         $newId = (int) $this->getConnection()->lastInsertId();
