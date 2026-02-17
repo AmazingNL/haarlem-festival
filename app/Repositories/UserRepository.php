@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Core\BaseEntity;
 use App\Models\User;
 use App\Core\BaseRepository;
 use App\Repositories\IUserRepository;
@@ -28,7 +29,7 @@ class UserRepository extends BaseRepository implements IUserRepository
             $stmt->execute([':value' => $email]);
             $row = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             if ($row) {
-                return $this->rowToUser($row[0]);
+                return User::fromArray($row);
             } else {
                 return null;
             }
@@ -64,7 +65,7 @@ class UserRepository extends BaseRepository implements IUserRepository
                 VALUES
                 (:email, :username, :password_hash, :first_name, :last_name, :role, NOW(), NOW())";
 
-        $data = $this->userToDbArray($user);
+        $data = $this->fromArray($user);
 
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([
@@ -159,7 +160,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         }
     }
 
-    public function findByRole(string $role): array
+    public function findByRole(string $role): User
     {
         try {
         $sql = "SELECT *
@@ -171,13 +172,13 @@ class UserRepository extends BaseRepository implements IUserRepository
         $stmt->execute([':role' => $role]);
 
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return array_map([$this, 'rowToUser'], $rows);
+        return User::fromArray($rows);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve users by role. ' . $e->getMessage());
         }
     }
 
-    public function findByName(string $name): array
+    public function findByName(string $name): user
     {
         try {
         $sql = "SELECT *
@@ -191,7 +192,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         $stmt->execute([':q' => '%' . $name . '%']);
 
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return array_map([$this, 'rowToUser'], $rows);
+        return User::fromArray($rows);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve users by name. ' . $e->getMessage());
         }
@@ -200,38 +201,6 @@ class UserRepository extends BaseRepository implements IUserRepository
     // ----------------------------
     // Helpers
     // ----------------------------
-
-    /** @param array<string,mixed> $row */
-    private function rowToUser(array $row): User
-    {
-        // If User extends BaseEntity, this exists and is perfect.
-        if (method_exists(User::class, 'fromArray')) {
-            /** @var User $user */
-            $user = User::fromArray($row);
-            return $user;
-        }
-
-        // Fallback: best-effort mapping
-        $user = new User();
-        foreach ($row as $k => $v) {
-            if (property_exists($user, $k)) {
-                $user->$k = $v;
-            }
-        }
-        return $user;
-    }
-
-    /** @return array<string,mixed> */
-    private function userToDbArray(User $user): array
-    {
-        // If User extends BaseEntity, this exists.
-        if (method_exists($user, 'toArray')) {
-            return $user->toArray();
-        }
-
-        // Fallback
-        return get_object_vars($user);
-    }
     public function existsByEmailOrUsername(string $email, string $username): bool
     {
         $sql = "SELECT 1

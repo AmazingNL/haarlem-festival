@@ -20,18 +20,23 @@ final class HomeController extends BaseController
     public function index(): void
     {
         try {
-        $this->ensureSession();
-        $pages = $this->adminPageService->getPageBySlug('home');
-        $page_id = $pages->page_id ?? null;
-        $homePage = $this->pageSectionService->getSectionsByPageId($page_id);
-        $message = ['message' => 'Home page loaded successfully.'];
-        $this->view('home/home', 
-        ['pages' => $homePage, 'title' => 'Haarlem Festival', $message],);
+            $this->ensureSession();
+            $pages = $this->adminPageService->getPageBySlug('home');
+            $page_id = $pages->page_id ?? null;
+            $homePage = $this->pageSectionService->getSectionsByPageId($page_id);
 
-        } 
-        catch (\Throwable $e) {
-            $this->view('home/home', 
-            ['pages' => [], 'title' => 'Haarlem Festival', 'message' => 'Failed to load home page. Please try again later.']);
+            $this->view('home/home', [
+                'sections' => $homePage,
+                'title' => 'Haarlem Festival',
+                'message' => 'Home page loaded successfully.'
+            ]);
+
+        } catch (\Throwable $e) {
+            $this->view('home/home', [
+                'sections' => [],
+                'title' => 'Haarlem Festival',
+                'message' => 'Failed to load home page. Please try again later.'
+            ]);
         }
     }
 }

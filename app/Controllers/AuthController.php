@@ -11,7 +11,8 @@ use App\Models\Enum\UserRole;
 final class AuthController extends BaseController
 {
     private IUserService $userService;
-    public function __construct(IUserService $userService) {
+    public function __construct(IUserService $userService)
+    {
         $this->userService = $userService;
     }
 
@@ -20,14 +21,17 @@ final class AuthController extends BaseController
     {
         $this->verifyCsrf();
         $this->ensureSession();
-        $this->view('auth/register',
-        $data = ['title' => 'Registration'],
-        $layout ='auth'  ) ;
+        $this->view(
+            'auth/register',
+            $data = ['title' => 'Registration'],
+            $layout = 'auth'
+        );
     }
 
     public function register(): void
     {
-        if (!$this->isPost()) $this->abort(405, 'Method Not Allowed');
+        if (!$this->isPost())
+            $this->abort(405, 'Method Not Allowed');
         $this->verifyCsrf();
         [$user, $plainPassword] = $this->hydrateRegistrationUser();
         $this->ensureRegistrationIsUnique($user);
@@ -46,11 +50,11 @@ final class AuthController extends BaseController
 
         $user = new User();
         $user->first_name = $this->str('first_name');
-        $user->last_name  = $this->str('last_name');
-        $user->username   = $this->str('username');
-        $user->email      = $email;
-        $user->phone      = isset($_POST['phone']) ? trim((string)$_POST['phone']) : null;
-        $user->role       = UserRole::customer;
+        $user->last_name = $this->str('last_name');
+        $user->username = $this->str('username');
+        $user->email = $email;
+        $user->phone = isset($_POST['phone']) ? trim((string) $_POST['phone']) : null;
+        $user->role = UserRole::customer;
 
         return [$user, $password];
     }
@@ -68,50 +72,52 @@ final class AuthController extends BaseController
 
     private function ensureRegistrationIsUnique(User $user): void
     {
-        if (method_exists($this->userService, 'userExists')
-            && $this->userService->userExists($user->email, $user->username)) {
+        if (
+            method_exists($this->userService, 'userExists')
+            && $this->userService->userExists($user->email, $user->username)
+        ) {
             $this->abort(409, 'Email or username already exists');
         }
     }
 
     //login part from here
     public function showLogin(): void
-{
-    $this->ensureSession();
-    $flash = $_SESSION['flash'] ?? [];
-    unset($_SESSION['flash']);
+    {
+        $this->ensureSession();
+        $flash = $_SESSION['flash'] ?? [];
+        unset($_SESSION['flash']);
 
-    $this->view('auth/login', [
-        'title' => 'Login',
-        'flash' => $flash,
-    ], layout: 'auth');
-}
-
-
-   public function login(): void
-{
-    if (!$this->isPost()) {
-        $this->abort(405, 'Method Not Allowed');
+        $this->view('auth/login', [
+            'title' => 'Login',
+            'flash' => $flash,
+        ], layout: 'auth');
     }
 
-    $this->ensureSession();
-    $this->verifyCsrf();
 
-    $this->requireFields(['email_or_Username', 'password']);
+    public function login(): void
+    {
+        if (!$this->isPost()) {
+            $this->abort(405, 'Method Not Allowed');
+        }
 
-    $emailOrUsername = trim($this->str('email_or_Username'));
-    $password        = $this->str('password'); 
+        $this->ensureSession();
+        $this->verifyCsrf();
 
-    $user = $this->userService->authenticate($emailOrUsername, $password);
+        $this->requireFields(['email_or_Username', 'password']);
 
-    if ($user === null) {
-        $_SESSION['flash']['error'] = 'Invalid email/username or password.';
-        $this->redirect('/login'); 
-        return;
+        $emailOrUsername = trim($this->str('email_or_Username'));
+        $password = $this->str('password');
+
+        $user = $this->userService->authenticate($emailOrUsername, $password);
+
+        if ($user === null) {
+            $_SESSION['flash']['error'] = 'Invalid email/username or password.';
+            $this->redirect('/login');
+            return;
+        }
+
+        $this->loginAndRedirect($user);
     }
-
-    $this->loginAndRedirect($user);
-}
 
 
     public function logout(): void
@@ -126,33 +132,33 @@ final class AuthController extends BaseController
     }
 
     private function loginAndRedirect(User $user): void
-{
-    $isAdmin = ($user->role === UserRole::admin);
+    {
+        $isAdmin = ($user->role === UserRole::admin);
 
-    $this->switchSession($isAdmin ? 'HF_ADMIN' : 'HF_APP');
+        $this->switchSession($isAdmin ? 'HF_ADMIN' : 'HF_APP');
 
-    $_SESSION['user_id'] = $user->user_id;
-    $_SESSION['role']    = $user->role->value;
+        $_SESSION['user_id'] = $user->user_id;
+        $_SESSION['role'] = $user->role->value;
 
-    if ($isAdmin) {
-        $this->redirect('/admin/dashboard');
-        return;
+        if ($isAdmin) {
+            $this->redirect('/admin/dashboard');
+            return;
+        }
+
+        switch ($user->role) {
+            case UserRole::customer:
+                $this->redirect('/');
+                return;
+
+            case UserRole::employee:
+                $this->redirect('/employee/dashboard');
+                return;
+
+            default:
+                $this->redirect('/');
+                return;
+        }
     }
-
-    switch ($user->role) {
-        case UserRole::customer:
-            $this->redirect('/');        
-            return;
-
-        case UserRole::employee:
-            $this->redirect('/employee/dashboard');
-            return;
-
-        default:
-            $this->redirect('/');       
-            return;
-    }
-}
 
 
     private function switchSession(string $sessionName): void

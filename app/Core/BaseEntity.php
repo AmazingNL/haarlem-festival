@@ -56,7 +56,6 @@ abstract class BaseEntity
         return $obj;
     }
 
-    /** @return array<string,mixed> */
     public function toArray(): array
     {
         return get_object_vars($this);
