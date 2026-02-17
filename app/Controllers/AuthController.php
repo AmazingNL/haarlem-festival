@@ -18,9 +18,11 @@ final class AuthController extends BaseController
     //registration part from here
     public function showRegisterForm(): void
     {
+        $this->verifyCsrf();
+        $this->ensureSession();
         $this->view('auth/register',
         $data = ['title' => 'Registration'],
-        $layout ='auth'  );
+        $layout ='auth'  ) ;
     }
 
     public function register(): void
