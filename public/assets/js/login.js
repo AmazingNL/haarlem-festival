@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const isHidden = passwordInput.type === "password";
     passwordInput.type = isHidden ? "text" : "password";
 
-    // swap icon (optional)
     if (icon) {
       icon.classList.toggle("fa-eye", !isHidden);
       icon.classList.toggle("fa-eye-slash", isHidden);

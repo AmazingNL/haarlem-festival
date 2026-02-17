@@ -1,0 +1,1542 @@
+/** @format */
+
+.home-page-visit-haarlem-hifi {
+	width: 100%;
+	position: relative;
+	background-color: #faeded;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 11px;
+	text-align: left;
+	font-size: 128px;
+	color: #410606;
+	font-family: Inter;
+}
+.fps-1-parent {
+	width: 1920px;
+	height: 590px;
+	position: relative;
+	color: #fff;
+	font-family: "Bebas Neue";
+}
+.fps-1 {
+	position: absolute;
+	top: 90px;
+	left: 0px;
+	background-color: rgba(0, 0, 0, 0.45);
+	width: 1920px;
+	height: 500px;
+}
+.discover-haarlem-wrapper {
+	position: absolute;
+	top: 398px;
+	left: 542px;
+	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25) inset;
+	background-color: rgba(8, 0, 0, 0.11);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0px 10px;
+}
+.discover-haarlem {
+	position: relative;
+	line-height: 123px;
+	background: rgba(0, 0, 0, 0), #f7d117;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+.frame-wrapper {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-color: #0d0000;
+	width: 1920px;
+	height: 90px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0px 10px;
+	box-sizing: border-box;
+	isolation: isolate;
+	font-size: 36px;
+	font-family: Arimo;
+}
+.logo-parent {
+	width: 100%;
+	margin: 0 !important;
+	position: absolute;
+	top: calc(50% - 35px);
+	right: 0%;
+	left: 0%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+	gap: 188px;
+	opacity: 0.92;
+	z-index: 0;
+	flex-shrink: 0;
+}
+.logo {
+	height: 40px;
+	width: 193px;
+	position: relative;
+}
+.ha {
+	position: absolute;
+	top: 10.38%;
+	left: 0%;
+	letter-spacing: -0.9px;
+	line-height: 40px;
+	flex-shrink: 0;
+}
+.rlem {
+	position: absolute;
+	top: 10.38%;
+	left: 49.22%;
+	letter-spacing: -0.9px;
+	line-height: 40px;
+	flex-shrink: 0;
+}
+.logo-child {
+	position: absolute;
+	height: 100%;
+	width: 23.32%;
+	top: 0%;
+	right: 50.78%;
+	bottom: 0%;
+	left: 25.91%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+	flex-shrink: 0;
+}
+.component-74-parent {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 101px;
+	font-size: 18px;
+	color: #fcf7f7;
+	font-family: Inter;
+}
+.component-74 {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 16px;
+}
+.label {
+	position: relative;
+}
+.component-68-parent {
+	height: 50px;
+	display: flex;
+	align-items: center;
+	gap: 30px;
+}
+.component-68 {
+	height: 30px;
+	width: 30px;
+	position: relative;
+}
+.component-9 {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	top: 0%;
+	right: 0%;
+	bottom: 0%;
+	left: 0%;
+}
+.vector-icon {
+	position: absolute;
+	height: 71%;
+	width: 83.33%;
+	top: 14.58%;
+	right: 8.33%;
+	bottom: 14.42%;
+	left: 8.33%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+}
+.vector-icon2 {
+	position: absolute;
+	height: 16.67%;
+	width: 16.67%;
+	top: 70.83%;
+	right: 12.5%;
+	bottom: 12.5%;
+	left: 70.83%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+}
+.vector-icon3 {
+	position: absolute;
+	height: 66.67%;
+	width: 66.67%;
+	top: 12.5%;
+	right: 20.83%;
+	bottom: 20.83%;
+	left: 12.5%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+}
+.vector-icon4 {
+	position: absolute;
+	height: 29.33%;
+	width: 29.33%;
+	top: 31.25%;
+	right: 35.25%;
+	bottom: 39.42%;
+	left: 35.42%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+}
+.vector-icon5 {
+	position: absolute;
+	height: 83.33%;
+	width: 75%;
+	top: 8.33%;
+	right: 12.5%;
+	bottom: 8.33%;
+	left: 12.5%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+}
+.frame-parent {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 35px;
+	font-size: 16px;
+}
+.the-heart-of-haarlem-parent {
+	width: 1920px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 19px 0px 0px;
+	box-sizing: border-box;
+	gap: 12px;
+}
+.the-heart-of {
+	position: relative;
+	font-size: 48px;
+	letter-spacing: 0.15em;
+	line-height: 60px;
+	font-family: "Bebas Neue";
+}
+.haarlem-is-one {
+	width: 982px;
+	position: relative;
+	line-height: 35px;
+	color: #0d0000;
+	white-space: pre-wrap;
+	display: inline-block;
+}
+.button-component-10 {
+	width: 300px;
+	height: 48px;
+	border-radius: 12px;
+	background-color: #801a1a;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 12px 20px;
+	box-sizing: border-box;
+	gap: 89px;
+	color: #fcf7f7;
+}
+.component-15 {
+	height: 24px;
+	width: 24px;
+	position: relative;
+	flex-shrink: 0;
+}
+.vector-icon6 {
+	position: absolute;
+	height: 25%;
+	width: 50%;
+	top: 41.67%;
+	right: 25%;
+	bottom: 33.33%;
+	left: 25%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+	object-fit: contain;
+}
+.vector-icon7 {
+	position: absolute;
+	height: 25%;
+	width: 50%;
+	top: 37.5%;
+	right: 29.17%;
+	bottom: 37.5%;
+	left: 20.83%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+	object-fit: contain;
+}
+.component-36-parent {
+	width: 1920px;
+	background-color: #fce3e3;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 39px;
+	font-size: 11px;
+}
+.component-36 {
+	height: 60px;
+	width: 60px;
+	border-radius: 999px;
+	background-color: #1a0101;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+	transform: rotate(180deg);
+}
+.component-5 {
+	height: 24px;
+	width: 24px;
+	position: relative;
+}
+.vector-icon8 {
+	position: absolute;
+	height: 50%;
+	width: 25%;
+	top: 25%;
+	right: 37.5%;
+	bottom: 25%;
+	left: 37.5%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+	transform: rotate(-180deg);
+}
+.frame-container {
+	width: 1530px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 10px;
+	box-sizing: border-box;
+}
+.frame-group {
+	width: 1486px;
+	overflow-x: auto;
+	display: flex;
+	align-items: center;
+	gap: 65px;
+}
+.frame-div {
+	width: 723px;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+}
+.molen-de-adriaan-wrapper {
+	align-self: stretch;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+}
+.molen-de-adriaan {
+	position: relative;
+	line-height: 19.8px;
+	font-weight: 600;
+}
+.zaterdagmarkt-haarlem-4-icon {
+	align-self: stretch;
+	height: 550px;
+	position: relative;
+	border-radius: 8px;
+	max-width: 100%;
+	overflow: hidden;
+	flex-shrink: 0;
+	object-fit: cover;
+}
+.frame-parent2 {
+	width: 723px;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 10px;
+}
+.grote-kerk-wrapper {
+	width: 723px;
+	height: 48px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+}
+.component-37 {
+	height: 60px;
+	width: 60px;
+	border-radius: 999px;
+	background-color: #1a0101;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+}
+.vector-icon9 {
+	position: absolute;
+	height: 50%;
+	width: 25%;
+	top: 25%;
+	right: 37.5%;
+	bottom: 25%;
+	left: 37.5%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+}
+.frame-parent5 {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 25px 0px;
+	gap: 57px;
+	text-align: center;
+	font-size: 28px;
+	font-family: Poppins;
+}
+.frame-wrapper2 {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 15px 0px;
+}
+.frame-parent6 {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 274px;
+}
+.frame-child {
+	height: 541.5px;
+	width: 775px;
+	border-radius: 12px;
+	object-fit: contain;
+}
+.frame-parent7 {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 13px;
+}
+.grote-markt-haarlem-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.grote-markt-haarlem {
+	position: relative;
+	line-height: 50px;
+}
+.the-haarlemse-markt {
+	width: 651px;
+	position: relative;
+	font-size: 16px;
+	line-height: 35px;
+	font-family: Inter;
+	color: #0d0000;
+	text-align: left;
+	display: flex;
+	align-items: center;
+}
+.frame-wrapper3 {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 10px 0px;
+}
+.frame-parent8 {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 244px;
+}
+.frame-parent9 {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+}
+.haarlems-historic-canal {
+	width: 650px;
+	position: relative;
+	font-size: 16px;
+	line-height: 35px;
+	font-family: Inter;
+	color: #0d0000;
+	text-align: left;
+	display: flex;
+	align-items: center;
+}
+.frame-parent10 {
+	display: flex;
+	align-items: flex-start;
+	gap: 22px;
+}
+.frame-item {
+	height: 540px;
+	width: 387px;
+	position: relative;
+	border-radius: 8px;
+	object-fit: cover;
+}
+.frame-inner {
+	height: 542px;
+	width: 387px;
+	position: relative;
+	border-radius: 8px;
+	object-fit: cover;
+}
+.what-you-can-do-in-haarlem-parent {
+	width: 1920px;
+	height: 2765px;
+	position: relative;
+	font-size: 48px;
+}
+.what-you-can {
+	position: absolute;
+	top: 19px;
+	left: 0px;
+	letter-spacing: 0.15em;
+	line-height: 60px;
+	font-family: "Bebas Neue";
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1920px;
+}
+.frame-parent11 {
+	position: absolute;
+	top: 116px;
+	left: 0px;
+	width: 1912px;
+	height: 760px;
+	font-size: 16px;
+}
+.imagewithfallback-parent {
+	position: absolute;
+	top: 0.46px;
+	left: 677px;
+	border-radius: 8px;
+	width: 1022px;
+	height: 370px;
+	overflow: hidden;
+	flex-shrink: 0;
+}
+.imagewithfallback {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	border-radius: 8px;
+	width: 500px;
+	height: 370px;
+	overflow: hidden;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: top;
+}
+.component-9-wrapper {
+	position: absolute;
+	top: 13.46px;
+	left: 13px;
+	border-radius: 999px;
+	background-color: #fce3e3;
+	width: 50px;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+}
+.vector-icon10 {
+	position: absolute;
+	height: 71%;
+	width: 83.33%;
+	top: 18.75%;
+	right: 12.5%;
+	bottom: 10.25%;
+	left: 4.17%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+}
+.frame-parent12 {
+	position: absolute;
+	top: 0px;
+	left: 500px;
+	background-color: #e5daa1;
+	width: 522px;
+	height: 370px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+	gap: 19px;
+}
+.stories-wrapper {
+	align-self: stretch;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 33px;
+	font-family: "Bebas Neue";
+}
+.stories {
+	height: 33.3px;
+	width: 92.2px;
+	position: relative;
+	line-height: 39.6px;
+	display: inline-block;
+	flex-shrink: 0;
+}
+.haarlem-is-a {
+	width: 484px;
+	position: relative;
+	line-height: 35px;
+	color: #0d0000;
+	display: inline-block;
+}
+.button-component-102 {
+	width: 243px;
+	height: 33px;
+	border-radius: 12px;
+	background-color: #801a1a;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 12px 20px;
+	box-sizing: border-box;
+	color: #fcf7f7;
+}
+.label8 {
+	position: relative;
+	line-height: 35px;
+	cursor: pointer;
+	flex-shrink: 0;
+}
+.frame-parent13 {
+	position: absolute;
+	top: 387.46px;
+	left: 673px;
+	border-radius: 8px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+.vector-parent {
+	height: 370px;
+	width: 499px;
+	position: relative;
+}
+.rectangle-icon {
+	position: absolute;
+	top: 0.46px;
+	left: 0px;
+	border-radius: 8px;
+	width: 499.1px;
+	height: 370px;
+	object-fit: contain;
+}
+.component-9-container {
+	position: absolute;
+	top: 13.46px;
+	left: 11px;
+	border-radius: 999px;
+	background-color: #fce3e3;
+	width: 50px;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+}
+.frame-parent14 {
+	height: 370px;
+	width: 527px;
+	background-color: #e5daa1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 5px;
+	box-sizing: border-box;
+	gap: 19px;
+}
+.label9 {
+	position: relative;
+	line-height: 35px;
+	flex-shrink: 0;
+}
+.frame-wrapper4 {
+	position: absolute;
+	top: 914px;
+	left: 0px;
+	width: 1912px;
+	height: 1150px;
+	font-size: 16px;
+}
+.frame-parent15 {
+	position: absolute;
+	top: 0px;
+	left: 690px;
+	border-radius: 8px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 20px;
+}
+.frame-parent16 {
+	border-radius: 8px;
+	display: flex;
+	align-items: flex-start;
+	justify-content: flex-end;
+}
+.frame-parent17 {
+	height: 370px;
+	width: 516px;
+	border-radius: 8px;
+	background-color: #e5daa1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 5px 15px;
+	box-sizing: border-box;
+	gap: 10px;
+}
+.restaurants {
+	position: relative;
+	line-height: 39.6px;
+}
+.enjoy-a-taste {
+	width: 484px;
+	height: 239px;
+	position: relative;
+	line-height: 35px;
+	color: #000;
+	display: inline-block;
+	flex-shrink: 0;
+}
+.shannia-christanty-noop-fmzg84-parent {
+	height: 370px;
+	width: 500px;
+	position: relative;
+}
+.shannia-christanty-noop-fmzg84-icon {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	border-radius: 8px;
+	width: 500px;
+	height: 370px;
+	object-fit: cover;
+}
+.component-9-frame {
+	position: absolute;
+	top: 5.46px;
+	left: 492px;
+	border-radius: 999px;
+	background-color: #fce3e3;
+	width: 50px;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+	transform: rotate(180deg);
+	transform-origin: 0 0;
+}
+.vector-icon14 {
+	position: absolute;
+	height: 71%;
+	width: 83.33%;
+	top: 18.75%;
+	right: 12.5%;
+	bottom: 10.25%;
+	left: 4.17%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+	transform: rotate(-180deg);
+}
+.vector-icon15 {
+	position: absolute;
+	height: 71%;
+	width: 83.33%;
+	top: 14.58%;
+	right: 8.33%;
+	bottom: 14.42%;
+	left: 8.33%;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+	transform: rotate(-180deg);
+}
+.group-parent {
+	border-radius: 8px;
+	overflow: hidden;
+	display: flex;
+	align-items: flex-start;
+	transform: rotate(180deg);
+}
+.imagewithfallback-icon {
+	position: absolute;
+	top: 0px;
+	left: -500px;
+	border-radius: 8px;
+	width: 500px;
+	height: 370px;
+	object-fit: cover;
+	transform: rotate(-180deg);
+}
+.component-9-wrapper2 {
+	position: absolute;
+	top: 13.46px;
+	left: 12px;
+	border-radius: 999px;
+	background-color: #fce3e3;
+	width: 50px;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+}
+.frame-parent18 {
+	height: 370px;
+	width: 516px;
+	background-color: #e5daa1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 5px 15px;
+	box-sizing: border-box;
+	gap: 19px;
+	transform: rotate(180deg);
+}
+.feel-the-bass {
+	width: 420px;
+	position: relative;
+	line-height: 35px;
+	color: #000;
+	display: inline-block;
+}
+.frame-parent19 {
+	border-radius: 8px;
+	overflow: hidden;
+	display: flex;
+	align-items: flex-start;
+}
+.frame-parent20 {
+	height: 370px;
+	width: 516px;
+	background-color: #e5daa1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 5px 15px;
+	box-sizing: border-box;
+	gap: 19px;
+}
+.every-summer-the {
+	width: 484px;
+	position: relative;
+	line-height: 35px;
+	color: #000;
+	display: inline-block;
+}
+.imagewithfallback2 {
+	height: 370px;
+	width: 500px;
+	position: relative;
+	border-radius: 8px;
+	overflow: hidden;
+	flex-shrink: 0;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: top;
+}
+.component-9-wrapper3 {
+	position: absolute;
+	top: 14.46px;
+	left: 437px;
+	border-radius: 999px;
+	background-color: #fce3e3;
+	width: 50px;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+}
+.frame-parent21 {
+	position: absolute;
+	top: 129.46px;
+	left: 111px;
+	border-radius: 8px;
+	background-color: #aa4100;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 16px 11px;
+	gap: 10px;
+	color: #fcf7f7;
+}
+.your-programs-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: "Bebas Neue";
+}
+.your-programs {
+	position: relative;
+	letter-spacing: 0.15em;
+	line-height: 50px;
+}
+.creative-studios-walking-alon-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 16px;
+}
+.creative-studios-walking {
+	width: 327px;
+	position: relative;
+	line-height: 35px;
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+.button-component-10-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	font-size: 13px;
+}
+.button-component-107 {
+	width: 166px;
+	height: 40px;
+	border-radius: 999px;
+	background-color: #2c5f44;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 16px;
+	box-sizing: border-box;
+}
+.label13 {
+	position: relative;
+	line-height: 23.4px;
+}
+.download-our-phone-application-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	font-size: 23px;
+	color: #4faa00;
+	font-family: Poppins;
+}
+.component-71-wrapper {
+	display: flex;
+	align-items: center;
+}
+.component-71 {
+	display: flex;
+	align-items: center;
+	padding: 10px;
+}
+.component-71-child {
+	height: 60px;
+	width: 20px;
+	position: relative;
+	object-fit: contain;
+}
+.f-391289573-awnb17ct5qwegzazxe-icon {
+	width: 281px;
+	position: relative;
+	border-radius: 8px;
+	max-height: 100%;
+	object-fit: cover;
+	cursor: pointer;
+}
+.group-container {
+	position: absolute;
+	top: 2102px;
+	left: 1920px;
+	background-color: #e5daa1;
+	width: 1920px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 15px 0px;
+	box-sizing: border-box;
+	transform: rotate(180deg);
+	transform-origin: 0 0;
+	font-family: "Bebas Neue";
+}
+.buses-station-building-haarlem-parent {
+	height: 613px;
+	width: 882.4px;
+	position: relative;
+}
+.buses-station-building-haarlem-icon {
+	position: absolute;
+	top: 0px;
+	left: -882.43px;
+	border-radius: 8px;
+	width: 882.4px;
+	height: 613px;
+	object-fit: cover;
+	transform: rotate(-180deg);
+}
+.component-9-wrapper4 {
+	position: absolute;
+	top: 5.68px;
+	left: 91.41px;
+	border-radius: 999px;
+	background-color: #fce3e3;
+	width: 59.6px;
+	height: 59.6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+	transform: rotate(180deg);
+	transform-origin: 0 0;
+}
+.frame-parent22 {
+	height: 613px;
+	width: 861px;
+	background-color: #e5daa1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	box-sizing: border-box;
+	gap: 21px;
+	transform: rotate(180deg);
+}
+.transportation-wrapper {
+	align-self: stretch;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.getting-around-haarlem-container {
+	align-self: stretch;
+	position: relative;
+	font-size: 16px;
+	line-height: 35px;
+	font-family: Inter;
+	color: #000;
+}
+.getting-around-haarlem {
+	margin: 0;
+}
+.trains-haarlem-central-statio {
+	margin: 0;
+	font-family: inherit;
+	font-size: inherit;
+	padding-left: 21px;
+}
+.trains-haarlem-central {
+	margin-bottom: 0px;
+}
+.button-component-108 {
+	width: 592px;
+	height: 53px;
+	border-radius: 16px;
+	background-color: #801a1a;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 16px 24px;
+	box-sizing: border-box;
+	font-size: 23px;
+	color: #fcf7f7;
+	font-family: Poppins;
+}
+.label14 {
+	position: relative;
+	line-height: 50px;
+	flex-shrink: 0;
+}
+.home-page-visit-haarlem-hifi-inner {
+	align-self: stretch;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	text-align: center;
+	font-size: 23px;
+	font-family: Poppins;
+}
+.frame-parent23 {
+	width: 127px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 0px 10px;
+	box-sizing: border-box;
+	gap: 14px;
+}
+.go-to-top-wrapper {
+	align-self: stretch;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.go-to-top {
+	position: relative;
+	line-height: 50px;
+	background: #1a0101, #000;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+.button-component-109 {
+	width: 36px;
+	height: 36px;
+	border-radius: 999px;
+	object-fit: contain;
+}
+.footer {
+	align-self: stretch;
+	height: 255px;
+	position: relative;
+	background-color: #1a0101;
+	font-size: 20px;
+	color: #f7d117;
+	font-family: Arimo;
+}
+.container {
+	position: absolute;
+	top: 24px;
+	left: 277px;
+	width: 1213px;
+	height: 190px;
+}
+.container2 {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 230.4px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	flex-shrink: 0;
+}
+.heading-3 {
+	align-self: stretch;
+	height: 30px;
+	position: relative;
+}
+.culture {
+	position: absolute;
+	top: -2.8px;
+	left: 0px;
+	line-height: 30px;
+	flex-shrink: 0;
+}
+.list {
+	align-self: stretch;
+	height: 144px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 8px;
+	color: #fff;
+}
+.link {
+	width: 165.6px;
+	height: 26.4px;
+	display: flex;
+	align-items: flex-start;
+}
+.history-of-haarlem {
+	position: relative;
+	line-height: 30px;
+	flex-shrink: 0;
+}
+.container3 {
+	position: absolute;
+	top: -3px;
+	left: 523px;
+	width: 230.4px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	flex-shrink: 0;
+}
+.list2 {
+	align-self: stretch;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 8px;
+	color: #fff;
+}
+.container4 {
+	position: absolute;
+	top: -6px;
+	left: 1200px;
+	width: 230.4px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	flex-shrink: 0;
+}
+.link-parent {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+}
+.link-icon {
+	height: 48px;
+	width: 48px;
+	border-radius: 40265300px;
+}
+.container5 {
+	position: absolute;
+	top: 186px;
+	left: 262px;
+	border-top: 1.2px solid #364153;
+	box-sizing: border-box;
+	width: 1395px;
+	height: 55px;
+	color: #99a1af;
+}
+.paragraph {
+	position: absolute;
+	top: 13.1px;
+	left: 0px;
+	width: 414.4px;
+	height: 30px;
+}
+.container6 {
+	position: absolute;
+	top: 13.1px;
+	left: 1110.41px;
+	width: 284.6px;
+	height: 30px;
+	display: flex;
+	align-items: flex-start;
+	gap: 24px;
+}
+.link6 {
+	height: 30px;
+	width: 117.9px;
+	position: relative;
+}
+.link7 {
+	height: 30px;
+	width: 142.7px;
+	position: relative;
+}
+
+.home-page-map {
+	width: 1247px;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 10px;
+	box-sizing: border-box;
+	max-width: 90%;
+	max-height: 90%;
+	overflow: auto;
+	text-align: left;
+	font-size: 18px;
+	color: #410606;
+	font-family: Inter;
+}
+.component-104 {
+	align-self: stretch;
+	height: 781px;
+	border-radius: 16px;
+	background:
+		linear-gradient(135deg, #d0fae5, #a4f4cf), linear-gradient(#fff, #fff);
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+.container7 {
+	align-self: stretch;
+	width: 224px;
+	position: relative;
+	box-shadow:
+		0px 20px 25px -5px rgba(0, 0, 0, 0.1),
+		0px 8px 10px -6px rgba(0, 0, 0, 0.1);
+	background-color: rgba(255, 255, 255, 0.4);
+}
+.heading-2 {
+	position: absolute;
+	top: 15.98px;
+	left: 15.98px;
+	width: 192px;
+	height: 20px;
+	display: flex;
+	align-items: flex-start;
+	padding: 0px 8px;
+	box-sizing: border-box;
+}
+.categories {
+	flex: 1;
+	position: relative;
+	flex-shrink: 0;
+}
+.button-component-11-parent {
+	position: absolute;
+	top: 71px;
+	left: 11px;
+	width: 205px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 14px;
+	font-size: 23px;
+	font-family: Poppins;
+}
+.button-component-11 {
+	align-self: stretch;
+	height: 58px;
+	border-radius: 16px;
+	background-color: #f5abab;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 16px 24px;
+	box-sizing: border-box;
+	color: #0d0000;
+}
+.label15 {
+	position: relative;
+	line-height: 50px;
+	flex-shrink: 0;
+}
+.button-component-12 {
+	align-self: stretch;
+	height: 58px;
+	border-radius: 16px;
+	background-color: #fce3e3;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 16px 24px;
+	box-sizing: border-box;
+}
+.restaurant-home-page-map {
+	height: 739px;
+	width: 959px;
+	border-radius: 16px;
+	background-color: #fce3e3;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	font-size: 23px;
+	color: #9f9999;
+	font-family: Poppins;
+}
+.button-component-10-parent {
+	align-self: stretch;
+	border-radius: 16px 16px 0px 0px;
+	background-color: #a1e5c1;
+	display: flex;
+	align-items: center;
+	padding: 5px 10px;
+	gap: 47px;
+}
+.button-component-1010 {
+	height: 53px;
+	width: 178px;
+	border-radius: 16px;
+	background-color: #d3cece;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 16px 24px;
+	box-sizing: border-box;
+}
+.button-component-112 {
+	height: 53px;
+	width: 178px;
+	border-radius: 16px;
+	background-color: #2c5f44;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 16px 24px;
+	box-sizing: border-box;
+	color: #fcf7f7;
+}
+.overlayhorizontalborder {
+	width: 959px;
+	height: 87px;
+	position: relative;
+	background-color: #d3cece;
+	color: #410606;
+}
+.container8 {
+	position: absolute;
+	top: 16px;
+	left: 16px;
+	height: 48px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+.container-icon {
+	height: 35.9px;
+	width: 35.9px;
+	border-radius: 10px;
+}
+.container9 {
+	height: 48px;
+	width: 229.3px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+.heading-1 {
+	height: 28px;
+	display: flex;
+	align-items: flex-start;
+}
+.find-ratatouille {
+	position: relative;
+	line-height: 40px;
+	flex-shrink: 0;
+}
+.paragraph2 {
+	align-self: stretch;
+	height: 20px;
+	display: flex;
+	align-items: flex-start;
+	font-size: 13px;
+	color: #0d0000;
+	font-family: Inter;
+}
+.papentorenvest-1a-2011 {
+	position: relative;
+	line-height: 30px;
+	font-weight: 600;
+	flex-shrink: 0;
+}
+.restaurant-home-page-map-inner {
+	align-self: stretch;
+	flex: 1;
+	position: relative;
+	border-radius: 20px;
+	overflow: auto;
+	text-align: center;
+	color: #000;
+}
+.screenshot-2026-01-25-002625-1-parent {
+	position: absolute;
+	top: -334px;
+	left: -488px;
+	width: 2584px;
+	height: 1655px;
+	flex-shrink: 0;
+}
+.screenshot-2026-01-25-002625-1 {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 2584px;
+	height: 1655px;
+	object-fit: cover;
+}
+.ratatouille-parent {
+	position: absolute;
+	top: 1367px;
+	left: 1216px;
+	width: 179px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.ratatouille {
+	align-self: stretch;
+	position: relative;
+	line-height: 40px;
+}
+.component-742 {
+	align-self: stretch;
+	height: 106px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+.union-icon {
+	align-self: stretch;
+	flex: 1;
+	position: relative;
+	max-width: 100%;
+	overflow: hidden;
+	max-height: 100%;
+}
+.component-74-group {
+	position: absolute;
+	top: 10px;
+	left: 2132px;
+	width: 179px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.patronaat-parent {
+	position: absolute;
+	top: 684px;
+	left: 268px;
+	width: 179px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
