@@ -5,13 +5,21 @@
  */
 
 :root {
+    /* Colors - matching main.css */
     --color-bg-dark: #0d0000;
-    --color-text-light: #fff5f5;
-    --color-border-light: rgba(255, 255, 255, 0.1);
+    --color-text-light: #fcf7f7;
+    --color-text-primary: #ffffff;
     --color-accent-pink: #f5abab;
-    --color-accent-yellow: #f5e1ab;
-    --font-primary: 'Poppins', sans-serif;
-    --transition: all 0.3s ease;
+    --color-accent-yellow: #f7d117;
+    --color-text-disabled: #410606;
+    --color-border-light: rgba(255, 255, 255, 0.1);
+
+    /* Fonts - matching main.css */
+    --font-primary: Arimo, sans-serif;
+    --font-secondary: Inter, sans-serif;
+
+    /* Transitions */
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Layout */
@@ -145,6 +153,16 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
+	transition: var(--transition);
+}
+
+.stat-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card a {
+	display: block;
 }
 
 .stat-value {
@@ -297,4 +315,38 @@
 .tox-tinymce {
 	border-radius: 8px;
 	border: 1px solid var(--color-border-light);
+}
+
+/* ===== FLASH MESSAGES ===== */
+.flash {
+	padding: 1rem 1.5rem;
+	border-radius: 8px;
+	margin-bottom: 1.5rem;
+	font-family: var(--font-secondary);
+	font-weight: 500;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.flash-success {
+	background: rgba(34, 197, 94, 0.1);
+	border: 1px solid rgba(34, 197, 94, 0.3);
+	color: #166534;
+}
+
+.flash-error {
+	background: rgba(239, 68, 68, 0.1);
+	border: 1px solid rgba(239, 68, 68, 0.3);
+	color: #991b1b;
+}
+
+/* ===== ADMIN SPECIFIC OVERRIDES ===== */
+/* Ensure admin content area has proper spacing with header/footer */
+.admin-wrapper {
+	min-height: calc(100vh - 300px); /* Account for header + footer */
+}
+
+/* Admin navigation link styling */
+.nav-link.admin-active {
+	color: var(--color-accent-yellow) !important;
+	border-bottom-color: var(--color-accent-yellow) !important;
 }

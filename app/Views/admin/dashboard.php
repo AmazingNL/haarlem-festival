@@ -1,120 +1,93 @@
 <!-- Admin Dashboard Homepage -->
 
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="mb-3">Dashboard</h1>
-            <p class="text-muted">Welcome to the Haarlem Festival admin panel</p>
-        </div>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="row g-4">
-        <!-- Users Card -->
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="flex-shrink-0">
-                            <i class="bi bi-people fs-1 text-primary"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted text-uppercase mb-1">Total Users</h6>
-                            <h2 class="mb-0">—</h2>
-                        </div>
-                    </div>
-                    <a href="/admin/users" class="btn btn-outline-primary btn-sm w-100">
-                        <i class="bi bi-arrow-right"></i> Manage Users
-                    </a>
-                </div>
+<div class="admin-wrapper">
+    <!-- Page Header -->
+    <div class="admin-panel">
+        <div class="admin-header">
+            <h1 class="admin-title">Dashboard</h1>
+            <div class="admin-actions">
+                <p class="muted">Welcome to the Haarlem Festival admin panel</p>
             </div>
         </div>
 
-        <!-- Events Card -->
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="flex-shrink-0">
-                            <i class="bi bi-calendar-event fs-1 text-success"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted text-uppercase mb-1">Total Events</h6>
-                            <h2 class="mb-0">—</h2>
-                        </div>
-                    </div>
-                    <a href="/admin/events" class="btn btn-outline-success btn-sm w-100">
-                        <i class="bi bi-arrow-right"></i> Manage Events
-                    </a>
-                </div>
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <!-- Users Card -->
+            <div class="stat-card">
+                <span class="stat-label">Total Users</span>
+                <span class="stat-value">—</span>
+                <a href="/admin/users" class="btn-primary" style="text-align: center; text-decoration: none; margin-top: 0.5rem;">
+                    Manage Users
+                </a>
+            </div>
+
+            <!-- Events Card -->
+            <div class="stat-card">
+                <span class="stat-label">Total Events</span>
+                <span class="stat-value">—</span>
+                <a href="/admin/events" class="btn-primary" style="text-align: center; text-decoration: none; margin-top: 0.5rem;">
+                    Manage Events
+                </a>
+            </div>
+
+            <!-- Orders Card -->
+            <div class="stat-card">
+                <span class="stat-label">Total Orders</span>
+                <span class="stat-value">—</span>
+                <a href="/admin/orders" class="btn-primary" style="text-align: center; text-decoration: none; margin-top: 0.5rem;">
+                    View Orders
+                </a>
+            </div>
+
+            <!-- Content Card -->
+            <div class="stat-card">
+                <span class="stat-label">Content Pages</span>
+                <span class="stat-value">—</span>
+                <a href="/admin/content" class="btn-primary" style="text-align: center; text-decoration: none; margin-top: 0.5rem;">
+                    Manage Content
+                </a>
             </div>
         </div>
 
-        <!-- Orders Card -->
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="flex-shrink-0">
-                            <i class="bi bi-cart fs-1 text-warning"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted text-uppercase mb-1">Total Orders</h6>
-                            <h2 class="mb-0">—</h2>
-                        </div>
-                    </div>
-                    <a href="/admin/orders" class="btn btn-outline-warning btn-sm w-100">
-                        <i class="bi bi-arrow-right"></i> View Orders
-                    </a>
-                </div>
+        <!-- Quick Actions Section -->
+        <div class="card">
+            <h3 style="font-family: var(--font-primary); color: var(--color-bg-dark); font-size: 1.25rem; margin-bottom: 1rem;">⚡ Quick Actions</h3>
+            <div class="form-actions">
+                <button class="btn-primary" disabled>
+                    ➕ Add Event
+                </button>
+                <button class="btn-primary" disabled>
+                    👤 Add User
+                </button>
+                <button class="btn-primary" disabled>
+                    📄 Create Content
+                </button>
             </div>
+            <p class="muted" style="margin-top: 1rem;">
+                ℹ️ Quick action buttons will be enabled once the respective modules are implemented
+            </p>
         </div>
 
-        <!-- Content Card -->
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="flex-shrink-0">
-                            <i class="bi bi-file-text fs-1 text-info"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted text-uppercase mb-1">Content Pages</h6>
-                            <h2 class="mb-0">—</h2>
-                        </div>
-                    </div>
-                    <a href="/admin/content" class="btn btn-outline-info btn-sm w-100">
-                        <i class="bi bi-arrow-right"></i> Manage Content
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions Section -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">
-                        <i class="bi bi-lightning-charge"></i> Quick Actions
-                    </h5>
-                    <div class="d-flex flex-wrap gap-2">
-                        <button class="btn btn-primary" disabled>
-                            <i class="bi bi-plus-circle"></i> Add Event
-                        </button>
-                        <button class="btn btn-success" disabled>
-                            <i class="bi bi-person-plus"></i> Add User
-                        </button>
-                        <button class="btn btn-info" disabled>
-                            <i class="bi bi-file-earmark-plus"></i> Create Content
-                        </button>
-                    </div>
-                    <p class="text-muted small mt-3 mb-0">
-                        <i class="bi bi-info-circle"></i> Quick action buttons will be enabled once the respective modules are implemented
-                    </p>
-                </div>
-            </div>
+        <!-- Recent Activity Section -->
+        <div class="card">
+            <h3 style="font-family: var(--font-primary); color: var(--color-bg-dark); font-size: 1.25rem; margin-bottom: 1rem;">Recent Activity</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>User</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 2rem;">
+                            <span class="muted">No recent activity to display</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
