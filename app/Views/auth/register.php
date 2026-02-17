@@ -10,7 +10,6 @@
   <script defer src="/assets/js/login.js"></script>
 
   <style>
-    /* Small layout helper for first/last name (uses same design language) */
     .two-col {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -20,7 +19,6 @@
       .two-col { grid-template-columns: 1fr; }
     }
 
-    /* Optional: error box if not already styled in login.css */
     .error-msg {
       background: #ffe7e4;
       border: 1px solid #f2b5ad;

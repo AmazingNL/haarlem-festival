@@ -12,6 +12,10 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Users
 -- Password for all: password123
 -- -------------------------
+-- -------------------------
+-- Users
+-- Password for all: Test12345!
+-- -------------------------
 INSERT INTO `user`
 (user_id, role, username, email, password_hash, first_name, last_name, phone, profile_image_id, is_active, created_at, updated_at)
 VALUES

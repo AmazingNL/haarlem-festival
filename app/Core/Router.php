@@ -111,13 +111,19 @@ final class Router
 
 
             //app route
-            $r->get('/registerForm', [AuthController::class, 'showRegisterForm']);
-            $r->post('/register', [AuthController::class, 'register']);
-            $r->get('/loginForm', [AuthController::class, 'showLogin']);
-            $r->post('/login', [AuthController::class, 'login']);
-            $r->get('/logout', [AuthController::class, 'logout']);
+    //app route
+$r->get('/registerForm', [AuthController::class, 'showRegisterForm']);
+$r->post('/register', [AuthController::class, 'register']);
 
-            $r->get('/', [HomeController::class, 'index']);
+$r->get('/login', [AuthController::class, 'showLogin']);
+$r->post('/login', [AuthController::class, 'login']);
+
+$r->get('/logout', [AuthController::class, 'logout']);
+
+$r->get('/', [HomeController::class, 'index']);
+$r->get('/home', [HomeController::class, 'index']);
+
+
 
             // Add more routes as needed
         }, [

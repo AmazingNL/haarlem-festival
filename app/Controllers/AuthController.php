@@ -76,31 +76,43 @@ final class AuthController extends BaseController
 
     //login part from here
     public function showLogin(): void
-    {
-        $this->view('auth/login', $data =
-        ['title' => 'Login'],
-        layout: 'auth');
+{
+    $this->ensureSession();
+    $flash = $_SESSION['flash'] ?? [];
+    unset($_SESSION['flash']);
+
+    $this->view('auth/login', [
+        'title' => 'Login',
+        'flash' => $flash,
+    ], layout: 'auth');
+}
+
+
+   public function login(): void
+{
+    if (!$this->isPost()) {
+        $this->abort(405, 'Method Not Allowed');
     }
 
-    public function login(): void
-    {
-        if (!$this->isPost()) {
-            $this->abort(405, 'Method Not Allowed');
-        }
+    $this->ensureSession();
+    $this->verifyCsrf();
 
-        $this->verifyCsrf();
-        $this->requireFields(['email_or_Username', 'password']);
+    $this->requireFields(['email_or_Username', 'password']);
 
-        $emailOrUsername = $this->str('email_or_Username');
-        $password = $this->str('password');
+    $emailOrUsername = trim($this->str('email_or_Username'));
+    $password        = $this->str('password'); 
 
-        $user = $this->userService->authenticate($emailOrUsername, $password);
-        if ($user === null) {
-            $this->abort(401, 'Invalid credentials');
-        }
+    $user = $this->userService->authenticate($emailOrUsername, $password);
 
-        $this->loginAndRedirect($user);
+    if ($user === null) {
+        $_SESSION['flash']['error'] = 'Invalid email/username or password.';
+        $this->redirect('/login'); 
+        return;
     }
+
+    $this->loginAndRedirect($user);
+}
+
 
     public function logout(): void
     {
@@ -114,37 +126,34 @@ final class AuthController extends BaseController
     }
 
     private function loginAndRedirect(User $user): void
-    {
-        // Assumes $user->role is an enum UserRole
-        $isAdmin = ($user->role === UserRole::admin);
+{
+    $isAdmin = ($user->role === UserRole::admin);
 
-        // Switch to correct session cookie jar
-        $this->switchSession($isAdmin ? 'HF_ADMIN' : 'HF_APP');
+    $this->switchSession($isAdmin ? 'HF_ADMIN' : 'HF_APP');
 
-        // Store login info in that session only
-        $_SESSION['user_id'] = $user->user_id;
-        $_SESSION['role']    = $user->role->value;
+    $_SESSION['user_id'] = $user->user_id;
+    $_SESSION['role']    = $user->role->value;
 
-        // Redirect
-        if ($isAdmin) {
-            $this->redirect('/admin/dashboard');
-            return;
-        }
-
-        switch ($user->role) {
-            case UserRole::customer:
-                $this->redirect('/loginForm');
-                return;
-
-            case UserRole::employee:
-                $this->redirect('/employee/dashboard');
-                return;
-
-            default:
-                $this->redirect('/login');
-                return;
-        }
+    if ($isAdmin) {
+        $this->redirect('/admin/dashboard');
+        return;
     }
+
+    switch ($user->role) {
+        case UserRole::customer:
+            $this->redirect('/');        
+            return;
+
+        case UserRole::employee:
+            $this->redirect('/employee/dashboard');
+            return;
+
+        default:
+            $this->redirect('/');       
+            return;
+    }
+}
+
 
     private function switchSession(string $sessionName): void
     {
