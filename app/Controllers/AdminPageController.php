@@ -8,6 +8,7 @@ use App\Core\BaseController;
 use App\Services\IAdminPageService;
 use App\Services\IPageSectionService;
 use App\Services\IUserService;
+use App\Models\PageSection;
 
 final class AdminPageController extends BaseController
 {
@@ -112,7 +113,7 @@ final class AdminPageController extends BaseController
             if (is_array($sectionsInput) && !empty($sectionsInput)) {
                 foreach ($sectionsInput as $idx => $s) {
                     $sectionId = isset($s['section_id']) ? (int)$s['section_id'] : 0;
-                    $section = new \App\Models\PageSection();
+                    $section = new PageSection();
                     $section->section_id = $sectionId;
                     $section->page_id = $page_id;
                     $section->section_type = (string) ($s['section_type'] ?? '');

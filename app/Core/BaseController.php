@@ -9,7 +9,6 @@ abstract class BaseController
     protected function view(string $template, array $data = [], ?string $layout = 'main', int $status = 200): void
     {
         $data['csrf'] ??= $this->csrfToken();
-        $data['flash'] ??= $this->getAllFlash();
         http_response_code($status);
         extract($data, EXTR_SKIP);
 
