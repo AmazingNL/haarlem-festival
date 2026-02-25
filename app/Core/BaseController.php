@@ -9,7 +9,8 @@ abstract class BaseController
     protected function view(string $template, array $data = [], ?string $layout = 'main', int $status = 200): void
     {
         $data['csrf'] ??= $this->csrfToken();
-        http_response_code($status);
+        // inject any flash messages stored in session so layouts can render them
+        $data['flash'] = $data['flash'] ?? $this->getAllFlash();
         extract($data, EXTR_SKIP);
 
         $content = __DIR__ . '/../views/' . ltrim($template, '/') . '.php';
@@ -113,7 +114,7 @@ abstract class BaseController
         }
     }
 
-    // ---------- CSRF (simple) ----------
+    // ---------- CSRF ----------
 
     protected function ensureSession(): void
     {

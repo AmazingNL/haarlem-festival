@@ -1,10 +1,10 @@
 <?php 
-$sections = $data['sections'] ?? [];
+$sections = $sections ?? [];
 ?>
 
 <?php foreach ($sections as $section): ?>
 
-    <?php if ($section->getSectionType() === 'hero'): ?>
+    <?php if ($section->getTitle() === 'hero'): ?>
         <section class="hero">
             <h1><?= htmlspecialchars($section->getTitle()) ?></h1>
             <?= $section->getContent() ?>

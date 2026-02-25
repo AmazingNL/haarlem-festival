@@ -27,12 +27,11 @@ class UserRepository extends BaseRepository implements IUserRepository
 
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute([':value' => $email]);
-            $row = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
             if ($row) {
                 return User::fromArray($row);
-            } else {
-                return null;
             }
+            return null;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
         }
@@ -49,9 +48,9 @@ class UserRepository extends BaseRepository implements IUserRepository
 
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute([':id' => $id]);
-            $row = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-            return $row ? $this->rowToUser($row[0]) : null;
+            return $row ? User::fromArray($row) : null;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
         }
@@ -65,8 +64,7 @@ class UserRepository extends BaseRepository implements IUserRepository
                 VALUES
                 (:email, :username, :password_hash, :first_name, :last_name, :role, NOW(), NOW())";
 
-        $data = $this->fromArray($user);
-
+        $data = $user->toArray();
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([
             ':email' => $data['email'],
@@ -74,7 +72,7 @@ class UserRepository extends BaseRepository implements IUserRepository
             ':password_hash' => $data['password_hash'],
             ':first_name' => $data['first_name'],
             ':last_name' => $data['last_name'],
-            ':role' => $data['role']->value,
+            ':role' => $data['role'] ?? null
         ]);
 
         $newId = (int) $this->getConnection()->lastInsertId();
@@ -90,7 +88,7 @@ class UserRepository extends BaseRepository implements IUserRepository
     public function updateUser(User $user): User
     {
         try {
-        $data = $this->userToDbArray($user);
+        $data = $user->toArray();
         $id = (int) ($data[self::PK] ?? 0);
 
         if ($id <= 0) {
@@ -154,13 +152,13 @@ class UserRepository extends BaseRepository implements IUserRepository
         $stmt = $this->getConnection()->query($sql);
 
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return array_map([$this, 'rowToUser'], $rows);
+        return array_map(fn($row) => User::fromArray($row), $rows);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve users. ' . $e->getMessage());
         }
     }
 
-    public function findByRole(string $role): User
+    public function findByRole(string $role): array
     {
         try {
         $sql = "SELECT *
@@ -172,13 +170,13 @@ class UserRepository extends BaseRepository implements IUserRepository
         $stmt->execute([':role' => $role]);
 
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return User::fromArray($rows);
+        return array_map(fn($row) => User::fromArray($row), $rows);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve users by role. ' . $e->getMessage());
         }
     }
 
-    public function findByName(string $name): user
+    public function findByName(string $name): array
     {
         try {
         $sql = "SELECT *
@@ -192,15 +190,12 @@ class UserRepository extends BaseRepository implements IUserRepository
         $stmt->execute([':q' => '%' . $name . '%']);
 
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return User::fromArray($rows);
+        return array_map(fn($row) => User::fromArray($row), $rows);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve users by name. ' . $e->getMessage());
         }
     }
 
-    // ----------------------------
-    // Helpers
-    // ----------------------------
     public function existsByEmailOrUsername(string $email, string $username): bool
     {
         $sql = "SELECT 1
@@ -216,4 +211,10 @@ class UserRepository extends BaseRepository implements IUserRepository
 
         return (bool)$stmt->fetchColumn();
     }
+
+    // ----------------------------
+    // Helpers
+    // ----------------------------
+
+
 }

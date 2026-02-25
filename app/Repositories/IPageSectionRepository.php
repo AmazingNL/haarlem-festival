@@ -3,6 +3,7 @@
 declare(strict_types=1);
 namespace App\Repositories;
 use App\Models\PageSection;
+use App\Core\BaseRepository;
 
 interface IPageSectionRepository
 {
@@ -11,4 +12,10 @@ interface IPageSectionRepository
     public function createSection(PageSection $section): int;
     public function updateSection(PageSection $section): bool;
     public function deleteSection(int $sectionId): bool;
+
+    public function beginTransaction();
+
+    public function commit();
+
+    public function rollBack();
 }

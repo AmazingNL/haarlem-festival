@@ -25,18 +25,37 @@ final class HomeController extends BaseController
             $page_id = $pages->page_id ?? null;
             $homePage = $this->pageSectionService->getSectionsByPageId($page_id);
 
-            $this->view('home/home', [
+            $this->view('/home/home', [
                 'sections' => $homePage,
                 'title' => 'Haarlem Festival',
                 'message' => 'Home page loaded successfully.'
             ]);
 
-        } catch (\Throwable $e) {
-            $this->view('home/home', [
-                'sections' => [],
-                'title' => 'Haarlem Festival',
-                'message' => 'Failed to load home page. Please try again later.'
-            ]);
+        } catch (\Exception $e) {
+            $this->setFlash('error', 'Failed to load home page: ' . $e->getMessage());
+        }
+    }
+
+    public function yummy(): void
+    {
+        try {
+            $page = $this->adminPageService->getPageBySlug('yummy');
+            $page_id = $page->page_id ?? null;
+            $yummy = $this->pageSectionService->getSectionsByPageId($page_id);
+            if (empty($yummy)) {
+                $this->setFlash('error', 'page does not exist');
+                $this->redirect('/');
+            }
+            $this->view(
+                '/yummy/index',
+                ['section' => $yummy, 'page' => $page, 'title' => 'Yummy']
+            );
+
+        } catch (\Exception $e) {
+            $this->view(
+                'no_page/index',
+                ['error' => 'Yummy page not available']
+            );
         }
     }
 }

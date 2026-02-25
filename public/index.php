@@ -20,9 +20,6 @@ $debug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
 error_reporting(E_ALL);
 ini_set('display_errors', $debug ? '1' : '0');
 
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
 
 $router = new \App\Core\Router();
 $router->dispatch();

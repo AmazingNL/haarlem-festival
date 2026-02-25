@@ -12,7 +12,10 @@ abstract class BaseEntity
         $ref = new \ReflectionObject($obj);
 
         foreach ($row as $key => $value) {
-            if (! $ref->hasProperty($key)) {
+            if (!is_string($key)) {
+                continue;
+            }
+            if (!$ref->hasProperty($key)) {
                 continue;
             }
 
@@ -20,7 +23,7 @@ abstract class BaseEntity
             $type = $prop->getType();
 
             if ($type !== null) {
-                $typeName = $type->getName();
+                $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
 
                 // Handle NULLs respecting nullable declarations
                 if ($value === null) {

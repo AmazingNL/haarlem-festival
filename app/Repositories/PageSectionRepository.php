@@ -25,7 +25,7 @@ final class PageSectionRepository extends BaseRepository implements IPageSection
             $stmt->bindValue(':page_id', $pageId, \PDO::PARAM_INT);
             $stmt->execute();
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            return array_map(fn($row) => PageSection::fromArray($row), $rows);
+            return $rows;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve page sections. ' . $e->getMessage());
         }

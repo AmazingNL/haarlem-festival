@@ -32,9 +32,31 @@ html {
 	height: 100%;
 }
 
+/* ===== ACCESSIBILITY HELPERS ===== */
+.skip-link {
+	position: absolute;
+	left: -999px;
+	top: auto;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+.skip-link:focus {
+	left: 1rem;
+	top: 1rem;
+	width: auto;
+	height: auto;
+	background: var(--color-accent-yellow);
+	color: #000;
+	padding: 0.5rem 1rem;
+	border-radius: 4px;
+	z-index: 2000;
+	text-decoration: none;
+}
+
 body {
-	background-color: var(--color-text-light);
-	color: var(--color-text-primary);
+	background-color: #ffffff;
+	color: #111827;
 	font-family: var(--font-secondary);
 	line-height: 1.6;
 	overflow-x: hidden;

@@ -13,7 +13,7 @@ interface IUserRepository
     public function updateUser(User $user): User;
     public function deleteUser(int $id): bool;
     public function findAllUsers(): array;
-    public function findByRole(string $role): user;
-    public function findByName(string $name): user;
+    public function findByRole(string $role): array;
+    public function findByName(string $name): array;
     public function existsByEmailOrUsername(string $email, string $username): bool;
 }

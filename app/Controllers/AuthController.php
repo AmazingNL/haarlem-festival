@@ -7,6 +7,7 @@ use App\Core\BaseController;
 use App\Services\IUserService;
 use App\Models\User;
 use App\Models\Enum\UserRole;
+use Exception;
 
 final class AuthController extends BaseController
 {
@@ -80,39 +81,46 @@ final class AuthController extends BaseController
     public function showLogin(): void
     {
         $this->ensureSession();
+
+        $isAdminLogin = str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin');
+
         $flash = $_SESSION['flash'] ?? [];
         unset($_SESSION['flash']);
 
         $this->view('auth/login', [
             'title' => 'Login',
             'flash' => $flash,
+            'isAdminLogin' => $isAdminLogin,
         ], layout: 'auth');
     }
 
 
     public function login(): void
     {
-        if (!$this->isPost()) {
-            $this->abort(405, 'Method Not Allowed');
+        try {
+            $this->ensureSession();
+            $this->verifyCsrf();
+
+            $this->requireFields(['email_or_Username', 'password']);
+
+            $emailOrUsername = trim($this->str('email_or_Username'));
+            $password = $this->str('password');
+
+            $user = $this->userService->authenticate($emailOrUsername, $password);
+            $loginForm = str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin')
+                ? '/admin/loginForm'
+                : '/loginForm';
+            if ($user === null) {
+                $_SESSION['flash']['error'] = 'Invalid email/username or password.';
+                $this->redirect($loginForm);
+                return;
+            }
+            $this->loginAndRedirect($user);
+        } catch (Exception $e) {
+            $this->setFlash('error', 'Something went wrong');
+            $this->redirect('/loginForm');
         }
 
-        $this->ensureSession();
-        $this->verifyCsrf();
-
-        $this->requireFields(['email_or_Username', 'password']);
-
-        $emailOrUsername = trim($this->str('email_or_Username'));
-        $password = $this->str('password');
-
-        $user = $this->userService->authenticate($emailOrUsername, $password);
-
-        if ($user === null) {
-            $_SESSION['flash']['error'] = 'Invalid email/username or password.';
-            $this->redirect('/login');
-            return;
-        }
-
-        $this->loginAndRedirect($user);
     }
 
 

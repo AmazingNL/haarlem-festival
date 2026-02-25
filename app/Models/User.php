@@ -24,7 +24,6 @@ final class User extends BaseEntity
     public ?string $updated_at = null;
 
 
-    /** @param array<string,mixed> $row */
     public static function fromArray(array $row): static
     {
         $rawRole = $row['role'] ?? null;
@@ -40,6 +39,13 @@ final class User extends BaseEntity
         }
 
         return $user;
+    }
+
+    public function toArray(): array
+    {
+        $data = parent::toArray();
+        $data['role'] = $this->role->value; // store enum as its string value in DB
+        return $data;
     }
 
 }
