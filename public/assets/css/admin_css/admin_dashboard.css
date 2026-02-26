@@ -14,6 +14,87 @@
 	--transition: all 0.3s ease;
 }
 
+/* Match body bg to page content so no white gap ever shows */
+body {
+	background-color: var(--color-text-light);
+}
+
+/* ===== ADMIN NAVBAR USER INFO ===== */
+.admin-nav-user {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.admin-nav-info {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 0.05rem;
+}
+
+.admin-nav-name {
+	color: var(--color-text-light);
+	font-weight: 700;
+	font-size: 0.9rem;
+	line-height: 1.2;
+}
+
+.admin-nav-role {
+	color: var(--color-accent-pink);
+	font-size: 0.72rem;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	line-height: 1.2;
+}
+
+.admin-logout-btn {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.45rem 1rem;
+	border-radius: 8px;
+	border: 1px solid rgba(245, 171, 171, 0.35);
+	background: rgba(245, 171, 171, 0.08);
+	color: var(--color-text-light);
+	font-size: 0.85rem;
+	font-weight: 600;
+	text-decoration: none;
+	transition: var(--transition);
+	white-space: nowrap;
+}
+
+.admin-logout-btn:hover {
+	background: rgba(245, 171, 171, 0.18);
+	border-color: var(--color-accent-pink);
+	color: var(--color-accent-pink);
+}
+
+/* ===== ADD PAGE / PRIMARY CTA BUTTON ===== */
+.admin-add-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	background: var(--color-bg-dark);
+	color: var(--color-text-light);
+	padding: 0.6rem 1.2rem;
+	border-radius: 10px;
+	font-weight: 700;
+	font-size: 0.9rem;
+	text-decoration: none;
+	transition: var(--transition);
+	border: 1px solid rgba(245, 171, 171, 0.2);
+	white-space: nowrap;
+}
+
+.admin-add-btn:hover {
+	background: #2d0a0a;
+	color: var(--color-accent-pink);
+	border-color: var(--color-accent-pink);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 16px rgba(13, 0, 0, 0.18);
+}
+
 .main-container {
 	display: flex;
 	min-height: 100vh;

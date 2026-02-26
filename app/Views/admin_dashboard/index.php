@@ -24,7 +24,9 @@ foreach ($allPages as $p) {
         <p class="muted mb-0">Haarlem Festival 2026 — site overview and quick actions.</p>
     </div>
     <div class="admin-actions">
-        <a class="btn-primary" href="/admin/pages/createPage">+ Add Page</a>
+        <a class="admin-add-btn" href="/admin/pages/createPage">
+            <span aria-hidden="true">+</span> New Page
+        </a>
     </div>
 </div>
 
@@ -46,18 +48,6 @@ foreach ($allPages as $p) {
         <span class="stat-value"><?= $userCount ?></span>
         <span class="stat-label">Users</span>
     </a>
-</div>
-
-<!-- Quick Actions -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h2>Quick Actions</h2>
-    </div>
-    <div class="quick-actions" style="padding: 1rem 1.25rem;">
-        <a href="/admin/pages/createPage" class="btn-primary">+ New Page</a>
-        <a href="/admin/pages/viewPage" class="btn-secondary">Manage Pages</a>
-        <a href="/admin/users" class="btn-secondary">Manage Users</a>
-    </div>
 </div>
 
 <!-- Recent Pages -->

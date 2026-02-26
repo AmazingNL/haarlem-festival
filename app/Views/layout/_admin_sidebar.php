@@ -35,10 +35,5 @@ $isUsers     = str_starts_with($current, '/admin/users');
             </ul>
         </nav>
 
-        <div style="margin-top: auto; padding-top: 2rem;">
-            <a href="/admin/logout" class="sidebar-link" style="opacity:0.7;">
-                Logout
-            </a>
-        </div>
     </div>
 </aside>

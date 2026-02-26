@@ -34,6 +34,7 @@ final class AdminPageController extends BaseController
     public function index(): void
     {
         $this->ensureSession();
+        $this->refreshAdminDisplayName();
         $users = $this->userService->getAllUsers();
         $allPages = $this->adminPageService->getAllPages();
         usort($allPages, fn($a, $b) => strcmp((string)($b->created_at ?? ''), (string)($a->created_at ?? '')));
@@ -463,6 +464,24 @@ final class AdminPageController extends BaseController
         @chmod($dest, 0644);
 
         return '/assets/images/admin/' . $name;
+    }
+
+    /**
+     * Refreshes $_SESSION['display_name'] from the DB so the admin navbar
+     * always shows the real name, even for sessions created before this key existed.
+     */
+    private function refreshAdminDisplayName(): void
+    {
+        $userId = (int)($_SESSION['user_id'] ?? 0);
+        if ($userId <= 0) {
+            return;
+        }
+        $user = $this->userService->getUserById($userId);
+        if ($user === null) {
+            return;
+        }
+        $fullName = trim($user->first_name . ' ' . $user->last_name);
+        $_SESSION['display_name'] = $fullName ?: $user->username;
     }
 
 }

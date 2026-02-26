@@ -141,8 +141,10 @@ final class AuthController extends BaseController
 
         $this->switchSession($isAdmin ? 'HF_ADMIN' : 'HF_APP');
 
-        $_SESSION['user_id'] = $user->user_id;
-        $_SESSION['role'] = $user->role->value;
+        $fullName = trim($user->first_name . ' ' . $user->last_name);
+        $_SESSION['user_id']      = $user->user_id;
+        $_SESSION['role']         = $user->role->value;
+        $_SESSION['display_name'] = $fullName ?: $user->username;
 
         if ($isAdmin) {
             $this->redirect('/admin/dashboard');
