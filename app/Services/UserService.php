@@ -22,6 +22,7 @@ final class UserService implements IUserService
 
     public function authenticate(string $emailOrUsername, string $plainPassword): ?User
     {
+        
         $user = $this->userRepo->findUserByEmail($emailOrUsername);
         if ($user && password_verify($plainPassword, $user->password_hash)) {
             return $user;
@@ -40,6 +41,14 @@ final class UserService implements IUserService
         return $this->userRepo->updateUser($user);
     }
 
+    public function getAllUsers(): array
+    {
+        return $this->userRepo->findAllUsers();
+    }
+    public function getUserByEmail(string $email): ?User
+    {
+        return $this->userRepo->findUserByEmail($email);
+    }
     public function deleteUser(int $id): bool
     {
         return $this->userRepo->deleteUser($id);

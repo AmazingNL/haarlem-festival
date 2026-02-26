@@ -1,32 +1,30 @@
-<?php
-
-declare(strict_types=1);
-namespace App\Views\home;
-
-$homePage = $data['pages'] ?? [];
-$message = $data['message'] ?? null;
-$title = $homePage[0]->title ?? 'Haarlem Festival';
-$sectionType = $homePage[0]->section_type ?? null;
-
-
+<?php 
+$sections = $sections ?? [];
 ?>
 
-<Section>
-    <h1 class="title"><?= htmlspecialchars($title)?></h1>
-    <?php if ($message): ?>
-        <p><?= htmlspecialchars($message) ?>
-    </p><?php endif; ?>
+<?php foreach ($sections as $section): ?>
 
-    <?php foreach ($homePage as $section): ?>
-        <div class="section">
-            <h2><?= htmlspecialchars($section->title) ?></h2>
-            <p><?= nl2br(htmlspecialchars($section->content)) ?></p>
-            <?php if ($section->image_id): ?>
-                <img src="/images/<?= htmlspecialchars($section->image_id) ?>" alt="<?= htmlspecialchars($section->title) ?>">
-            <?php endif; ?>
-            <?php if ($section->button_text && $section->button_link): ?>
-                <a href="<?= htmlspecialchars($section->button_link) ?>" class="btn"><?= htmlspecialchars($section->button_text) ?></a>
-            <?php endif; ?>
-        </div><?php endforeach; ?>
+    <?php if ($section->getTitle() === 'hero'): ?>
+        <section class="hero">
+            <h1><?= htmlspecialchars($section->getTitle()) ?></h1>
+            <?= $section->getContent() ?>
+        </section>
 
-</Section>
+    <?php elseif ($section->getSectionType() === 'text_block'): ?>
+        <section class="text-block">
+            <h2><?= htmlspecialchars($section->getTitle()) ?></h2>
+            <?= $section->getContent() ?>
+        </section>
+
+    <?php elseif ($section->getSectionType() === 'image_left'): ?>
+        <section class="image-left">
+            <img src="/uploads/<?= htmlspecialchars($section->getImagePath()) ?>" alt="">
+            <div>
+                <h2><?= htmlspecialchars($section->getTitle()) ?></h2>
+                <?= $section->getContent() ?>
+            </div>
+        </section>
+
+    <?php endif; ?>
+
+<?php endforeach; ?>

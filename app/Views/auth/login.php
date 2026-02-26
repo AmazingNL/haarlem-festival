@@ -1,22 +1,11 @@
-<?php ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($title ?? 'Login - Haarlem Festival', ENT_QUOTES, 'UTF-8') ?></title>
-
-    <link rel="stylesheet" href="/assets/css/login.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script defer src="/assets/js/login.js"></script>
-</head>
 <body>
     <div class="split-screen">
         <div class="left-panel">
             <div class="overlay"></div>
             <div class="left-content">
                 <h1>Welcome to <br><span>Haarlem</span></h1>
-                <p>Sign in to explore everything Haarlem has to offer—from stories and history to restaurants, dance, and jazz.</p>
+                <p>Sign in to explore everything Haarlem has to offer—from stories and history to restaurants, dance,
+                    and jazz.</p>
                 <div class="brand-footer">THE CITY OF HAARLEM</div>
             </div>
         </div>
@@ -32,14 +21,15 @@
                     <div class="error-msg"><?= htmlspecialchars(($flash ?? [])['error'], ENT_QUOTES, 'UTF-8') ?></div>
                 <?php endif; ?>
 
-                <form action="/login" method="POST">
-                    <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                <form action="<?= !empty($isAdminLogin) ? '/admin/login' : '/login' ?>" method="POST"> <input
+                        type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
                     <div class="form-group">
                         <label>Email or Username</label>
                         <div class="input-wrapper">
                             <i class="fa-regular fa-envelope input-icon"></i>
-                            <input type="text" name="email_or_Username" placeholder="you@example.com or username" required>
+                            <input type="text" name="email_or_Username" placeholder="you@example.com or username"
+                                required>
                         </div>
                     </div>
 
@@ -65,4 +55,3 @@
         </div>
     </div>
 </body>
-</html>

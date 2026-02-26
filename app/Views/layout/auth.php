@@ -2,12 +2,14 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, width=device-width">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($title ?? 'Login - Haarlem Festival', ENT_QUOTES, 'UTF-8') ?></title>
 
-    <!-- <link rel="stylesheet" href="./assets/css/main.css" /> -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" />
+    <link rel="stylesheet" href="/assets/css/login.css">
+    <link rel="stylesheet" href="/assets/css/login.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <main class="main-content">
@@ -17,5 +19,9 @@
             ?>
         </div>
     </main>
+    <script defer src="/assets/js/login.js"></script>
+
+    <script defer src="/assets/js/login.js"></script>
+
 </body>
 </html>

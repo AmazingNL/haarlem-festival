@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, width=device-width">
+    <title>Haarlem Festival</title>
+    <meta name="description" content="Haarlem Festival — events, programs and city guides">
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/home.css" />
 
-    <link rel="stylesheet" href="./assets/css/main.css" />
-    <link rel="stylesheet" href="./assets/css/home.css" />
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" />
 </head>
 
 <body>
-
+    <a class="skip-link" href="#main">Skip to content</a>
     <header class="header">
+        <!-- navbar here -->
         <nav class="navbar">
             <!-- Logo Section -->
             <a href="#" class="logo-link">
@@ -55,42 +55,16 @@
         </nav>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="main-content">
+    <main id="main" class="main-content" role="main">
         <div class="main-container">
-            <?php 
-            // Flash messages injected by BaseController
-            $flash = $flash ?? [];
-            if (!empty($flash)) {
-                if (!empty($flash['success'])) {
-                    $s = $flash['success'];
-                    if (is_array($s)) {
-                        foreach ($s as $m) echo '<div class="flash flash-success">' . htmlspecialchars($m) . '</div>';
-                    } else {
-                        echo '<div class="flash flash-success">' . htmlspecialchars($s) . '</div>';
-                    }
-                }
-                if (!empty($flash['error'])) {
-                    $e = $flash['error'];
-                    if (is_array($e)) {
-                        foreach ($e as $m) echo '<div class="flash flash-error">' . htmlspecialchars($m) . '</div>';
-                    } else {
-                        echo '<div class="flash flash-error">' . htmlspecialchars($e) . '</div>';
-                    }
-                }
-            }
-
-            require $content; 
-            ?>
+            <?php if (isset($content) && is_string($content)) : ?>
+                <?php require $content; ?>
+            <?php endif; ?>
         </div>
     </main>
 
     <footer class="footer">
-
-
-
-
-    <footer class="footer">
+        <!-- footer here -->
         <div class="footer-content">
             <!-- Footer Columns -->
             <div class="footer-columns">
@@ -141,8 +115,7 @@
         </div>
     </footer>
 
-
-    <script src="./assets/js/navbar.js"></script>
+    <script src="/assets/js/navbar.js"></script>
 </body>
 
 </html>

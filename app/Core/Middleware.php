@@ -16,10 +16,17 @@ final class Middleware
         $userId = $_SESSION['user_id'] ?? null;
         $role = $_SESSION['role'] ?? null;
 
-/*         if (!$userId || $role !== 'admin') {
+        if (!$userId || $role !== 'admin') {
             http_response_code(403);
-            echo '403 - Forbidden';
+            // In development, print session debug info to help diagnose missing session data
+            $debug = (($_ENV['APP_DEBUG'] ?? 'false') === 'true');
+            if ($debug) {
+                echo '<h1>403 - Forbidden</h1>';
+                echo '<pre>SESSION: ' . htmlspecialchars(var_export($_SESSION, true), ENT_QUOTES, 'UTF-8') . '</pre>';
+            } else {
+                echo '403 - Forbidden';
+            }
             exit;
-        } */
+        } 
     }
 }

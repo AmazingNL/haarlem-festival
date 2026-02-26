@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Page;
 use App\Repositories\IAdminPageRepository;
 use App\Models\Enum\PageStatus;
+use RuntimeException;
+use Throwable;
 
 final class AdminPageService implements IAdminPageService
 {
@@ -17,7 +19,11 @@ final class AdminPageService implements IAdminPageService
 
     public function getAllPages(): array
     {
-        return $this->repository->getAllPages();
+        try {
+            return $this->repository->getAllPages();
+        } catch (Throwable $e) {
+            throw new RuntimeException($e);
+        }
     }
     public function getPageById(int $id): ?Page
     {
@@ -30,11 +36,9 @@ final class AdminPageService implements IAdminPageService
 
     public function createPage(array $pageData): int
     {
-        try {
-            return $this->repository->createPage($pageData);
-        } catch (\Throwable $e) {
-            throw new \RuntimeException($e);
-        }
+
+        return $this->repository->createPage($pageData);
+
     }
 
     public function updatePage(int $id, array $pageData): bool
@@ -50,7 +54,8 @@ final class AdminPageService implements IAdminPageService
     public function getPublishedPages(): array
     {
         $pages = $this->repository->getAllPages();
-        return array_values(array_filter($pages,
+        return array_values(array_filter(
+            $pages,
             fn($p) => (((isset($p->status) && $p->status instanceof PageStatus)
                 ? $p->status->value
                 : (string) ($p->status ?? '')) === PageStatus::published->value)
