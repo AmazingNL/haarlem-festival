@@ -63,4 +63,15 @@ final class UserService implements IUserService
     {
         return $this->userRepo->existsByEmailOrUsername($email, $username);
     }
+
+    /**
+     * @param string $role   Empty = all roles.
+     * @param string $search Name/email search term. Empty = no filter.
+     * @param string $sort   date_desc|date_asc|name_asc|name_desc.
+     * @return User[]
+     */
+    public function filterUsers(string $role, string $search, string $sort): array
+    {
+        return $this->userRepo->findFiltered($role, $search, $sort);
+    }
 }

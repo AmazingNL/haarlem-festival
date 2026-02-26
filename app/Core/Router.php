@@ -123,6 +123,9 @@ final class Router
             $r->get('/admin/pages/viewPage', [AdminPageController::class, 'viewPages']);
             $r->get('/admin/pageSection/editPage', [AdminPageController::class, 'updatePageSection']);
             $r->get('/admin/users', [AdminPageController::class, 'manageUsersPage']);
+            $r->get('/admin/users/{id:\d+}/edit', [AdminPageController::class, 'editUserForm']);
+            $r->post('/admin/users/{id:\d+}/update', [AdminPageController::class, 'updateUserAction']);
+            $r->get('/admin/users/{id:\d+}/delete', [AdminPageController::class, 'deleteUserAction']);
             $r->get('/admin/events/{event_id:\d+}', [AdminPageController::class, 'viewEventPage']);
             $r->get('/admin/events/{event_id:\d+}/delete', [AdminPageController::class, 'deleteEventPage']);
             $r->get('/admin/events/{event_id:\d+}/edit', [AdminPageController::class, 'updateEventPage']);

@@ -7,6 +7,8 @@ namespace App\Controllers;
 use App\Core\BaseController;
 use App\Core\Middleware;
 use App\Models\Page;
+use App\Models\User;
+use App\Models\Enum\UserRole;
 use App\Services\IAdminPageService;
 use App\Services\IPageSectionService;
 use App\Services\IUserService;
@@ -376,12 +378,81 @@ final class AdminPageController extends BaseController
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function manageUsersPage(): void
     {
-        $this->ensureSession();
         Middleware::requireAdmin();
-        $users = $this->userService->getAllUsers();
-        $this->view('admin/manage_users', ['users' => $users, 'title' => 'Manage Users'], 'admin_dashboard');
+        $role   = $this->str('role');
+        $search = $this->str('search');
+        $sort   = $this->str('sort', 'date_desc');
+        $users  = $this->userService->filterUsers($role, $search, $sort);
+        $this->view('admin/manage_users', compact('users', 'role', 'search', 'sort') + ['title' => 'Manage Users'], 'admin_dashboard');
+    }
+
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function editUserForm(int $id): void
+    {
+        Middleware::requireAdmin();
+        $user = $this->userService->getUserById($id);
+        if ($user === null) {
+            $this->setFlash('error', 'User not found');
+            $this->redirect('/admin/users');
+            return;
+        }
+        $this->view('admin/edit_user', ['user' => $user, 'title' => 'Edit User'], 'admin_dashboard');
+    }
+
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function updateUserAction(int $id): void
+    {
+        $this->verifyCsrf();
+        Middleware::requireAdmin();
+        $user = $this->userService->getUserById($id);
+        if ($user === null) {
+            $this->abort(404, 'User not found');
+        }
+        $this->hydrateUserFromPost($user);
+        $this->userService->updateUser($user);
+        $this->setFlash('success', 'User updated successfully');
+        $this->redirect('/admin/users');
+    }
+
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function deleteUserAction(int $id): void
+    {
+        Middleware::requireAdmin();
+        if ($id === (int)($_SESSION['user_id'] ?? 0)) {
+            $this->setFlash('error', 'You cannot delete your own account');
+            $this->redirect('/admin/users');
+            return;
+        }
+        $this->userService->deleteUser($id);
+        $this->setFlash('success', 'User deleted');
+        $this->redirect('/admin/users');
+    }
+
+    /**
+     * @param User $user
+     * @return void
+     */
+    private function hydrateUserFromPost(User $user): void
+    {
+        $user->first_name = $this->str('first_name');
+        $user->last_name  = $this->str('last_name');
+        $user->email      = $this->str('email');
+        $user->username   = $this->str('username');
+        $user->role       = UserRole::from($this->str('role'));
     }
 
     // minimal stubs for routes referenced in Router
