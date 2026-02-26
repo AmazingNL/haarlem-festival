@@ -138,6 +138,81 @@
 	color: rgba(13, 0, 0, 0.6);
 }
 
+/* ===== STAT CARD VARIANTS ===== */
+.stat-card {
+	border-radius: 12px;
+	padding: 1.25rem 1.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+	text-decoration: none;
+	transition: var(--transition);
+}
+.stat-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.13);
+}
+.stat-card--pink {
+	background: linear-gradient(135deg, #f9d0d0 0%, #fce8e8 100%);
+	border-left: 4px solid var(--color-accent-pink);
+}
+.stat-card--green {
+	background: linear-gradient(135deg, #c5eed8 0%, #e0f6eb 100%);
+	border-left: 4px solid #4caf7d;
+}
+.stat-card--yellow {
+	background: linear-gradient(135deg, #f5e1ab 0%, #faf0d2 100%);
+	border-left: 4px solid #c8a237;
+}
+.stat-card--blue {
+	background: linear-gradient(135deg, #b8d8f0 0%, #d8ecf8 100%);
+	border-left: 4px solid #4a8fc0;
+}
+
+/* ===== STATUS BADGES ===== */
+.badge-published {
+	display: inline-block;
+	padding: 0.25rem 0.65rem;
+	border-radius: 999px;
+	background: rgba(76, 175, 125, 0.15);
+	color: #2d7a53;
+	font-weight: 600;
+	font-size: 0.8rem;
+}
+.badge-draft {
+	display: inline-block;
+	padding: 0.25rem 0.65rem;
+	border-radius: 999px;
+	background: rgba(200, 162, 55, 0.15);
+	color: #7a5e10;
+	font-weight: 600;
+	font-size: 0.8rem;
+}
+.badge-archived {
+	display: inline-block;
+	padding: 0.25rem 0.65rem;
+	border-radius: 999px;
+	background: rgba(0, 0, 0, 0.06);
+	color: rgba(13, 0, 0, 0.55);
+	font-weight: 600;
+	font-size: 0.8rem;
+}
+
+/* ===== QUICK ACTIONS ===== */
+.quick-actions {
+	display: flex;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+}
+
+/* ===== DANGER BUTTON ===== */
+.btn-danger {
+	background: rgba(220, 53, 69, 0.1);
+	color: #c0392b;
+	border: 1px solid rgba(220, 53, 69, 0.25);
+}
+
 .card {
 	background: var(--color-text-light);
 	border-radius: 10px;

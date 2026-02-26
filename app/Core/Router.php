@@ -108,6 +108,7 @@ final class Router
             $r->get('/admin/loginForm', [AuthController::class, 'showLogin']);
             $r->post('/admin/login', [AuthController::class, 'login']);
             $r->get('/admin/logout', [AuthController::class, 'logout']);
+            $r->get('/admin', [AdminPageController::class, 'index']);
             $r->get('/admin/dashboard', [AdminPageController::class, 'index']);
             $r->get('/admin/dashboard/{page_id:\d+}/delete', [AdminPageController::class, 'deletePage']);
             $r->get('/admin/pages/createPage', [AdminPageController::class, 'createPageForm']);

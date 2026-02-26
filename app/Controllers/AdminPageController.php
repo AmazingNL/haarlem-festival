@@ -35,11 +35,16 @@ final class AdminPageController extends BaseController
     {
         $this->ensureSession();
         $users = $this->userService->getAllUsers();
-        $userCount = count($users);
-        $pages = $this->adminPageService->getPublishedPages();
+        $allPages = $this->adminPageService->getAllPages();
+        usort($allPages, fn($a, $b) => strcmp((string)($b->created_at ?? ''), (string)($a->created_at ?? '')));
         $this->view(
             'admin_dashboard/index',
-            ['page' => $pages, 'userCount' => $userCount, 'title' => 'Admin Dashboard'],
+            [
+                'allPages'    => $allPages,
+                'recentPages' => array_slice($allPages, 0, 5),
+                'userCount'   => count($users),
+                'title'       => 'Admin Dashboard',
+            ],
             layout: 'admin_dashboard'
         );
     }
@@ -372,7 +377,10 @@ final class AdminPageController extends BaseController
 
     public function manageUsersPage(): void
     {
-        $this->view('admin/manage_users', [], 'admin_dashboard');
+        $this->ensureSession();
+        Middleware::requireAdmin();
+        $users = $this->userService->getAllUsers();
+        $this->view('admin/manage_users', ['users' => $users, 'title' => 'Manage Users'], 'admin_dashboard');
     }
 
     // minimal stubs for routes referenced in Router

@@ -1,21 +1,44 @@
 <?php
 // Reusable admin sidebar partial — included in admin layout so it's present on all admin pages
 $current = $_SERVER['REQUEST_URI'] ?? '/';
+
+$isDashboard = ($current === '/admin' || $current === '/admin/dashboard');
+$isPages     = str_starts_with($current, '/admin/pages') || str_starts_with($current, '/admin/pageSection');
+$isUsers     = str_starts_with($current, '/admin/users');
 ?>
 <aside class="col-md-3 mb-4">
-    <div class="p-3 bg-dark text-light rounded">
+    <div class="admin-sidebar">
         <div class="brand mb-3">
-            <h5 class="m-0">HAARLEM</h5>
+            <a href="/admin/dashboard" style="text-decoration:none; color: var(--color-text-light);">
+                <h5 class="m-0">HAARLEM</h5>
+                <small style="font-size:0.7rem; opacity:0.6;">Festival 2026 — Admin</small>
+            </a>
         </div>
 
-        <nav class="nav flex-column mt-3">
-            <a class="nav-link text-light <?= $current === '/admin' ? 'active' : '' ?>" href="/admin">Dashboard</a>
-            <a class="nav-link text-light <?= strpos($current, '/admin/pages') === 0 ? 'active' : '' ?>"
-                href="/admin/pages/viewPage">Pages</a>
-            <a class="nav-link text-light <?= strpos($current, '/admin/users') === 0 ? 'active' : '' ?>"
-                href="/admin/users">Users</a>
-            <a class="nav-link text-light <?= strpos($current, '/admin/settings') === 0 ? 'active' : '' ?>"
-                href="/admin/settings">Settings</a>
+        <nav>
+            <ul class="sidebar-nav">
+                <li>
+                    <a class="sidebar-link <?= $isDashboard ? 'active' : '' ?>" href="/admin/dashboard">
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-link <?= $isPages ? 'active' : '' ?>" href="/admin/pages/viewPage">
+                        Pages
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-link <?= $isUsers ? 'active' : '' ?>" href="/admin/users">
+                        Users
+                    </a>
+                </li>
+            </ul>
         </nav>
+
+        <div style="margin-top: auto; padding-top: 2rem;">
+            <a href="/admin/logout" class="sidebar-link" style="opacity:0.7;">
+                Logout
+            </a>
+        </div>
     </div>
 </aside>
