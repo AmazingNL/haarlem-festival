@@ -17,96 +17,94 @@ foreach ($pages as $p) {
 }
 
 ?>
-<main class="main-content">
-	<div class="main-container">
-		<aside class="admin-sidebar">
-			<div class="brand">
-				<span class="logo-text">H<span style="opacity:.9">
-						<img class="logo-icon" src="./assets/svg/main/Star 3.svg" alt="logo">
-					</span>RLEM</span>
+<!-- content for the admin right column (layout provides the left sidebar) -->
+<div class="d-flex justify-content-between align-items-start mb-3">
+	<div>
+		<h1 class="h3">Admin Dashboard</h1>
+		<p class="text-muted mb-0">Overview of site content and quick actions.</p>
+	</div>
+	<div>
+		<a class="btn btn-primary" href="/admin/pages/createPage">Add Page</a>
+	</div>
+</div>
+
+<div class="row g-3 mb-4">
+	<div class="col-4">
+		<div class="card text-center">
+			<div class="card-body">
+				<div class="h2 mb-0"><?= $pagesCount ?></div>
+				<div class="text-muted">Pages</div>
 			</div>
-
-			<ul class="sidebar-nav">
-				<li><a href="/admin" class="nav-link sidebar-link active">Dashboard</a></li>
-				<li><a href="/admin/pages/viewPage" class="nav-link sidebar-link">Pages</a></li>
-				<li><a href="/admin/users" class="nav-link sidebar-link">Users</a></li>
-				<li><a href="/admin/settings" class="nav-link sidebar-link">Settings</a></li>
-			</ul>
-		</aside>
-
-		<div class="admin-panel">
-			<div class="admin-header">
-				<div>
-					<h1 class="admin-title">Admin Dashboard</h1>
-					<p class="muted">Overview of site content and quick actions.</p>
-				</div>
-
-				<div class="admin-actions">
-					<a class="btn-primary" href="/admin/pages/createPage">Add Page</a>
-				</div>
-			</div>
-
-			<div class="stats-grid">
-				<div class="stat-card">
-					<div class="stat-value"><?= $pagesCount ?></div>
-					<div class="stat-label">Pages</div>
-				</div>
-				<div class="stat-card">
-					<div class="stat-value"><?= $userCount ?></div>
-					<div class="stat-label">Users</div>
-				</div>
-				<div class="stat-card">
-					<div class="stat-value"><?= $published ?></div>
-					<div class="stat-label">Published</div>
-				</div>
-			</div>
-
-				<div class="card">
-					<div class="card-header">
-						<h2>Recent Pages</h2>
-					</div>
-
-					<table class="table">
-						<thead>
-								<th>Title</th>
-								<th>Status</th>
-								<th>Visibility</th>
-								<th>Publish On</th>
-								<th>Action</th>
-						</thead>
-						<tbody>
-							<?php if (empty($pages)): ?>
-								<tr>
-									<td colspan="5" class="muted">No pages yet.</td>
-								</tr>
-							<?php else: ?>
-								<?php foreach ($pages as $p):
-									$id = (int) ($p->page_id ?? 0);
-									$title = htmlspecialchars((string) ($p->title ?? ''), ENT_QUOTES, 'UTF-8');
-									$statusVal = is_object($p->status) && property_exists($p->status, 'value')
-										? $p->status->value
-										: (string) ($p->status ?? 'draft');
-									$visibility = ($statusVal === 'published') ? 'Public' : 'Private';
-									$publishedOn = htmlspecialchars((string) ($p->created_at ?? '-'), ENT_QUOTES, 'UTF-8');
-									?>
-									<tr>
-										<td><?= $title ?></td>
-										<td><?= htmlspecialchars((string) $statusVal, ENT_QUOTES, 'UTF-8') ?></td>
-										<td><?= $visibility ?></td>
-										<td><?= $publishedOn ?></td>
-										<td class="a">
-											<a href="/admin/pages/<?= $id ?>/editForm" class="btn-primary">Edit</a>
-											<a class="btn-primary" href="/admin/pageSection/<?= $id ?>/pageSectionForm">Add Page
-												Section</a>
-										</td>
-									</tr>
-								<?php endforeach; ?>
-							<?php endif; ?>
-						</tbody>
-					</table>
-				</div>
 		</div>
 	</div>
-</main>
+	<div class="col-4">
+		<div class="card text-center">
+			<div class="card-body">
+				<div class="h2 mb-0"><?= $userCount ?></div>
+				<div class="text-muted">Users</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-4">
+		<div class="card text-center">
+			<div class="card-body">
+				<div class="h2 mb-0"><?= $published ?></div>
+				<div class="text-muted">Published</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="card">
+	<div class="card-header d-flex justify-content-between align-items-center">
+		<h5 class="mb-0">Recent Pages</h5>
+	</div>
+	<div class="card-body p-0">
+		<div class="table-responsive">
+			<table class="table table-hover mb-0">
+				<thead class="table-light">
+					<tr>
+						<th>Title</th>
+						<th>Status</th>
+						<th>Visibility</th>
+						<th>Publish On</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php if (empty($pages)): ?>
+						<tr>
+							<td colspan="5" class="text-muted p-3">No pages yet.</td>
+						</tr>
+					<?php else: ?>
+						<?php foreach ($pages as $p):
+							$id = (int) ($p->page_id ?? 0);
+							$title = htmlspecialchars((string) ($p->title ?? ''), ENT_QUOTES, 'UTF-8');
+							$statusVal = is_object($p->status) && property_exists($p->status, 'value')
+								? $p->status->value
+								: (string) ($p->status ?? 'draft');
+							$visibility = ($statusVal === 'published') ? 'Public' : 'Private';
+							$publishedOn = htmlspecialchars((string) ($p->created_at ?? '-'), ENT_QUOTES, 'UTF-8');
+							?>
+							<tr>
+								<td><?= $title ?></td>
+								<td><?= htmlspecialchars((string) $statusVal, ENT_QUOTES, 'UTF-8') ?></td>
+								<td><?= $visibility ?></td>
+								<td><?= $publishedOn ?></td>
+								<td>
+									<a href="/admin/pages/<?= $id ?>/editForm" class="btn btn-sm btn-outline-primary">Edit</a>
+									<a href="/admin/pageSection/<?= $id ?>/pageSectionForm"
+										class="btn btn-sm btn-outline-secondary">Add Section</a>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+</section>
+</div>
 
 <?php
