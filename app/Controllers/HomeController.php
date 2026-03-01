@@ -58,5 +58,29 @@ final class HomeController extends BaseController
             );
         }
     }
+
+
+    public function stories(): void
+    {
+        try {
+            $page = $this->adminPageService->getPageBySlug('stories');
+            $page_id = $page->page_id ?? null;
+            $stories = $this->pageSectionService->getSectionsByPageId($page_id);
+            if (empty($stories)) {
+                $this->setFlash('error', 'page does not exist');
+                $this->redirect('/');
+            }
+            $this->view(
+                '/stories/index',
+                ['section' => $stories, 'page' => $page, 'title' => 'Stories']
+            );
+
+        } catch (\Exception $e) {
+            $this->view(
+                'no_page/index',
+                ['error' => 'Stories page not available']
+            );
+        }
+    }
 }
 
