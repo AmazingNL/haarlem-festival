@@ -97,8 +97,17 @@ final class Router
 
     private function buildDispatcher(): Dispatcher
     {
-        $cacheFile = __DIR__ . '/../../storage/cache/routes.cache.php';
+        $cacheDir = __DIR__ . '/../../storage/cache';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0775, true);
+        }
+
+        $cacheFile = $cacheDir . '/routes.cache.php';
         $cacheDisabled = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
+        // Avoid hard failures when the route cache path is not writable.
+        if (!is_dir($cacheDir) || !is_writable($cacheDir)) {
+            $cacheDisabled = true;
+        }
 
         return cachedDispatcher(function (RouteCollector $r) {
             // admin route 

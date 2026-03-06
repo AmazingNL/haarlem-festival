@@ -13,12 +13,12 @@ abstract class BaseController
         $data['flash'] = $data['flash'] ?? $this->getAllFlash();
         extract($data, EXTR_SKIP);
 
-        $content = __DIR__ . '/../views/' . ltrim($template, '/') . '.php';
+        $content = __DIR__ . '/../Views/' . ltrim($template, '/') . '.php';
         if (!is_file($content)) {
             $this->abort(500, "View not found: {$template}");
         }
 
-        $layout = __DIR__ . '/../views/layout/' . ltrim($layout, '/') . '.php';
+        $layout = __DIR__ . '/../Views/layout/' . ltrim($layout, '/') . '.php';
         if (!is_file($layout)) {
             $this->abort(500, "Layout not found: {$layout}");
         }
