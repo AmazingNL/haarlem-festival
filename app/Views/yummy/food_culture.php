@@ -12,22 +12,22 @@
 
 <style>
     .food-culture-section {
-        background: #f6e9e9;
-        padding: 48px 16px 72px;
-        color: #231815;
+        background: var(--color-background);
+        padding: 48px 16px 0;
+        color: var(--color-text-header);
     }
 
     .food-culture-kicker {
         text-align: center;
         font-size: 40px;
-        letter-spacing: 0.2em;
-        color: #6b1a1a;
+        letter-spacing: 0.1em;
+        color: var(--color-text-header);
         margin: 0 0 28px 0;
     }
 
     .food-culture-container {
         max-width: 1100px;
-        margin: 0 auto;
+        margin: 50px auto;
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 42px;
@@ -36,7 +36,13 @@
 
     /* You will add these wrappers INSIDE TinyMCE */
     .food-culture-text h3 {
-        margin-top: 0;
+        margin: 0;
+        color: var(----color-text-header);
+    }
+
+    .food-culture-text p {
+        margin: 10px 0;
+        line-height: 2.2em;
     }
 
     .food-culture-gallery {
@@ -62,5 +68,17 @@
         margin-top: 10px;
         font-size: 14px;
         color: #6b1a1a;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 900px) {
+
+        .food-culture-container {
+            margin: 50px auto;
+            display: grid;
+            grid-template-columns:1fr;
+            gap: 42px;
+            align-items: start;
+        }
     }
 </style>

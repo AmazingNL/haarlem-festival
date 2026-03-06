@@ -159,7 +159,6 @@ final class Router
         if (session_status() === PHP_SESSION_ACTIVE) {
             return;
         }
-        // Separate cookie names
         if ($this->isAdminPath($path)) {
             session_name('HF_ADMIN');
         } else {

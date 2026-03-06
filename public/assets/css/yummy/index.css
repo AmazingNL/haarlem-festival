@@ -1,0 +1,164 @@
+/** @format */
+/* ===================== Welcome banner ===================== */
+ /* HERO BACKGROUND IS NOW THE SECTION */
+
+    .welcome-banner {
+        background-image: url('/assets/images/admin/9b6d4a6e36ebd72fc86d1d10f2c39660.jpg') !important;
+        background-size: cover;
+        background-position: top;
+        background-repeat: no-repeat;
+        min-height: 600px;
+        align-content: center;
+    }
+
+    .welcome-card-inner {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+        padding: 56px 56px;
+        gap: 40px;
+        max-width: 640px;
+    }
+
+    .welcome-card-title {
+        text-transform: uppercase;
+        font-size: xx-large;
+        line-height: 1.1;
+        display: flex;
+        flex-direction: column;
+        gap: 100px;
+    }
+
+    .welcome-card-title--accent {
+        font-size: 4.1rem;
+        font-weight: 1000;
+        background: linear-gradient(90deg, #f2b53a 0%, #e24a2b 45%, #c21f1f 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        white-space: nowrap;
+    }
+
+    .welcome-card-title--main {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: var(--color-text-primary);
+        white-space: nowrap;
+    }
+
+    .welcome-card-content {
+        max-width: 520px;
+        font-size: 1.02rem;
+        line-height: 1.75;
+        color: var(--color-text-primary);
+        margin-bottom: 22px;
+
+    }
+
+    .primary-button .icon-explore {
+        margin-left: 20px;
+        stroke: var(--color-text-primary);
+    }
+
+    .primary-button:hover .icon-explore {
+        stroke: var(--color-text-header);
+        transform: rotate(90deg);
+
+    }
+
+    @media (max-width: 1100px) {
+        .welcome-card-inner {
+            padding: 56px 44px;
+        }
+
+        .welcome-card-title--accent {
+            font-size: 3.1rem;
+        }
+
+        .welcome-card-title--main {
+            font-size: 2.7rem;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .welcome-card {
+            width: calc(100% - 28px);
+        }
+
+        .welcome-card-inner {
+            padding: 64px 22px 28px;
+            max-width: 100%;
+        }
+
+
+        .welcome-banner::after {
+            background: linear-gradient(180deg,
+                    rgba(8, 9, 10, 0.88) 0%,
+                    rgba(8, 9, 10, 0.55) 60%,
+                    rgba(8, 9, 10, 0.45) 100%);
+        }
+    }
+
+
+/* ===================== BreadCrumb ===================== */
+.icon-fixed svg {
+	width: 100%;
+	height: 100%;
+}
+
+.yummy-breadcrumb {
+	width: 100%;
+	background: #9f9999;
+	box-sizing: border-box;
+	position: relative;
+	z-index: 50;
+}
+
+.yummy-breadcrumb-inner {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 18px 24px;
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	font-family: var(--font-primary);
+}
+
+.crumb {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+    margin-left: 20px;
+	text-decoration: none;
+	color: var(--color-text-light);
+	font-size: 18px;
+	font-weight: 600;
+	position: relative;
+	z-index: 60;
+}
+
+.crumb--home:hover {
+	color: var(--color-accent-pink);
+}
+.crumb--home:hover .icon-arrow-front {
+	transform: rotate(90deg);
+}
+
+.crumb--current {
+	color: var(--color-text-header);
+}
+
+/* Responsive adjustments */
+@media (max-width: 700px) {
+	.yummy-breadcrumb-inner {
+		padding: 12px 16px;
+	}
+
+	.crumb,
+	.crumb--current {
+		font-size: 16px;
+	}
+}
+
+

@@ -6,8 +6,10 @@
     <meta name="viewport" content="initial-scale=1, width=device-width">
     <title>Haarlem Festival</title>
     <meta name="description" content="Haarlem Festival — events, programs and city guides">
+    <link rel="stylesheet" href="{{ assets('/css/home.css') }}"/> 
     <link rel="stylesheet" href="/assets/css/main.css" />
-    <link rel="stylesheet" href="/assets/css/home.css" />
+    <link rel="stylesheet" href="/assets/css/yummy/index.css" />
+    <link rel="stylesheet" href="/assets/css/yummy/restaurant_card.css" />
 
 </head>
 
@@ -34,7 +36,7 @@
             <ul class="nav-links">
                 <li><a href="#" class="nav-link">History</a></li>
                 <li><a href="#" class="nav-link">Stories</a></li>
-                <li><a href="#" class="nav-link">Restaurants</a></li>
+                <li><a href="/yummy" class="nav-link">Restaurants</a></li>
                 <li><a href="#" class="nav-link">Jazz</a></li>
                 <li><a href="#" class="nav-link">Dance</a></li>
                 <li><a href="#" class="nav-link">My Programs</a></li>
@@ -56,11 +58,19 @@
     </header>
 
     <main id="main" class="main-content" role="main">
-        <div class="main-container">
-            <?php if (isset($content) && is_string($content)) : ?>
-                <?php require $content; ?>
-            <?php endif; ?>
-        </div>
+                <?php if (!empty($flash['success'])): ?>
+            <div class="alert alert-success mx-3" role="status">
+                <?= htmlspecialchars((string) $flash['success'], ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php elseif (!empty($flash['error'])): ?>
+            <div class="alert alert-danger mx-3" role="alert">
+                <?= htmlspecialchars((string) $flash['error'], ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($content) && is_string($content)): ?>
+            <?php require $content; ?>
+        <?php endif; ?>
     </main>
 
     <footer class="footer">

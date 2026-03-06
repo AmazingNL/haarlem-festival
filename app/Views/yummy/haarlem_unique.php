@@ -6,7 +6,7 @@
 
 <style>
     .haarlem-unique-section {
-        background: #f6e9e9;
+        background: var(--color-background);
         padding: 40px 16px;
     }
 
@@ -34,19 +34,19 @@
         display: block;
     }
 
+    .unique-images figure {
+        color: var(--color-text-header);
+    }
+
     .unique-text h3 {
-        font-family: 'Bebas Neue', system-ui, sans-serif;
-        color: #6b1a1a;
+        color: var(--color-text-header);
         font-size: 28px;
         margin: 0 0 14px 0;
     }
 
     .unique-text p {
-        font-family: 'Poppins', system-ui, sans-serif;
-        color: #2f1f1f;
-        line-height: 1.7;
+        color: var(--color-text-header);
         margin: 0;
-        font-size: 15px;
     }
 
     @media (max-width: 900px) {

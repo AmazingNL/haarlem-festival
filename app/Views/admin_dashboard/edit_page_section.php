@@ -82,9 +82,9 @@ $isPublished = (int) ($isPublished ?? ($section?->getIsPublished() ? 1 : 0));
                         value="<?= htmlspecialchars($buttonLink) ?>">
                 </div>
 
-                <div class="field">
+                <div>
                     <label>
-                        <input type="checkbox" name="is_published" value="1" <?= $isPublished ? 'checked' : '' ?>>
+                        <input class="published" type="checkbox" name="is_published" value="1" <?= htmlspecialchars($isPublished ? 'checked' : '') ?>>
                         Published
                     </label>
                 </div>

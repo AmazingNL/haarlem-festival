@@ -18,7 +18,7 @@ $section = $pageSection;
         <div class="card">
             <div class="sections-table">
                 <div class="sections-row sections-row--head">
-                    <div>#</div>
+                    <div>Sort Order</div>
                     <div>Type</div>
                     <div>Title</div>
                     <div>Status / Actions</div>
