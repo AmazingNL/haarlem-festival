@@ -1,17 +1,9 @@
--- ============================================================
--- 02_sample_data.sql
--- Sample data for Haarlem Festival DB (NEW schema)
--- Password for all users: password123
--- ============================================================
+
 -- migrate:up
 USE haarlem_festival;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
--- -------------------------
--- Users
--- Password for all: password123
--- -------------------------
 -- -------------------------
 -- Users
 -- Password for all: Test12345!

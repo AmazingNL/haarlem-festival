@@ -103,8 +103,13 @@ final class Router
         }
 
         $cacheFile = $cacheDir . '/routes.cache.php';
+        $cacheDir = __DIR__ . '/../../storage/cache';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0775, true);
+        }
+
+        $cacheFile = $cacheDir . '/routes.cache.php';
         $cacheDisabled = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
-        // Avoid hard failures when the route cache path is not writable.
         if (!is_dir($cacheDir) || !is_writable($cacheDir)) {
             $cacheDisabled = true;
         }
@@ -168,7 +173,6 @@ final class Router
         if (session_status() === PHP_SESSION_ACTIVE) {
             return;
         }
-        // Separate cookie names
         if ($this->isAdminPath($path)) {
             session_name('HF_ADMIN');
         } else {

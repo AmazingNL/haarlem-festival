@@ -16,6 +16,20 @@
 				"undo redo | styles | bold italic underline | bullist numlist | link image | table | code",
 			branding: true,
 
+			// ADD THIS 👇
+			extended_valid_elements: `
+        svg[class|xmlns|width|height|viewBox|fill|stroke|stroke-width|stroke-linecap|stroke-linejoin],
+        path[d|fill|stroke|stroke-width|stroke-linecap|stroke-linejoin],
+        g[class|fill|stroke|transform],
+        defs,
+        linearGradient[id|x1|y1|x2|y2|gradientUnits],
+        stop[offset|stop-color|stop-opacity]
+    `,
+
+			valid_children: "+svg[path|g|defs|linearGradient|stop]",
+
+			verify_html: false,
+
 			// Keep these:
 			images_upload_credentials: true,
 			image_title: true,

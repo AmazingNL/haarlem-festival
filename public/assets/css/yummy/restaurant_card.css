@@ -1,0 +1,218 @@
+/**
+ * Restaurants grid
+ *
+ * @format
+ */
+
+.restaurants-heading {
+	font-family: "Bebas Neue", system-ui, sans-serif;
+	letter-spacing: 0.15em;
+	color: #6b1a1a;
+	font-size: 36px;
+	margin: 0 0 18px;
+	text-transform: uppercase;
+	text-align: left;
+}
+
+.page-container {
+	max-width: 1200px; /* pick 1100-1400 depending on your taste */
+	margin: 0 auto; /* centers the whole block */
+	padding: 0 24px; /* space on left/right on small screens */
+}
+
+.restaurants-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	gap: 50px;
+	justify-content: center;
+	align-items: center;
+}
+
+.restaurant-card {
+	background: transparent;
+	width: 100%;
+	overflow: visible;
+	max-width: 380px;
+}
+
+.card-media {
+	position: relative;
+	overflow: visible;
+	display: block;
+}
+
+.card-media img {
+	display: block;
+	width: 100%;
+	object-fit: cover;
+	border-radius: 12px 12px 0 0;
+}
+
+.rating-tag {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	padding: 10px;
+	border-radius: 50px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	width: 50px;
+	justify-content: center;
+	align-items: center;
+	background-color: wheat;
+}
+
+.rating-tag .rating {
+	background: #801a1a;
+	border-radius: 50px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	font-weight: 700;
+	font-size: 13px;
+	width: 100%;
+	padding: 10px 20px;
+}
+
+.restaurant-card h3,
+.restaurant-card p {
+	margin: 0;
+}
+.rating-tag p {
+	color: #fff;
+}
+
+.icon-favorite:hover {
+	cursor: pointer;
+	transform: scale(2);
+	fill: #6b1a1a;
+}
+
+.rating-tag .icon-favorite {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.icon-favorite {
+	width: 40px;
+	height: 40px;
+	fill: none;
+}
+
+.fav svg.is-fav .icon-favorite {
+	fill: #231815;
+	stroke: #d3cece;
+}
+
+.card-body {
+	background: #fcddca;
+	padding: 16px;
+	border-radius: 0 0 12px 12px;
+}
+
+.card-title {
+	margin: 0 0 8px;
+	font-size: 16px;
+	color: #231815;
+}
+
+.card-excerpt {
+	margin: 0 0 12px;
+	font-size: 13px;
+	color: #2f1f1f;
+	line-height: 1.45;
+}
+
+.card-tags {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-bottom: 12px;
+}
+
+.card-tags span {
+	background: #7f6e19;
+	color: #fff;
+	padding: 6px 10px;
+	border-radius: 8px;
+	font-size: 12px;
+}
+
+.card-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.card-footer .strong {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	color: #6b1a1a;
+}
+
+.strong strong {
+	margin-top: 10px;
+}
+
+.footer-button a {
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.btn[disabled] {
+	background: #d3cece;
+	color: #9f9999;
+	cursor: not-allowed;
+}
+
+.restaurant-card:hover {
+	transform: translateY(-4px);
+	transition: all 0.5s ease;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+	.restaurants-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (max-width: 640px) {
+	.restaurants-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Popup / detail page error (kept from previous design) */
+.detail-page-error {
+	width: 882px;
+	height: 264px;
+	position: relative;
+	border-radius: 20px;
+	background-color: #fccaca;
+	border: 2px solid #aa0000;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	justify-content: center;
+	padding: 10px;
+	gap: 10px;
+	max-width: 90%;
+	max-height: 90%;
+	overflow: auto;
+	text-align: left;
+	font-size: 33px;
+	color: #0d0000;
+	font-family: "Bebas Neue";
+}

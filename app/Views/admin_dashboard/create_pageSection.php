@@ -54,10 +54,10 @@ $pageId = (int) ($page_id ?? 0);
             <input name="button_link" class="input" type="text" id="sec_button_link" placeholder="/yummy/food-culture">
         </div>
 
-        <div class="field">
-            <label>
-                <input type="checkbox" name="is_published" value="1">
-                Published
+        <div>
+            <label class="checkbox-label">
+                <input class="published" type="checkbox" name="is_published" value="1">
+                Publish
             </label>
         </div>
 
