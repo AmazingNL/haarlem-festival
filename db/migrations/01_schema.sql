@@ -11,41 +11,11 @@ CREATE DATABASE IF NOT EXISTS haarlem_festival
   COLLATE utf8mb4_unicode_ci;
 
 USE haarlem_festival;
-
--- ============================================================
--- SAFE RESET (drop in correct dependency order)
--- ============================================================
-
-SET FOREIGN_KEY_CHECKS = 0;
-
-DROP TABLE IF EXISTS page_section_image;
-DROP TABLE IF EXISTS page_section;
-DROP TABLE IF EXISTS page;
-
-DROP TABLE IF EXISTS program_item;
-
-DROP TABLE IF EXISTS invoice_line;
-DROP TABLE IF EXISTS invoice;
-
-DROP TABLE IF EXISTS ticket;
-DROP TABLE IF EXISTS order_ticket;
-DROP TABLE IF EXISTS payment;
-DROP TABLE IF EXISTS `order`;
-
-DROP TABLE IF EXISTS ticket_type;
-DROP TABLE IF EXISTS event;
-DROP TABLE IF EXISTS location;
-
-DROP TABLE IF EXISTS image;
-DROP TABLE IF EXISTS `user`;
-
-SET FOREIGN_KEY_CHECKS = 1;
-
 -- ============================================================
 -- USER
 -- ============================================================
 
-CREATE TABLE `user` (
+CREATE TABLE IF NOT EXISTS `user` (
   user_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
   role ENUM('admin','customer','employee') 
@@ -77,7 +47,7 @@ COLLATE=utf8mb4_unicode_ci;
 -- IMAGE
 -- ============================================================
 
-CREATE TABLE image (
+CREATE TABLE IF NOT EXISTS image (
   image_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   file_path VARCHAR(500) NOT NULL,
   alt_text VARCHAR(255) NULL,
@@ -93,17 +63,9 @@ CREATE TABLE image (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 
 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE `user`
-  ADD CONSTRAINT fk_user_profile_image
-  FOREIGN KEY (profile_image_id)
-  REFERENCES image(image_id)
-  ON DELETE SET NULL ON UPDATE CASCADE;
 
--- ============================================================
--- PAGE (CMS)
--- ============================================================
 
-CREATE TABLE page (
+CREATE TABLE IF NOT EXISTS page (
   page_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   title VARCHAR(255) NOT NULL,
   slug VARCHAR(255) NOT NULL UNIQUE,
@@ -125,7 +87,7 @@ COLLATE=utf8mb4_unicode_ci;
 -- PAGE SECTION (Homepage layout blocks)
 -- ============================================================
 
-CREATE TABLE page_section (
+CREATE TABLE IF NOT EXISTS page_section (
   section_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   page_id BIGINT UNSIGNED NOT NULL,
 
@@ -162,7 +124,7 @@ COLLATE=utf8mb4_unicode_ci;
 -- PAGE SECTION IMAGES (Gallery support)
 -- ============================================================
 
-CREATE TABLE page_section_image (
+CREATE TABLE IF NOT EXISTS page_section_image (
   section_id BIGINT UNSIGNED NOT NULL,
   image_id BIGINT UNSIGNED NOT NULL,
   sort_order INT NOT NULL DEFAULT 0,
@@ -185,7 +147,7 @@ COLLATE=utf8mb4_unicode_ci;
 -- LOCATION
 -- ============================================================
 
-CREATE TABLE location (
+CREATE TABLE IF NOT EXISTS location (
   location_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
   address VARCHAR(255) NOT NULL,
@@ -200,7 +162,7 @@ COLLATE=utf8mb4_unicode_ci;
 -- EVENT
 -- ============================================================
 
-CREATE TABLE event (
+CREATE TABLE IF NOT EXISTS event (
   event_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   title VARCHAR(255) NOT NULL,
   slug VARCHAR(255) NOT NULL UNIQUE,
@@ -231,7 +193,7 @@ COLLATE=utf8mb4_unicode_ci;
 -- TICKET TYPE
 -- ============================================================
 
-CREATE TABLE ticket_type (
+CREATE TABLE IF NOT EXISTS ticket_type (
   ticket_type_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   event_id BIGINT UNSIGNED NOT NULL,
 
@@ -252,7 +214,7 @@ COLLATE=utf8mb4_unicode_ci;
 -- ORDER
 -- ============================================================
 
-CREATE TABLE `order` (
+CREATE TABLE IF NOT EXISTS `order` (
   order_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id BIGINT UNSIGNED NOT NULL,
 
@@ -274,7 +236,7 @@ COLLATE=utf8mb4_unicode_ci;
 -- ORDER TICKET
 -- ============================================================
 
-CREATE TABLE order_ticket (
+CREATE TABLE IF NOT EXISTS order_ticket (
   order_ticket_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   order_id BIGINT UNSIGNED NOT NULL,
   ticket_type_id BIGINT UNSIGNED NOT NULL,
@@ -299,7 +261,7 @@ COLLATE=utf8mb4_unicode_ci;
 -- TICKET
 -- ============================================================
 
-CREATE TABLE ticket (
+CREATE TABLE IF NOT EXISTS ticket (
   ticket_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   order_ticket_id BIGINT UNSIGNED NOT NULL,
 
@@ -322,7 +284,7 @@ COLLATE=utf8mb4_unicode_ci;
 -- PAYMENT
 -- ============================================================
 
-CREATE TABLE payment (
+CREATE TABLE IF NOT EXISTS payment (
   payment_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   order_id BIGINT UNSIGNED NOT NULL,
 
@@ -347,7 +309,7 @@ COLLATE=utf8mb4_unicode_ci;
 -- PROGRAM ITEM
 -- ============================================================
 
-CREATE TABLE program_item (
+CREATE TABLE IF NOT EXISTS program_item (
   program_item_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id BIGINT UNSIGNED NOT NULL,
   event_id BIGINT UNSIGNED NOT NULL,
