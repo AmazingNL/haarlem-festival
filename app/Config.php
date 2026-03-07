@@ -20,4 +20,5 @@ class Config
     {
         return $_ENV['DB_NAME'] ?? 'haarlem_festival';
     }
+
 }
