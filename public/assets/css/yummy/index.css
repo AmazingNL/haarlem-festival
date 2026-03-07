@@ -113,6 +113,7 @@
 	box-sizing: border-box;
 	position: relative;
 	z-index: 50;
+    margin: 0;
 }
 
 .yummy-breadcrumb-inner {
@@ -131,11 +132,14 @@
 	gap: 8px;
     margin-left: 20px;
 	text-decoration: none;
-	color: var(--color-text-light);
 	font-size: 18px;
 	font-weight: 600;
 	position: relative;
 	z-index: 60;
+
+}
+.crumb--home span{
+    color: var(--color-accent-yellow);
 }
 
 .crumb--home:hover {
