@@ -19,6 +19,7 @@
 	/* Fonts */
 	--font-primary: Arimo, sans-serif;
 	--font-secondary: Inter, sans-serif;
+	--font-family: Poppins;
 
 	/* Transitions */
 	--transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
