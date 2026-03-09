@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 use App\Core\BaseController;
-use App\Models\Page;
 use App\Services\IPageSectionService;
 use App\Services\IAdminPageService;
 final class HomeController extends BaseController
@@ -34,6 +33,18 @@ final class HomeController extends BaseController
         } catch (\Exception $e) {
             $this->setFlash('error', 'Failed to load home page: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * @return void
+     * @throws \Throwable
+     */
+    /**
+     * @return void
+     */
+    public function stories(): void
+    {
+        $this->view('stories/index', ['title' => 'Stories in Haarlem']);
     }
 
     public function yummy(): void

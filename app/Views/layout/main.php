@@ -57,7 +57,7 @@
 
     <main id="main" class="main-content" role="main">
         <div class="main-container">
-            <?php if (isset($content) && is_string($content)) : ?>
+            <?php if (isset($content) && is_string($content)): ?>
                 <?php require $content; ?>
             <?php endif; ?>
         </div>
