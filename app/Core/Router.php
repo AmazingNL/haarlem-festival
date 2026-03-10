@@ -142,9 +142,9 @@ final class Router
 
             $r->get('/', [HomeController::class, 'index']);
             $r->get('/home', [HomeController::class, 'index']);
-            $r->get('/stories', [HomeController::class, 'stories']);
             $r->get('/yummy', [HomeController::class, 'yummy']);
             $r->get('/stories', [HomeController::class, 'stories']);
+            $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
 
 
 

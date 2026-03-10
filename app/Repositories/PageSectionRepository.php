@@ -17,15 +17,14 @@ final class PageSectionRepository extends BaseRepository implements IPageSection
     public function getSectionsByPageId(int $pageId): array
     {
         try {
-            $sql = "SELECT *
-                    FROM " . self::TABLE . "
-                    WHERE page_id = :page_id
-                    ORDER BY sort_order ASC";
+            $sql = "SELECT ps.*, i.file_path AS image_path
+                    FROM " . self::TABLE . " ps
+                    LEFT JOIN image i ON i.image_id = ps.image_id
+                    WHERE ps.page_id = ?
+                    ORDER BY ps.sort_order ASC";
             $stmt = $this->getConnection()->prepare($sql);
-            $stmt->bindValue(':page_id', $pageId, \PDO::PARAM_INT);
-            $stmt->execute();
-            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            return $rows;
+            $stmt->execute([$pageId]);
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve page sections. ' . $e->getMessage());
         }

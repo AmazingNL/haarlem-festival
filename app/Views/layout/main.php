@@ -7,15 +7,11 @@
     <title>Haarlem Festival</title>
     <meta name="description" content="Haarlem Festival — events, programs and city guides">
     <link rel="stylesheet" href="/assets/css/main.css" />
-<<<<<<< Updated upstream
     <link rel="stylesheet" href="/assets/css/home.css" />
-=======
     <link rel="stylesheet" href="/assets/css/yummy/index.css" />
     <link rel="stylesheet" href="/assets/css/yummy/restaurant_card.css" />
     <link rel="stylesheet" href="/assets/css/yummy/ratatouille.css" />
     <link rel="stylesheet" href="/assets/css/stories/index.css" />
-
->>>>>>> Stashed changes
 
 </head>
 
@@ -41,13 +37,8 @@
             <!-- Navigation Links -->
             <ul class="nav-links">
                 <li><a href="#" class="nav-link">History</a></li>
-<<<<<<< Updated upstream
-                <li><a href="#" class="nav-link">Stories</a></li>
-                <li><a href="#" class="nav-link">Restaurants</a></li>
-=======
                 <li><a href="/stories" class="nav-link">Stories</a></li>
                 <li><a href="/yummy" class="nav-link">Restaurants</a></li>
->>>>>>> Stashed changes
                 <li><a href="#" class="nav-link">Jazz</a></li>
                 <li><a href="#" class="nav-link">Dance</a></li>
                 <li><a href="#" class="nav-link">My Programs</a></li>
@@ -69,11 +60,9 @@
     </header>
 
     <main id="main" class="main-content" role="main">
-        <div class="main-container">
-            <?php if (isset($content) && is_string($content)): ?>
-                <?php require $content; ?>
-            <?php endif; ?>
-        </div>
+        <?php if (isset($content) && is_string($content)): ?>
+            <?php require $content; ?>
+        <?php endif; ?>
     </main>
 
     <footer class="footer">
@@ -129,6 +118,7 @@
     </footer>
 
     <script src="/assets/js/navbar.js"></script>
+    <script src="/assets/js/stories.js"></script>
 </body>
 
 </html>
