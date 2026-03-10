@@ -10,6 +10,8 @@
 	--color-accent-yellow: #f7d117;
 	--color-text-disabled: #410606;
 	--color-border-light: rgba(255, 255, 255, 0.1);
+	--color-background: #f6e9e9;
+	--color-text-header: #3b0b0b;
 
 	/* Fonts */
 	--font-primary: Arimo, sans-serif;

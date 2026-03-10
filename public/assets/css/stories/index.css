@@ -213,7 +213,7 @@
 
 /* Day panels — only show the active day */
 .sched-body .sched-day { display: none; }
-.sched-body .sched-day.active { display: block; }
+.sched-body .sched-day.active { display: flex; flex-direction: column; gap: 16px; }
 
 .sched-cards {
     display: flex;
@@ -227,6 +227,7 @@
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(65, 6, 6, 0.08);
     overflow: hidden;
+    border-left: 4px solid #7f1414;
 }
 
 .sched-card-body {

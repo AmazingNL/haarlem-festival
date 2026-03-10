@@ -8,9 +8,6 @@
     <meta name="description" content="Haarlem Festival — events, programs and city guides">
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/home.css" />
-    <link rel="stylesheet" href="/assets/css/yummy/index.css" />
-    <link rel="stylesheet" href="/assets/css/yummy/restaurant_card.css" />
-    <link rel="stylesheet" href="/assets/css/yummy/ratatouille.css" />
     <link rel="stylesheet" href="/assets/css/stories/index.css" />
 
 </head>

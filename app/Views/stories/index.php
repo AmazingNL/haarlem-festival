@@ -7,7 +7,6 @@
 
         case 'stories_hero':
             require __DIR__ . '/stories_hero.php';
-            require __DIR__ . '/breadcrumb.php';
             break;
 
         case 'what_is_stories':
