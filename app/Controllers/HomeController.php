@@ -58,5 +58,51 @@ final class HomeController extends BaseController
             );
         }
     }
+
+
+    public function stories(): void
+    {
+        try {
+            $page = $this->adminPageService->getPageBySlug(slug: 'stories');
+            $page_id = $page->page_id ?? null;
+            $stories = $this->pageSectionService->getSectionsByPageId(pageId: $page_id);
+            if (empty($stories)) {
+                $this->setFlash(key: 'error', value: 'page does not exist');
+                $this->redirect(to: '/');
+            }
+            $this->view(
+                template: '/stories/index',
+                data: ['section' => $stories, 'page' => $page, 'title' => 'Stories']
+            );
+        } catch (\Exception $e) {
+            $this->view(
+                template: 'no_page/index',
+                data: ['error' => 'Stories page not available']
+            );
+        }
+    }
+
+    public function ratatouille(): void
+    {
+        try {
+            $page = $this->adminPageService->getPageBySlug('ratatouille');
+            $page_id = $page->page_id ?? null;
+            $ratatouille = $this->pageSectionService->getSectionsByPageId($page_id);
+            if (empty($ratatouille)) {
+                $this->setFlash('error', 'page does not exist');
+                $this->redirect('/');
+            }
+            $this->view(
+                '/ratatouille/index',
+                ['section' => $ratatouille, 'page' => $page, 'title' => 'ratatouille']
+            );
+
+        } catch (\Exception $e) {
+            $this->view(
+                'no_page/index',
+                ['error' => 'ratatouille page not available']
+            );
+        }
+    }
 }
 

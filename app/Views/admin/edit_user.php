@@ -21,76 +21,57 @@ $roles = ['admin', 'employee', 'customer'];
 </div>
 
 <div class="cards">
-    <div class="card" style="max-width:600px;">
-        <div class="card-header">
-            <h2>User #<?= $uid ?></h2>
-        </div>
-        <form method="POST" action="/admin/users/<?= $uid ?>/update" class="p-3">
+    <div class="card">
+        <form method="POST" action="/admin/users/<?= $uid ?>/edit" class="admin-form">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
-            <div class="row mb-3">
-                <div class="col">
-                    <label class="form-label" for="first_name">First name</label>
-                    <input
-                        id="first_name"
-                        type="text"
-                        name="first_name"
-                        class="form-control"
-                        value="<?= $firstName ?>"
-                        required
-                    >
+            <div class="form-grid">
+                <div class="field">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" class="form-input"
+                           value="<?= $firstName ?>" required>
                 </div>
-                <div class="col">
-                    <label class="form-label" for="last_name">Last name</label>
-                    <input
-                        id="last_name"
-                        type="text"
-                        name="last_name"
-                        class="form-control"
-                        value="<?= $lastName ?>"
-                        required
-                    >
+
+                <div class="field">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" class="form-input"
+                           value="<?= $lastName ?>" required>
+                </div>
+
+                <div class="field">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" class="form-select" required>
+                        <?php foreach ($roles as $r): ?>
+                            <option value="<?= $r ?>" <?= $roleVal === $r ? 'selected' : '' ?>>
+                                <?= ucfirst($r) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="field field-full">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-input"
+                           value="<?= $email ?>" required>
+                </div>
+
+                <div class="field field-full">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-input"
+                           value="<?= $username ?>" required>
+                </div>
+
+                <div class="field field-full">
+                    <label for="password">New Password</label>
+                    <input type="password" id="password" name="password" class="form-input"
+                           placeholder="Leave blank to keep current password">
+                    <span class="hint">Only fill this in if you want to change the password.</span>
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label" for="email">Email</label>
-                <input
-                    id="email"
-                    type="email"
-                    name="email"
-                    class="form-control"
-                    value="<?= $email ?>"
-                    required
-                >
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" for="username">Username</label>
-                <input
-                    id="username"
-                    type="text"
-                    name="username"
-                    class="form-control"
-                    value="<?= $username ?>"
-                    required
-                >
-            </div>
-
-            <div class="mb-4">
-                <label class="form-label" for="role">Role</label>
-                <select id="role" name="role" class="form-select">
-                    <?php foreach ($roles as $r): ?>
-                        <option value="<?= $r ?>" <?= $roleVal === $r ? 'selected' : '' ?>>
-                            <?= ucfirst($r) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="row-actions">
-                <button type="submit" class="admin-add-btn">Save Changes</button>
-                <a href="/admin/users" class="btn-secondary">Cancel</a>
+            <div class="form-actions" style="margin-top:1.5rem;">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="/admin/users" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>

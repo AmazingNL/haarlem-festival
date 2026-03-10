@@ -3,8 +3,7 @@ $users  = $users  ?? [];
 $role   = $role   ?? '';
 $search = $search ?? '';
 $sort   = $sort   ?? 'date_desc';
-
-$roles = ['admin', 'employee', 'customer'];
+$roles  = ['admin', 'employee', 'customer'];
 ?>
 
 <div class="admin-header mb-4">
@@ -13,6 +12,7 @@ $roles = ['admin', 'employee', 'customer'];
         <p class="muted mb-0">All registered users on the Haarlem Festival platform.</p>
     </div>
     <div class="admin-actions">
+        <a href="/admin/users/create" class="admin-add-btn">+ Create User</a>
         <a href="/admin/dashboard" class="btn-secondary">← Dashboard</a>
     </div>
 </div>
@@ -30,9 +30,7 @@ $roles = ['admin', 'employee', 'customer'];
     <select name="role" class="form-select form-select-sm" style="max-width:150px;">
         <option value="">All roles</option>
         <?php foreach ($roles as $r): ?>
-            <option value="<?= $r ?>" <?= $role === $r ? 'selected' : '' ?>>
-                <?= ucfirst($r) ?>
-            </option>
+            <option value="<?= $r ?>" <?= $role === $r ? 'selected' : '' ?>><?= ucfirst($r) ?></option>
         <?php endforeach; ?>
     </select>
     <select name="sort" class="form-select form-select-sm" style="max-width:160px;">
@@ -85,6 +83,7 @@ $roles = ['admin', 'employee', 'customer'];
                             'employee' => 'badge-draft',
                             default    => 'badge-archived',
                         };
+                        $isSelf = $uid === (int)($_SESSION['user_id'] ?? 0);
                     ?>
                         <tr>
                             <td class="muted"><?= $uid ?></td>
@@ -97,13 +96,17 @@ $roles = ['admin', 'employee', 'customer'];
                                 </span>
                             </td>
                             <td><?= $createdAt ?></td>
-                            <td class="row-actions">
-                                <a href="/admin/users/<?= $uid ?>/edit" class="btn-secondary">Edit</a>
-                                <a
-                                    href="/admin/users/<?= $uid ?>/delete"
-                                    class="pill btn-danger"
-                                    onclick="return confirm('Delete user <?= addslashes($username) ?>?')"
-                                >Delete</a>
+                            <td>
+                                <div class="row-actions">
+                                    <a href="/admin/users/<?= $uid ?>/edit" class="btn-secondary">Edit</a>
+                                    <?php if ($isSelf): ?>
+                                        <span class="muted" style="font-size:0.8rem; padding:0.5rem 0.4rem;">You</span>
+                                    <?php else: ?>
+                                        <a href="/admin/users/<?= $uid ?>/delete"
+                                           class="btn-danger"
+                                           onclick="return confirm('Delete user <?= addslashes($username) ?>?')">Delete</a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>

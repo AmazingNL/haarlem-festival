@@ -33,8 +33,8 @@
             <!-- Navigation Links -->
             <ul class="nav-links">
                 <li><a href="#" class="nav-link">History</a></li>
-                <li><a href="#" class="nav-link">Stories</a></li>
-                <li><a href="#" class="nav-link">Restaurants</a></li>
+                <li><a href="/stories" class="nav-link">Stories</a></li>
+                <li><a href="/yummy" class="nav-link">Restaurants</a></li>
                 <li><a href="#" class="nav-link">Jazz</a></li>
                 <li><a href="#" class="nav-link">Dance</a></li>
                 <li><a href="#" class="nav-link">My Programs</a></li>
@@ -57,65 +57,66 @@
 
     <main id="main" class="main-content" role="main">
         <div class="main-container">
-            <?php if (isset($content) && is_string($content)) : ?>
+            <?php if (isset($content) && is_string($content)): ?>
                 <?php require $content; ?>
             <?php endif; ?>
         </div>
     </main>
 
-    <footer class="footer">
+    <!-- <footer class="footer">
         <!-- footer here -->
-        <div class="footer-content">
-            <!-- Footer Columns -->
-            <div class="footer-columns">
-                <!-- Culture Column -->
-                <div class="footer-column">
-                    <h3 class="footer-title">Culture</h3>
-                    <ul class="footer-links">
-                        <li><a href="#" class="footer-link">History of Haarlem</a></li>
-                        <li><a href="#" class="footer-link">Stories in Haarlem</a></li>
-                    </ul>
-                </div>
-
-                <!-- What to do Column -->
-                <div class="footer-column">
-                    <h3 class="footer-title">What to do</h3>
-                    <ul class="footer-links">
-                        <li><a href="#" class="footer-link">Events</a></li>
-                        <li><a href="#" class="footer-link">Food and drinks</a></li>
-                        <li><a href="#" class="footer-link">Haarlem Tickets</a></li>
-                    </ul>
-                </div>
-
-                <!-- Follow Us Column -->
-                <div class="footer-column">
-                    <h3 class="footer-title">Follow Us</h3>
-                    <div class="social-links">
-                        <a href="#" class="social-link" aria-label="Facebook">
-                            <img class="social-icon" alt="Facebook" src="./assets/svg/main/facebook.svg">
-                        </a>
-                        <a href="#" class="social-link" aria-label="Instagram">
-                            <img class="social-icon" alt="Instagram" src="./assets/svg/main/instagram.svg">
-                        </a>
-                        <a href="#" class="social-link" aria-label="Youtube">
-                            <img class="social-icon" alt="Youtube" src="./assets/svg/main/youtube.svg">
-                        </a>
-                    </div>
-                </div>
+    <div class="footer-content">
+        <!-- Footer Columns -->
+        <div class="footer-columns">
+            <!-- Culture Column -->
+            <div class="footer-column">
+                <h3 class="footer-title">Culture</h3>
+                <ul class="footer-links">
+                    <li><a href="#" class="footer-link">History of Haarlem</a></li>
+                    <li><a href="#" class="footer-link">Stories in Haarlem</a></li>
+                </ul>
             </div>
 
-            <!-- Footer Bottom -->
-            <div class="footer-bottom">
-                <p class="footer-copyright">© 2025 Haarlem Marketing. All rights reserved.</p>
-                <nav class="footer-nav">
-                    <a href="#" class="footer-bottom-link">Privacy Policy</a>
-                    <a href="#" class="footer-bottom-link">Terms of Service</a>
-                </nav>
+            <!-- What to do Column -->
+            <div class="footer-column">
+                <h3 class="footer-title">What to do</h3>
+                <ul class="footer-links">
+                    <li><a href="#" class="footer-link">Events</a></li>
+                    <li><a href="#" class="footer-link">Food and drinks</a></li>
+                    <li><a href="#" class="footer-link">Haarlem Tickets</a></li>
+                </ul>
+            </div>
+
+            <!-- Follow Us Column -->
+            <div class="footer-column">
+                <h3 class="footer-title">Follow Us</h3>
+                <div class="social-links">
+                    <a href="#" class="social-link" aria-label="Facebook">
+                        <img class="social-icon" alt="Facebook" src="./assets/svg/main/facebook.svg">
+                    </a>
+                    <a href="#" class="social-link" aria-label="Instagram">
+                        <img class="social-icon" alt="Instagram" src="./assets/svg/main/instagram.svg">
+                    </a>
+                    <a href="#" class="social-link" aria-label="Youtube">
+                        <img class="social-icon" alt="Youtube" src="./assets/svg/main/youtube.svg">
+                    </a>
+                </div>
             </div>
         </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <p class="footer-copyright">© 2025 Haarlem Marketing. All rights reserved.</p>
+            <nav class="footer-nav">
+                <a href="#" class="footer-bottom-link">Privacy Policy</a>
+                <a href="#" class="footer-bottom-link">Terms of Service</a>
+            </nav>
+        </div>
+    </div>
     </footer>
 
     <script src="/assets/js/navbar.js"></script>
-</body>
+    <script src="/assets/js/stories.js"></script> -->
+    <!-- </body> -->
 
 </html>
