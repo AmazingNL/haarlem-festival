@@ -1,13 +1,17 @@
-<?php foreach (($section ?? []) as $s): ?>
-    <?php if (empty($s['is_published']))
-        continue; ?>
+<?php
+$resCard = [];
 
-    <?php
-    $type = trim((string) ($s['section_type'] ?? ''));
-    ?>
+foreach (($section ?? []) as $s) {
+    if (empty($s['is_published'])) continue;
 
-    <?php switch ($type):
+    $type = trim($s['section_type'] ?? '');
 
+    if ($type === 'restaurants_card') {
+        $resCard[] = $s;   // collect
+        continue;          
+    }
+
+    switch ($type) {
         case 'welcome_banner':
             require __DIR__ . '/welcome_banner.php';
             require __DIR__ . '/breadcrumb.php';
@@ -26,8 +30,12 @@
             break;
 
         default:
-            require __DIR__ . '/sections/generic.php';
+            require __DIR__ . '/inspection.php';
             break;
+    }
+}
 
-    endswitch; ?>
-<?php endforeach; ?>
+if (!empty($resCard)) {
+    require __DIR__ . '/restaurants_card.php';
+}
+?>

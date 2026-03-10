@@ -6,8 +6,14 @@
     <meta name="viewport" content="initial-scale=1, width=device-width">
     <title>Haarlem Festival</title>
     <meta name="description" content="Haarlem Festival — events, programs and city guides">
+    <link rel="stylesheet" href="{{ assets('/css/home.css') }}" />
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/home.css" />
+    <link rel="stylesheet" href="/assets/css/stories/index.css" />
+    <link rel="stylesheet" href="/assets/css/yummy/index.css" />
+    <link rel="stylesheet" href="/assets/css/yummy/restaurant_card.css" />
+    <link rel="stylesheet" href="/assets/css/yummy/ratatouille.css" />
+
 
 </head>
 
@@ -34,6 +40,7 @@
             <ul class="nav-links">
                 <li><a href="#" class="nav-link">History</a></li>
                 <li><a href="/stories" class="nav-link">Stories</a></li>
+                <li><a href="#" class="nav-link">Stories</a></li>
                 <li><a href="/yummy" class="nav-link">Restaurants</a></li>
                 <li><a href="#" class="nav-link">Jazz</a></li>
                 <li><a href="#" class="nav-link">Dance</a></li>
@@ -56,67 +63,75 @@
     </header>
 
     <main id="main" class="main-content" role="main">
-        <div class="main-container">
-            <?php if (isset($content) && is_string($content)): ?>
-                <?php require $content; ?>
-            <?php endif; ?>
-        </div>
+        <?php if (!empty($flash['success'])): ?>
+            <div class="alert alert-success mx-3" role="status">
+                <?= htmlspecialchars((string) $flash['success'], ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php elseif (!empty($flash['error'])): ?>
+            <div class="alert alert-danger mx-3" role="alert">
+                <?= htmlspecialchars((string) $flash['error'], ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($content) && is_string($content)): ?>
+            <?php require $content; ?>
+        <?php endif; ?>
     </main>
 
-    <!-- <footer class="footer">
+    <footer class="footer">
         <!-- footer here -->
-    <div class="footer-content">
-        <!-- Footer Columns -->
-        <div class="footer-columns">
-            <!-- Culture Column -->
-            <div class="footer-column">
-                <h3 class="footer-title">Culture</h3>
-                <ul class="footer-links">
-                    <li><a href="#" class="footer-link">History of Haarlem</a></li>
-                    <li><a href="#" class="footer-link">Stories in Haarlem</a></li>
-                </ul>
-            </div>
+        <div class="footer-content">
+            <!-- Footer Columns -->
+            <div class="footer-columns">
+                <!-- Culture Column -->
+                <div class="footer-column">
+                    <h3 class="footer-title">Culture</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">History of Haarlem</a></li>
+                        <li><a href="#" class="footer-link">Stories in Haarlem</a></li>
+                    </ul>
+                </div>
 
-            <!-- What to do Column -->
-            <div class="footer-column">
-                <h3 class="footer-title">What to do</h3>
-                <ul class="footer-links">
-                    <li><a href="#" class="footer-link">Events</a></li>
-                    <li><a href="#" class="footer-link">Food and drinks</a></li>
-                    <li><a href="#" class="footer-link">Haarlem Tickets</a></li>
-                </ul>
-            </div>
+                <!-- What to do Column -->
+                <div class="footer-column">
+                    <h3 class="footer-title">What to do</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">Events</a></li>
+                        <li><a href="#" class="footer-link">Food and drinks</a></li>
+                        <li><a href="#" class="footer-link">Haarlem Tickets</a></li>
+                    </ul>
+                </div>
 
-            <!-- Follow Us Column -->
-            <div class="footer-column">
-                <h3 class="footer-title">Follow Us</h3>
-                <div class="social-links">
-                    <a href="#" class="social-link" aria-label="Facebook">
-                        <img class="social-icon" alt="Facebook" src="./assets/svg/main/facebook.svg">
-                    </a>
-                    <a href="#" class="social-link" aria-label="Instagram">
-                        <img class="social-icon" alt="Instagram" src="./assets/svg/main/instagram.svg">
-                    </a>
-                    <a href="#" class="social-link" aria-label="Youtube">
-                        <img class="social-icon" alt="Youtube" src="./assets/svg/main/youtube.svg">
-                    </a>
+                <!-- Follow Us Column -->
+                <div class="footer-column">
+                    <h3 class="footer-title">Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <img class="social-icon" alt="Facebook" src="./assets/svg/main/facebook.svg">
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <img class="social-icon" alt="Instagram" src="./assets/svg/main/instagram.svg">
+                        </a>
+                        <a href="#" class="social-link" aria-label="Youtube">
+                            <img class="social-icon" alt="Youtube" src="./assets/svg/main/youtube.svg">
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Footer Bottom -->
-        <div class="footer-bottom">
-            <p class="footer-copyright">© 2025 Haarlem Marketing. All rights reserved.</p>
-            <nav class="footer-nav">
-                <a href="#" class="footer-bottom-link">Privacy Policy</a>
-                <a href="#" class="footer-bottom-link">Terms of Service</a>
-            </nav>
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <p class="footer-copyright">© 2025 Haarlem Marketing. All rights reserved.</p>
+                <nav class="footer-nav">
+                    <a href="#" class="footer-bottom-link">Privacy Policy</a>
+                    <a href="#" class="footer-bottom-link">Terms of Service</a>
+                </nav>
+            </div>
         </div>
-    </div>
     </footer>
 
     <script src="/assets/js/navbar.js"></script>
-    <script src="/assets/js/stories.js"></script> -->
-    <!-- </body> -->
+    <script src="/assets/js/stories.js"></script>
+</body>
 
 </html>

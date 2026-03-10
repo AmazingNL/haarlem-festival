@@ -18,6 +18,14 @@ final class Middleware
 
         if (!$userId || $role !== 'admin') {
             http_response_code(403);
+            $accept = strtolower($_SERVER['HTTP_ACCEPT'] ?? '');
+            $wantsJson = str_contains($accept, 'application/json');
+            if ($wantsJson) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['error' => 'Forbidden'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                exit;
+            }
+
             // In development, print session debug info to help diagnose missing session data
             $debug = (($_ENV['APP_DEBUG'] ?? 'false') === 'true');
             if ($debug) {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 use App\Core\BaseController;
-use App\Models\Page;
 use App\Services\IPageSectionService;
 use App\Services\IAdminPageService;
 final class HomeController extends BaseController
@@ -41,17 +40,25 @@ final class HomeController extends BaseController
         try {
             $page = $this->adminPageService->getPageBySlug('yummy');
             $page_id = $page->page_id ?? null;
+            if ($page_id === null) {
+                $this->view(
+                    'no_page/index',
+                    ['error' => 'Yummy page not available']
+                );
+                return;
+            }
+
             $yummy = $this->pageSectionService->getSectionsByPageId($page_id);
             if (empty($yummy)) {
                 $this->setFlash('error', 'page does not exist');
                 $this->redirect('/');
             }
             $this->view(
-                '/yummy/index',
+                'yummy/index',
                 ['section' => $yummy, 'page' => $page, 'title' => 'Yummy']
             );
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->view(
                 'no_page/index',
                 ['error' => 'Yummy page not available']
@@ -81,7 +88,6 @@ final class HomeController extends BaseController
             );
         }
     }
-
     public function ratatouille(): void
     {
         try {
@@ -99,10 +105,12 @@ final class HomeController extends BaseController
 
         } catch (\Exception $e) {
             $this->view(
-                'no_page/index',
-                ['error' => 'ratatouille page not available']
+                template: 'no_page/index',
+                data: ['error' => 'ratatouille page not available']
             );
+
         }
     }
 }
+
 

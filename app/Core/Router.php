@@ -33,7 +33,7 @@ final class Router
 
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
-                $this->respond(404, '404 - Page not found');
+                $this->renderNotFound();
                 return;
 
             case Dispatcher::METHOD_NOT_ALLOWED:
@@ -97,8 +97,22 @@ final class Router
 
     private function buildDispatcher(): Dispatcher
     {
-        $cacheFile = __DIR__ . '/../../storage/cache/routes.cache.php';
+        $cacheDir = __DIR__ . '/../../storage/cache';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0775, true);
+        }
+
+        $cacheFile = $cacheDir . '/routes.cache.php';
+        $cacheDir = __DIR__ . '/../../storage/cache';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0775, true);
+        }
+
+        $cacheFile = $cacheDir . '/routes.cache.php';
         $cacheDisabled = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
+        if (!is_dir($cacheDir) || !is_writable($cacheDir)) {
+            $cacheDisabled = true;
+        }
 
         return cachedDispatcher(function (RouteCollector $r) {
             // admin route 
@@ -148,6 +162,10 @@ final class Router
             $r->get('/', [HomeController::class, 'index']);
             $r->get('/home', [HomeController::class, 'index']);
             $r->get('/yummy', [HomeController::class, 'yummy']);
+            $r->get('/stories', [HomeController::class, 'stories']);
+            $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
+            $r->get('/yummy/ratatouille', [HomeController::class, 'ratatouille']);
+
 
 
 
@@ -164,7 +182,6 @@ final class Router
         if (session_status() === PHP_SESSION_ACTIVE) {
             return;
         }
-        // Separate cookie names
         if ($this->isAdminPath($path)) {
             session_name('HF_ADMIN');
         } else {
@@ -198,6 +215,18 @@ final class Router
     {
         return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
+    }
+
+    private function renderNotFound(): void
+    {
+        http_response_code(404);
+        $error = 'The requested page could not be found.';
+        $flash = [];
+        $csrf = '';
+        $content = __DIR__ . '/../Views/no_page/index.php';
+        $layout = __DIR__ . '/../Views/layout/main.php';
+        require $layout;
+        exit;
     }
 
     private function respond(int $code, string $message): void
