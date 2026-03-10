@@ -212,9 +212,44 @@ class UserRepository extends BaseRepository implements IUserRepository
         return (bool)$stmt->fetchColumn();
     }
 
-    // ----------------------------
-    // Helpers
-    // ----------------------------
+    /**
+     * @param string $role   Empty = all roles.
+     * @param string $search Matched against first_name, last_name, email.
+     * @param string $sort   date_desc|date_asc|name_asc|name_desc.
+     * @return User[]
+     */
+    public function findFiltered(string $role, string $search, string $sort): array
+    {
+        [$where, $params] = $this->buildFilter($role, $search);
+        $sql  = 'SELECT * FROM ' . self::TABLE . $where . ' ORDER BY ' . $this->resolveOrder($sort);
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute($params);
+        return array_map(fn($r) => User::fromArray($r), $stmt->fetchAll(\PDO::FETCH_ASSOC));
+    }
 
+    /** @return array{0: string, 1: array} */
+    private function buildFilter(string $role, string $search): array
+    {
+        $clauses = [];
+        $params  = [];
+        if ($role !== '') {
+            $clauses[] = 'role = ?';
+            $params[]  = $role;
+        }
+        if ($search !== '') {
+            $clauses[] = '(first_name LIKE ? OR last_name LIKE ? OR email LIKE ?)';
+            $params    = array_merge($params, ["%$search%", "%$search%", "%$search%"]);
+        }
+        return [$clauses ? ' WHERE ' . implode(' AND ', $clauses) : '', $params];
+    }
 
+    private function resolveOrder(string $sort): string
+    {
+        return match ($sort) {
+            'name_asc'  => 'first_name ASC, last_name ASC',
+            'name_desc' => 'first_name DESC, last_name DESC',
+            'date_asc'  => 'created_at ASC',
+            default     => 'created_at DESC',
+        };
+    }
 }

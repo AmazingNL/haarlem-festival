@@ -7,6 +7,8 @@ namespace App\Controllers;
 use App\Core\BaseController;
 use App\Core\Middleware;
 use App\Models\Page;
+use App\Models\User;
+use App\Models\Enum\UserRole;
 use App\Services\IAdminPageService;
 use App\Services\IPageSectionService;
 use App\Services\IUserService;
@@ -37,14 +39,14 @@ final class AdminPageController extends BaseController
         $this->refreshAdminDisplayName();
         $users = $this->userService->getAllUsers();
         $allPages = $this->adminPageService->getAllPages();
-        usort($allPages, fn($a, $b) => strcmp((string)($b->created_at ?? ''), (string)($a->created_at ?? '')));
+        usort($allPages, fn($a, $b) => strcmp((string) ($b->created_at ?? ''), (string) ($a->created_at ?? '')));
         $this->view(
             'admin_dashboard/index',
             [
-                'allPages'    => $allPages,
+                'allPages' => $allPages,
                 'recentPages' => array_slice($allPages, 0, 5),
-                'userCount'   => count($users),
-                'title'       => 'Admin Dashboard',
+                'userCount' => count($users),
+                'title' => 'Admin Dashboard',
             ],
             layout: 'admin_dashboard'
         );
@@ -247,12 +249,12 @@ final class AdminPageController extends BaseController
                 $this->setFlash('error', 'No section Found');
                 $this->redirect('/admin/dashboard');
                 return;
-            }else
-            $this->view(
-                'admin_dashboard/edit_page_section',
-                ['section' => $section],
-                'admin_dashboard'
-            );
+            } else
+                $this->view(
+                    'admin_dashboard/edit_page_section',
+                    ['section' => $section],
+                    'admin_dashboard'
+                );
         } catch (Throwable $e) {
             $this->setFlash('error', 'Something went wrong' . $e);
             $this->redirect('/admin/page_section');
@@ -275,7 +277,7 @@ final class AdminPageController extends BaseController
             $this->setFlash('success', 'Section updated successfully');
             $this->redirect('/admin/pageSection/' . $page_id . '/pageSectionList');
         } catch (Throwable $e) {
-            $this->setFlash('error', 'Something went wrong while saving  '.$e);
+            $this->setFlash('error', 'Something went wrong while saving  ' . $e);
             $this->view(
                 '/admin_dashboard/create_page',
                 ['pageSection' => $pageSection],
@@ -284,6 +286,7 @@ final class AdminPageController extends BaseController
         }
     }
 
+    //this is create page section. needs better naming
     private function pageSection(int $page_id): PageSection
     {
         $this->ensureSession();
@@ -334,12 +337,12 @@ final class AdminPageController extends BaseController
                 $this->setFlash('error', 'Page Not Found');
                 $this->redirect('/admin/pages/viewPage');
             }
-            $this->adminPageService->deletePage((int)$page_id);
+            $this->adminPageService->deletePage((int) $page_id);
             $this->setFlash('success', 'Deleted successfully');
             $this->redirect('/admin/pages/viewPage');
 
         } catch (Throwable $e) {
-            $this->setFlash('error', 'Something went wrong  ' .$e);
+            $this->setFlash('error', 'Something went wrong  ' . $e);
             $this->redirect('/admin/pages/viewPage');
         }
     }
@@ -376,12 +379,17 @@ final class AdminPageController extends BaseController
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function manageUsersPage(): void
     {
-        $this->ensureSession();
         Middleware::requireAdmin();
-        $users = $this->userService->getAllUsers();
-        $this->view('admin/manage_users', ['users' => $users, 'title' => 'Manage Users'], 'admin_dashboard');
+        $role = $this->str('role');
+        $search = $this->str('search');
+        $sort = $this->str('sort', 'date_desc');
+        $users = $this->userService->filterUsers($role, $search, $sort);
+        $this->view('admin/manage_users', compact('users', 'role', 'search', 'sort') + ['title' => 'Manage Users'], 'admin_dashboard');
     }
 
     // minimal stubs for routes referenced in Router
@@ -466,13 +474,130 @@ final class AdminPageController extends BaseController
         return '/assets/images/admin/' . $name;
     }
 
+    // ─── User CRUD ────────────────────────────────────────────────────────────
+
+    /**
+     * Show the create-user form.
+     *
+     * @return void
+     */
+    public function createUserForm(): void
+    {
+        $this->ensureSession();
+        Middleware::requireAdmin();
+        $this->view('admin/create_user', ['title' => 'Create User'], 'admin_dashboard');
+    }
+
+    /**
+     * Process the create-user form submission.
+     *
+     * @return void
+     */
+    public function createUser(): void
+    {
+        $this->ensureSession();
+        Middleware::requireAdmin();
+        try {
+            $this->verifyCsrf();
+            $this->requireFields(['first_name', 'last_name', 'email', 'username', 'password', 'role']);
+            $user = new User();
+            $user->first_name = $this->str('first_name');
+            $user->last_name = $this->str('last_name');
+            $user->email = $this->str('email');
+            $user->username = $this->str('username');
+            $user->role = UserRole::from($this->str('role'));
+            $this->userService->registerUser($user, $this->str('password'));
+            $this->setFlash('success', 'User created successfully.');
+            $this->redirect('/admin/users');
+        } catch (Throwable $e) {
+            $this->setFlash('error', 'Failed to create user: ' . $e->getMessage());
+            $this->redirect('/admin/users/create');
+        }
+    }
+
+    /**
+     * Show the edit-user form.
+     *
+     * @param int $user_id
+     * @return void
+     */
+    public function editUserForm(int $user_id): void
+    {
+        $this->ensureSession();
+        Middleware::requireAdmin();
+        $user = $this->userService->getUserById($user_id);
+        if ($user === null) {
+            $this->setFlash('error', 'User not found.');
+            $this->redirect('/admin/users');
+            return;
+        }
+        $this->view('admin/edit_user', ['user' => $user, 'title' => 'Edit User'], 'admin_dashboard');
+    }
+
+    /**
+     * Process the edit-user form submission.
+     *
+     * @param int $user_id
+     * @return void
+     */
+    public function editUser(int $user_id): void
+    {
+        $this->ensureSession();
+        Middleware::requireAdmin();
+        try {
+            $this->verifyCsrf();
+            $this->requireFields(['first_name', 'last_name', 'email', 'username', 'role']);
+            $user = $this->userService->getUserById($user_id);
+            if ($user === null) {
+                $this->setFlash('error', 'User not found.');
+                $this->redirect('/admin/users');
+                return;
+            }
+            $user->first_name = $this->str('first_name');
+            $user->last_name = $this->str('last_name');
+            $user->email = $this->str('email');
+            $user->username = $this->str('username');
+            $user->role = UserRole::from($this->str('role'));
+            $this->userService->updateUserAdmin($user, $this->str('password'));
+            $this->setFlash('success', 'User updated successfully.');
+            $this->redirect('/admin/users');
+        } catch (Throwable $e) {
+            $this->setFlash('error', 'Failed to update user: ' . $e->getMessage());
+            $this->redirect('/admin/users/' . $user_id . '/edit');
+        }
+    }
+
+    /**
+     * Delete a user by ID (cannot delete yourself).
+     *
+     * @param int $user_id
+     * @return void
+     */
+    public function deleteUser(int $user_id): void
+    {
+        $this->ensureSession();
+        Middleware::requireAdmin();
+        try {
+            if ($user_id === (int) ($_SESSION['user_id'] ?? 0)) {
+                $this->setFlash('error', 'You cannot delete your own account.');
+                $this->redirect('/admin/users');
+                return;
+            }
+            $this->userService->deleteUser($user_id);
+            $this->setFlash('success', 'User deleted.');
+        } catch (Throwable $e) {
+            $this->setFlash('error', 'Failed to delete user.');
+        }
+        $this->redirect('/admin/users');
+    }
+
     /**
      * Refreshes $_SESSION['display_name'] from the DB so the admin navbar
      * always shows the real name, even for sessions created before this key existed.
      */
     private function refreshAdminDisplayName(): void
     {
-        $userId = (int)($_SESSION['user_id'] ?? 0);
+        $userId = (int) ($_SESSION['user_id'] ?? 0);
         if ($userId <= 0) {
             return;
         }
