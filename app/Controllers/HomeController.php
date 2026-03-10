@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 use App\Core\BaseController;
-use App\Models\Page;
 use App\Services\IPageSectionService;
 use App\Services\IAdminPageService;
 final class HomeController extends BaseController
@@ -67,6 +66,20 @@ final class HomeController extends BaseController
         }
     }
 
+
+    public function stories(): void
+    {
+        try {
+            $page = $this->adminPageService->getPageBySlug(slug: 'stories');
+            $page_id = $page->page_id ?? null;
+            $stories = $this->pageSectionService->getSectionsByPageId(pageId: $page_id);
+            if (empty($stories)) {
+                $this->setFlash(key: 'error', value: 'page does not exist');
+                $this->redirect(to: '/');
+            }
+            $this->view(
+                template: '/stories/index',
+                data: ['section' => $stories, 'page' => $page, 'title' => 'Stories']
     public function ratatouille(): void
     {
         try {
@@ -84,6 +97,8 @@ final class HomeController extends BaseController
 
         } catch (\Exception $e) {
             $this->view(
+                template: 'no_page/index',
+                data: ['error' => 'Stories page not available']
                 'no_page/index',
                 ['error' => 'ratatouille page not available']
             );

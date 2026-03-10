@@ -49,6 +49,9 @@
 				const res = await fetch("/admin/media/upload", {
 					method: "POST",
 					body: formData,
+					headers: {
+						Accept: "application/json",
+					},
 					credentials: "include",
 				});
 
