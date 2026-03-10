@@ -98,6 +98,13 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 $httpMethod = $_SERVER['REQUEST_METHOD'];
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+$publicAdminRoutes = [
+    '/admin/loginForm',
+    '/admin/login',
+    '/admin/register',
+    '/admin/logout',
+];
+
 $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 
 switch ($routeInfo[0]) {
@@ -117,21 +124,12 @@ switch ($routeInfo[0]) {
         [$controllerClass, $method] = $routeInfo[1];
         $vars = $routeInfo[2];
 
-        if (str_starts_with($uri, '/admin')) {
-
-            $publicAdminRoutes = [
-                '/admin/loginForm',
-                '/admin/login',
-                '/admin/register',
-                '/admin/logout',
-            ];
-
-            if (!in_array($uri, $publicAdminRoutes)) {
-                if (empty($_SESSION['admin'])) {
-                    header('Location: /admin/loginForm');
-                    exit;
-                }
-            }
+        if (str_starts_with($uri, '/admin')
+            && !in_array($uri, $publicAdminRoutes)
+            && empty($_SESSION['admin']))
+        {
+            header('Location: /admin/loginForm');
+            exit;
         }
 
         $controller = createController($controllerClass);

@@ -137,36 +137,36 @@ final class AuthController extends BaseController
 
     private function loginAndRedirect(User $user): void
     {
+
         $isAdmin = ($user->role === UserRole::admin);
 
-        $this->switchSession($isAdmin ? 'HF_ADMIN' : 'HF_APP');
+        $sessionName = $isAdmin ? 'HF_ADMIN' : 'HF_APP';
+        if (session_name() !== $sessionName) {
+            session_write_close();
+            session_name($sessionName);
+            session_start();
+        }
 
         $fullName = trim($user->first_name . ' ' . $user->last_name);
         $_SESSION['user_id']      = $user->user_id;
         $_SESSION['role']         = $user->role->value;
         $_SESSION['display_name'] = $fullName ?: $user->username;
 
+        $_SESSION['admin'] = $isAdmin;
+
         if ($isAdmin) {
-            $_SESSION['admin'] = true; // ✅ this fixes the middleware
             $this->redirect('/admin/dashboard');
-            return;
-        }
-
-        switch ($user->role) {
-            case UserRole::customer:
-                $_SESSION['admin'] = false;
-                $this->redirect('/');
-                return;
-
-            case UserRole::employee:
-                $_SESSION['admin'] = false;
-                $this->redirect('/employee/dashboard');
-                return;
-
-            default:
-                $_SESSION['admin'] = false;
-                $this->redirect('/');
-                return;
+        } else {
+            switch ($user->role) {
+                case UserRole::customer:
+                    $this->redirect('/');
+                    break;
+                case UserRole::employee:
+                    $this->redirect('/employee/dashboard');
+                    break;
+                default:
+                    $this->redirect('/');
+            }
         }
     }
 
