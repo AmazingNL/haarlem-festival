@@ -79,7 +79,15 @@ final class HomeController extends BaseController
             }
             $this->view(
                 template: '/stories/index',
-                data: ['section' => $stories, 'page' => $page, 'title' => 'Stories']
+                data: ['section' => $stories, 'page' => $page, 'title' => 'Stories']);
+                    } catch (\Exception $e) {
+            $this->view(
+                'no_page/index',
+                ['error' => 'Stories page not available']
+            );
+        }
+    }
+
     public function ratatouille(): void
     {
         try {
@@ -97,10 +105,8 @@ final class HomeController extends BaseController
 
         } catch (\Exception $e) {
             $this->view(
-                template: 'no_page/index',
-                data: ['error' => 'Stories page not available']
                 'no_page/index',
-                ['error' => 'ratatouille page not available']
+                ['error' => 'Stories page not available']
             );
         }
     }
