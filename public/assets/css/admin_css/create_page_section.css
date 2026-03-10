@@ -63,6 +63,11 @@
 	flex-direction: column;
 	gap: 0.45rem;
 }
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
 
 .field label {
 	font-weight: 700;

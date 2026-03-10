@@ -97,8 +97,22 @@ final class Router
 
     private function buildDispatcher(): Dispatcher
     {
-        $cacheFile = __DIR__ . '/../../storage/cache/routes.cache.php';
+        $cacheDir = __DIR__ . '/../../storage/cache';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0775, true);
+        }
+
+        $cacheFile = $cacheDir . '/routes.cache.php';
+        $cacheDir = __DIR__ . '/../../storage/cache';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0775, true);
+        }
+
+        $cacheFile = $cacheDir . '/routes.cache.php';
         $cacheDisabled = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
+        if (!is_dir($cacheDir) || !is_writable($cacheDir)) {
+            $cacheDisabled = true;
+        }
 
         return cachedDispatcher(function (RouteCollector $r) {
             // admin route 
@@ -145,6 +159,8 @@ final class Router
             $r->get('/yummy', [HomeController::class, 'yummy']);
             $r->get('/stories', [HomeController::class, 'stories']);
             $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
+            $r->get('/yummy/ratatouille', [HomeController::class, 'ratatouille']);
+
 
 
 
@@ -161,7 +177,6 @@ final class Router
         if (session_status() === PHP_SESSION_ACTIVE) {
             return;
         }
-        // Separate cookie names
         if ($this->isAdminPath($path)) {
             session_name('HF_ADMIN');
         } else {

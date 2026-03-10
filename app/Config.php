@@ -13,11 +13,12 @@ class Config
 
     public static function dbPassword(): string
     {
-        return $_ENV['DB_PASS'] ?? '';
+        return $_ENV['DB_PASS'] ?? 'secret123';
     }
 
     public static function dbName(): string
     {
-        return $_ENV['DB_NAME'] ?? '';
+        return $_ENV['DB_NAME'] ?? 'haarlem_festival';
     }
+
 }

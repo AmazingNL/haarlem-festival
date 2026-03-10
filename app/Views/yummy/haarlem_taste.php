@@ -17,16 +17,12 @@
 
     .taste-title {
         text-align: center;
-        font-family: 'Bebas Neue', system-ui, sans-serif;
-        color: #4e1616;
-        font-size: 22px;
         margin: 4px 0 12px;
     }
 
     .taste-copy {
         text-align: center;
         color: #2d1f1f;
-        font-family: 'Poppins', system-ui, sans-serif;
         max-width: 900px;
         margin: 0 auto 18px;
     }
