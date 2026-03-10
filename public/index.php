@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+
 use FastRoute\RouteCollector;
 use FastRoute\Dispatcher;
 use function FastRoute\simpleDispatcher;
@@ -12,6 +13,8 @@ use App\Controllers\HomeController;
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
 require_once __DIR__ . '/../app/config.php';
+
+session_start();
 
 $envFile = __DIR__ . '/../.env';
 if (is_file($envFile)) {
@@ -25,14 +28,6 @@ $debug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
 error_reporting(E_ALL);
 ini_set('display_errors', $debug ? '1' : '0');
 
-
-session_start();
-
-/*
-|--------------------------------------------------------------------------
-| Routes
-|--------------------------------------------------------------------------
-*/
 
 $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
@@ -105,21 +100,6 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 
-if (str_starts_with($uri, '/admin')) {
-
-    $publicAdminRoutes = [
-        '/admin/loginForm',
-        '/admin/login',
-        '/admin/register'
-    ];
-
-    if (!in_array($uri, $publicAdminRoutes) && !isset($_SESSION['admin'])) {
-        header('Location: /admin/loginForm');
-        exit;
-    }
-}
-
-
 switch ($routeInfo[0]) {
 
     case Dispatcher::NOT_FOUND:
@@ -137,8 +117,24 @@ switch ($routeInfo[0]) {
         [$controllerClass, $method] = $routeInfo[1];
         $vars = $routeInfo[2];
 
-        $controller = createController($controllerClass);
+        if (str_starts_with($uri, '/admin')) {
 
+            $publicAdminRoutes = [
+                '/admin/loginForm',
+                '/admin/login',
+                '/admin/register',
+                '/admin/logout',
+            ];
+
+            if (!in_array($uri, $publicAdminRoutes)) {
+                if (empty($_SESSION['admin'])) {
+                    header('Location: /admin/loginForm');
+                    exit;
+                }
+            }
+        }
+
+        $controller = createController($controllerClass);
         call_user_func_array([$controller, $method], $vars);
 
         break;
