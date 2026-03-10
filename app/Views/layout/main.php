@@ -40,7 +40,6 @@
             <ul class="nav-links">
                 <li><a href="#" class="nav-link">History</a></li>
                 <li><a href="/stories" class="nav-link">Stories</a></li>
-                <li><a href="#" class="nav-link">Stories</a></li>
                 <li><a href="/yummy" class="nav-link">Restaurants</a></li>
                 <li><a href="#" class="nav-link">Jazz</a></li>
                 <li><a href="#" class="nav-link">Dance</a></li>
