@@ -147,20 +147,24 @@ final class AuthController extends BaseController
         $_SESSION['display_name'] = $fullName ?: $user->username;
 
         if ($isAdmin) {
+            $_SESSION['admin'] = true; // ✅ this fixes the middleware
             $this->redirect('/admin/dashboard');
             return;
         }
 
         switch ($user->role) {
             case UserRole::customer:
+                $_SESSION['admin'] = false;
                 $this->redirect('/');
                 return;
 
             case UserRole::employee:
+                $_SESSION['admin'] = false;
                 $this->redirect('/employee/dashboard');
                 return;
 
             default:
+                $_SESSION['admin'] = false;
                 $this->redirect('/');
                 return;
         }
