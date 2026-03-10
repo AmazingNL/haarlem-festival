@@ -81,10 +81,10 @@ final class HomeController extends BaseController
                 template: '/stories/index',
                 data: ['section' => $stories, 'page' => $page, 'title' => 'Stories']
             );
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             $this->view(
-                'no_page/index',
-                ['error' => 'Yummy page not available']
+                template: 'no_page/index',
+                data: ['error' => 'Stories page not available']
             );
         }
     }
@@ -105,9 +105,10 @@ final class HomeController extends BaseController
 
         } catch (\Exception $e) {
             $this->view(
-                'no_page/index',
-                ['error' => 'Stories page not available']
+                template: 'no_page/index',
+                data: ['error' => 'ratatouille page not available']
             );
+
         }
     }
 }
