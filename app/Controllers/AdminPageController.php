@@ -65,12 +65,11 @@ final class AdminPageController extends BaseController
     }
     public function createPageForm(): void
     {
-        $this -
-            $this->view(
-                'admin_dashboard/create_page',
-                ['title' => 'Create Page'],
-                layout: 'admin_dashboard'
-            );
+        $this->view(
+            'admin_dashboard/create_page',
+            ['title' => 'Create Page'],
+            layout: 'admin_dashboard'
+        );
     }
 
     public function createPage(): void
@@ -176,13 +175,11 @@ final class AdminPageController extends BaseController
     public function pageSectionForm($page_id)
     {
         $this->ensureSession();
-        Middleware::requireAdmin();
         try {
             $pageSection = $this->pageSectionService->getSectionsByPageId((int) $page_id);
-            if ($pageSection === null) {
+            if (empty($pageSection)) {
                 $this->setFlash('error', 'No page Found');
                 $this->redirect('/admin/pages/createPage');
-                echo new Exception();
                 return;
             }
             $this->view(
@@ -190,6 +187,7 @@ final class AdminPageController extends BaseController
                 ['pageSection' => $pageSection, 'page_id' => (int) $page_id],
                 'admin_dashboard'
             );
+
         } catch (Throwable $e) {
             $this->setFlash('error', 'Something went wrong' . $e);
             $this->redirect('/admin/pages/createPage');
@@ -199,18 +197,17 @@ final class AdminPageController extends BaseController
     public function createPageSection(int $page_id): void
     {
         $this->ensureSession();
-        Middleware::requireAdmin();
 
         try {
             $section = $this->pageSection($page_id);
 
-            $publicUrl = null;
+            $imageUrl = null;
             if (!empty($_FILES['section_image']) && $_FILES['section_image']['error'] === UPLOAD_ERR_OK) {
                 $file = $this->getUploadedFileOrFail('section_image');
-                $publicUrl = $this->storeImageFileOrFail($file);
+                $imageUrl = $this->storeImageFileOrFail($file);
             }
 
-            $this->pageSectionService->createSectionWithImage($section, $publicUrl);
+            $this->pageSectionService->createSectionWithImage($section, $imageUrl);
 
             $this->setFlash('success', 'Section created successful');
             $this->redirect('/admin/dashboard');
@@ -289,9 +286,7 @@ final class AdminPageController extends BaseController
     //this is create page section. needs better naming
     private function pageSection(int $page_id): PageSection
     {
-        $this->ensureSession();
         $this->verifyCsrf();
-
         $this->requireFields([
             'section_type',
             'title',
@@ -312,14 +307,14 @@ final class AdminPageController extends BaseController
         $button_link = ($this->input('button_link', '') !== '') ? $this->str('button_link') : null;
 
         $sort_order = (int) ($this->input('sort_order', 0) ?? 0);
-        $is_published = (bool) $this->int('is_published', 0) !== null;
+        $is_published = (bool) $this->int('is_published', 0);
 
         return new PageSection(
             $sectionId,
             $page_id,
             $sectionType,
             $title,
-            $content,
+            json_encode($content),
             $image_id,
             $button_text,
             $button_link,
@@ -332,7 +327,6 @@ final class AdminPageController extends BaseController
     {
         try {
             $this->ensureSession();
-            Middleware::requireAdmin();
             if ($page_id === 0) {
                 $this->setFlash('error', 'Page Not Found');
                 $this->redirect('/admin/pages/viewPage');
@@ -349,7 +343,6 @@ final class AdminPageController extends BaseController
 
     public function uploadImage(): void
     {
-        Middleware::requireAdmin(); // starts HF_ADMIN session correctly
 
         $file = $this->getUploadedFileOrFail('file');
         $publicUrl = $this->storeImageFileOrFail($file);
@@ -384,7 +377,6 @@ final class AdminPageController extends BaseController
      */
     public function manageUsersPage(): void
     {
-        Middleware::requireAdmin();
         $role = $this->str('role');
         $search = $this->str('search');
         $sort = $this->str('sort', 'date_desc');
@@ -484,7 +476,6 @@ final class AdminPageController extends BaseController
     public function createUserForm(): void
     {
         $this->ensureSession();
-        Middleware::requireAdmin();
         $this->view('admin/create_user', ['title' => 'Create User'], 'admin_dashboard');
     }
 
@@ -496,7 +487,6 @@ final class AdminPageController extends BaseController
     public function createUser(): void
     {
         $this->ensureSession();
-        Middleware::requireAdmin();
         try {
             $this->verifyCsrf();
             $this->requireFields(['first_name', 'last_name', 'email', 'username', 'password', 'role']);
@@ -524,7 +514,6 @@ final class AdminPageController extends BaseController
     public function editUserForm(int $user_id): void
     {
         $this->ensureSession();
-        Middleware::requireAdmin();
         $user = $this->userService->getUserById($user_id);
         if ($user === null) {
             $this->setFlash('error', 'User not found.');
@@ -543,7 +532,6 @@ final class AdminPageController extends BaseController
     public function editUser(int $user_id): void
     {
         $this->ensureSession();
-        Middleware::requireAdmin();
         try {
             $this->verifyCsrf();
             $this->requireFields(['first_name', 'last_name', 'email', 'username', 'role']);
@@ -576,7 +564,6 @@ final class AdminPageController extends BaseController
     public function deleteUser(int $user_id): void
     {
         $this->ensureSession();
-        Middleware::requireAdmin();
         try {
             if ($user_id === (int) ($_SESSION['user_id'] ?? 0)) {
                 $this->setFlash('error', 'You cannot delete your own account.');
