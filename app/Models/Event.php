@@ -4,7 +4,7 @@
 declare(strict_types=1);
 namespace App\Models;
 use App\Core\BaseEntity;
-final class Event extends BaseEntity
+final class Even
 {
     public ?int $event_id = null;
     public string $title = '';

@@ -1,6 +1,7 @@
 /** @format */
 
 /* ===== ROOT STYLES & VARIABLES ===== */
+@import "tailwindcss";
 :root {
 	/* Colors */
 	--button-padding-vertical: 10px;

@@ -1,16 +1,16 @@
 <?php
-$section = $section ?? null;
-$sectionId = (int) ($section?->getSectionId() ?? 0);
-$pageId = (int) ($pageId ?? ($section?->getPageId() ?? 0));
+use App\Models\Enum\SectionType;
 
-$sectionType = (string) ($sectionType ?? ($section?->getSectionType() ?? ''));
-$title = (string) ($title ?? ($section?->getTitle() ?? ''));
-$sectionContent = (string) ($sectionContent ?? ($section?->getContent() ?? ''));
-$imageId = (string) ($imageId ?? ($section?->getImageId() ?? ''));
-$buttonText = (string) ($buttonText ?? ($section?->getButtonText() ?? ''));
-$buttonLink = (string) ($buttonLink ?? ($section?->getButtonLink() ?? ''));
-$sortOrder = (int) ($sortOrder ?? ($section?->getSortOrder() ?? 0));
-$isPublished = (int) ($isPublished ?? ($section?->getIsPublished() ? 1 : 0));
+$sectionId = (int) ($sectionId ?? 0);
+$pageId = (int) ($pageId ?? 0);
+$sectionType = (string) ($sectionType ?? '');
+$title = (string) ($title ?? '');
+$sectionContent = (string) ($sectionContent ?? '');
+$imageId = (string) ($imageId ?? '');
+$buttonText = (string) ($buttonText ?? '');
+$buttonLink = (string) ($buttonLink ?? '');
+$sortOrder = (int) ($sortOrder ?? 0);
+$isPublished = (int) ($isPublished ?? 0);
 ?>
 
 <section class="admin-wrap">
@@ -37,11 +37,16 @@ $isPublished = (int) ($isPublished ?? ($section?->getIsPublished() ? 1 : 0));
 
             <div class="form-grid form-grid--2">
 
-                <div class="field">
-                    <label for="sec_section_type">Section Type</label>
-                    <input name="section_type" class="input" type="text" id="sec_section_type"
-                        value="<?= htmlspecialchars($sectionType) ?>" required>
-                </div>
+        <div class="field">
+            <label for="sec_section_type">Section Type</label>
+            <select name="section_type" class="input" required>
+                <?php foreach (SectionType::cases() as $case): ?>
+                <option value="<?= htmlspecialchars($case->value) ?>" <?= $sectionType === $case->value ? 'selected' : '' ?>>
+                    <?= htmlspecialchars(ucwords(str_replace('_', ' ', $case->value))) ?>
+                </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
                 <div class="field">
                     <label for="sec_sort_order">Sort Order</label>
@@ -84,7 +89,7 @@ $isPublished = (int) ($isPublished ?? ($section?->getIsPublished() ? 1 : 0));
 
                 <div>
                     <label>
-                        <input class="published" type="checkbox" name="is_published" value="1" <?= htmlspecialchars($isPublished ? 'checked' : '') ?>>
+                        <input class="published" type="checkbox" name="is_published" value="1" <?= $isPublished ? 'checked' : '' ?>>
                         Published
                     </label>
                 </div>

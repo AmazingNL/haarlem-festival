@@ -91,7 +91,13 @@ CREATE TABLE IF NOT EXISTS page_section (
   section_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   page_id BIGINT UNSIGNED NOT NULL,
 
-  section_type VARCHAR(50) NOT NULL,
+  section_type ENUM(
+  'cta',
+  'text_block',
+  'image_text',
+  'restaurants_card',
+  'welcome_banner'
+) NOT NULL,
   title VARCHAR(255) NULL,
   content LONGTEXT NULL,
   image_id BIGINT UNSIGNED NULL,
@@ -101,7 +107,7 @@ CREATE TABLE IF NOT EXISTS page_section (
 
   sort_order INT NOT NULL DEFAULT 0,
   is_published TINYINT(1) NOT NULL DEFAULT 1,
-
+  setting_json JSON NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,

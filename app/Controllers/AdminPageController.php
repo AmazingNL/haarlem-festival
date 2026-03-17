@@ -8,6 +8,7 @@ use App\Core\BaseController;
 use App\Core\Middleware;
 use App\Models\Page;
 use App\Models\User;
+use App\Models\Enum\SectionType;
 use App\Models\Enum\UserRole;
 use App\Services\IAdminPageService;
 use App\Services\IPageSectionService;
@@ -176,10 +177,9 @@ final class AdminPageController extends BaseController
     {
         $this->ensureSession();
         try {
-            $pageSection = $this->pageSectionService->getSectionsByPageId((int) $page_id);
+            $pageSection = $this->adminPageService->getPageById((int) $page_id);
             if (empty($pageSection)) {
                 $this->setFlash('error', 'No page Found');
-                $this->redirect('/admin/pages/createPage');
                 return;
             }
             $this->view(
@@ -194,12 +194,19 @@ final class AdminPageController extends BaseController
         }
 
     }
-    public function createPageSection(int $page_id): void
+    public function createPageSection($page_id): void
     {
         $this->ensureSession();
+        $pageId = (int) $page_id;
+
+        if ($pageId <= 0) {
+            $this->setFlash('error', 'Invalid page id.');
+            $this->redirect('/admin/dashboard');
+            return;
+        }
 
         try {
-            $section = $this->pageSection($page_id);
+            $section = $this->pageSection($pageId);
 
             $imageUrl = null;
             if (!empty($_FILES['section_image']) && $_FILES['section_image']['error'] === UPLOAD_ERR_OK) {
@@ -249,7 +256,7 @@ final class AdminPageController extends BaseController
             } else
                 $this->view(
                     'admin_dashboard/edit_page_section',
-                    ['section' => $section],
+                    $this->sectionFormData($section),
                     'admin_dashboard'
                 );
         } catch (Throwable $e) {
@@ -266,7 +273,7 @@ final class AdminPageController extends BaseController
                 $this->setFlash('error', 'Section not saving');
                 $this->view(
                     'admin_dashboard/edit_page_section',
-                    ['section' => $pageSection],
+                    $this->sectionFormData($pageSection),
                     'admin_dashboard'
                 );
                 return;
@@ -283,44 +290,53 @@ final class AdminPageController extends BaseController
         }
     }
 
-    //this is create page section. needs better naming
-    private function pageSection(int $page_id): PageSection
+    //this is create page section.
+private function pageSection(int $page_id): PageSection
+{
+    $this->verifyCsrf();
+
+    $sectionId = (int) ($this->input('section_id', 0) ?? 0);
+    $sectionTypeRaw = $this->str('section_type');
+    $sectionType = SectionType::tryFrom($sectionTypeRaw);
+    $title = $this->str('title', '');
+    $content = $this->str('content', '');
+    $rawImage = $this->input('image_id', null);
+    $image_id = ($rawImage === null || $rawImage === '') ? null : (int) $rawImage;
+    $button_text = ($this->input('button_text', '') !== '') ? $this->str('button_text') : null;
+    $button_link = ($this->input('button_link', '') !== '') ? $this->str('button_link') : null;
+    $sort_order = (int) ($this->input('sort_order', 0) ?? 0);
+    $is_published = (bool) $this->int('is_published', 0);
+    $settings = [];
+    return new PageSection(
+        $sectionId,
+        $page_id,
+        $sectionType,
+        $title,
+        $content,
+        $image_id,
+        $button_text,
+        $button_link,
+        $sort_order,
+        $is_published,
+        json_encode($settings)
+    );
+}
+    private function sectionFormData(PageSection $section): array
     {
-        $this->verifyCsrf();
-        $this->requireFields([
-            'section_type',
-            'title',
-            'content',
-            'sort_order',
-            'is_published'
-        ]);
+        $sectionType = $section->section_type;
 
-        $sectionId = (int) ($this->input('section_id', 0) ?? 0);
-        $sectionType = $this->str('section_type');
-        $title = $this->str('title');
-        $content = $this->str('content');
-
-        $rawImage = $this->input('image_id', null);
-        $image_id = ($rawImage === null || $rawImage === '') ? null : (int) $rawImage;
-
-        $button_text = ($this->input('button_text', '') !== '') ? $this->str('button_text') : null;
-        $button_link = ($this->input('button_link', '') !== '') ? $this->str('button_link') : null;
-
-        $sort_order = (int) ($this->input('sort_order', 0) ?? 0);
-        $is_published = (bool) $this->int('is_published', 0);
-
-        return new PageSection(
-            $sectionId,
-            $page_id,
-            $sectionType,
-            $title,
-            json_encode($content),
-            $image_id,
-            $button_text,
-            $button_link,
-            $sort_order,
-            $is_published
-        );
+        return [
+            'sectionId' => (int) $section->section_id,
+            'pageId' => (int) $section->page_id,
+            'sectionType' => $sectionType instanceof SectionType ? $sectionType->value : (string) $sectionType,
+            'title' => (string) ($section->title ?? ''),
+            'sectionContent' => (string) ($section->content ?? ''),
+            'imageId' => (string) ($section->image_id ?? ''),
+            'buttonText' => (string) ($section->button_text ?? ''),
+            'buttonLink' => (string) ($section->button_link ?? ''),
+            'sortOrder' => (int) $section->sort_order,
+            'isPublished' => $section->is_published ? 1 : 0,
+        ];
     }
 
     public function deletePage($page_id): void

@@ -133,7 +133,8 @@ switch ($routeInfo[0]) {
         }
 
         $controller = createController($controllerClass);
-        call_user_func_array([$controller, $method], $vars);
+        // FastRoute provides associative params; pass positionally to avoid PHP named-arg binding.
+        call_user_func_array([$controller, $method], array_values($vars));
 
         break;
 }

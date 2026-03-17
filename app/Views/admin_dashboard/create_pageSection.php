@@ -1,5 +1,7 @@
 <?php
 $pageId = (int) ($page_id ?? 0);
+
+use App\Models\Enum\SectionType;
 ?>
 
 <form class="admin-form admin-form--compact page-section-form" method="post"
@@ -16,8 +18,13 @@ $pageId = (int) ($page_id ?? 0);
 
         <div class="field">
             <label for="sec_section_type">Section Type</label>
-            <input name="section_type" class="input" type="text" id="sec_section_type"
-                placeholder="e.g. food_culture, hero, text_block" required>
+            <select name="section_type" class="input" required>
+                <?php foreach (SectionType::cases() as $case): ?>
+                <option value="<?= htmlspecialchars($case->value) ?>">
+                    <?= htmlspecialchars(ucwords(str_replace('_', ' ', $case->value))) ?>
+                </option>
+                <?php endforeach; ?>
+            </select>
         </div>
 
         <div class="field">

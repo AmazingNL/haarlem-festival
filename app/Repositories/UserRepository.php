@@ -2,10 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Core\BaseEntity;
-use App\Models\User;
 use App\Core\BaseRepository;
+use App\Models\Enum\UserRole;
+use App\Models\User;
 use App\Repositories\IUserRepository;
+
 class UserRepository extends BaseRepository implements IUserRepository
 {
     private const TABLE = 'user';
@@ -16,6 +17,28 @@ class UserRepository extends BaseRepository implements IUserRepository
         parent::__construct();
     }
 
+    public function createUser(User $user): User
+    {
+        try {
+            $sql = "INSERT INTO " . self::TABLE . "
+                    (email, username, first_name, last_name, password_hash, role, created_at)
+                    VALUES (:email, :username, :first_name, :last_name, :password_hash, :role, NOW())";
+            
+            $stmt = $this->getConnection()->prepare($sql);
+            $stmt->execute([
+                ':email' => $user->getEmail(),
+                ':username' => $user->getUsername(),
+                ':first_name' => $user->getFirstName(),
+                ':last_name' => $user->getLastName(),
+                ':password_hash' => $user->getPasswordHash(),
+                ':role' => $user->getRole()->value
+            ]);
+            
+            return $this->findUserById((int)$this->getConnection()->lastInsertId());
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to create user. ' . $e->getMessage());
+        }
+    }
     public function findUserByEmail(string $email): ?User
     {
         // Login requirement says "username OR e-mail", so we search both.
@@ -29,7 +52,7 @@ class UserRepository extends BaseRepository implements IUserRepository
             $stmt->execute([':value' => $email]);
             $row = $stmt->fetch(\PDO::FETCH_ASSOC);
             if ($row) {
-                return User::fromArray($row);
+                return $this->hydrateUser($row);
             }
             return null;
         } catch (\Exception $e) {
@@ -50,53 +73,24 @@ class UserRepository extends BaseRepository implements IUserRepository
             $stmt->execute([':id' => $id]);
             $row = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-            return $row ? User::fromArray($row) : null;
+            return $row ? $this->hydrateUser($row) : null;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
         }
     }
 
-    public function createUser(User $user): User
-    {
-        try {
-        $sql = "INSERT INTO " . self::TABLE . "
-                (email, username, password_hash, first_name, last_name, role, created_at, updated_at)
-                VALUES
-                (:email, :username, :password_hash, :first_name, :last_name, :role, NOW(), NOW())";
-
-        $data = $user->toArray();
-        $stmt = $this->getConnection()->prepare($sql);
-        $stmt->execute([
-            ':email' => $data['email'],
-            ':username' => $data['username'],
-            ':password_hash' => $data['password_hash'],
-            ':first_name' => $data['first_name'],
-            ':last_name' => $data['last_name'],
-            ':role' => $data['role'] ?? null
-        ]);
-
-        $newId = (int) $this->getConnection()->lastInsertId();
-
-        // Return freshly loaded user
-        return $this->findUserById($newId) ?? $user;
-        } 
-        catch (\Exception $e) {
-            throw new \RuntimeException('Failed to create user. ' . $e->getMessage());
-        }
-    }
 
     public function updateUser(User $user): User
     {
         try {
-        $data = $user->toArray();
-        $id = (int) ($data[self::PK] ?? 0);
+        $id = (int) ($user->getUserId() ?? 0);
 
         if ($id <= 0) {
             throw new \InvalidArgumentException("User id is required for update.");
         }
 
         // If password_hash is empty, don't overwrite it.
-        $setPassword = (!empty($data['password_hash']));
+        $setPassword = ($user->getPasswordHash() !== '');
 
         $sql = "UPDATE " . self::TABLE . "
                 SET email = :email,
@@ -110,16 +104,16 @@ class UserRepository extends BaseRepository implements IUserRepository
                 WHERE " . self::PK . " = :id";
 
         $params = [
-            ':email' => $data['email'],
-            ':username' => $data['username'],
-            ':first_name' => $data['first_name'],
-            ':last_name' => $data['last_name'],
-            ':role' => $data['role'],
+            ':email' => $user->getEmail(),
+            ':username' => $user->getUsername(),
+            ':first_name' => $user->getFirstName(),
+            ':last_name' => $user->getLastName(),
+            ':role' => $user->getRole()->value,
             ':id' => $id,
         ];
 
         if ($setPassword) {
-            $params[':password_hash'] = $data['password_hash'];
+            $params[':password_hash'] = $user->getPasswordHash();
         }
 
         $stmt = $this->getConnection()->prepare($sql);
@@ -152,7 +146,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         $stmt = $this->getConnection()->query($sql);
 
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return array_map(fn($row) => User::fromArray($row), $rows);
+        return array_map(fn($row) => $this->hydrateUser($row), $rows);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve users. ' . $e->getMessage());
         }
@@ -170,7 +164,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         $stmt->execute([':role' => $role]);
 
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return array_map(fn($row) => User::fromArray($row), $rows);
+        return array_map(fn($row) => $this->hydrateUser($row), $rows);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve users by role. ' . $e->getMessage());
         }
@@ -190,7 +184,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         $stmt->execute([':q' => '%' . $name . '%']);
 
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return array_map(fn($row) => User::fromArray($row), $rows);
+        return array_map(fn($row) => $this->hydrateUser($row), $rows);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve users by name. ' . $e->getMessage());
         }
@@ -224,7 +218,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         $sql  = 'SELECT * FROM ' . self::TABLE . $where . ' ORDER BY ' . $this->resolveOrder($sort);
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute($params);
-        return array_map(fn($r) => User::fromArray($r), $stmt->fetchAll(\PDO::FETCH_ASSOC));
+        return array_map(fn($r) => $this->hydrateUser($r), $stmt->fetchAll(\PDO::FETCH_ASSOC));
     }
 
     /** @return array{0: string, 1: array} */
@@ -251,5 +245,28 @@ class UserRepository extends BaseRepository implements IUserRepository
             'date_asc'  => 'created_at ASC',
             default     => 'created_at DESC',
         };
+    }
+
+    /** @param array<string,mixed> $row */
+    private function hydrateUser(array $row): User
+    {
+        $role = UserRole::tryFrom((string)($row['role'] ?? '')) ?? UserRole::customer;
+
+        $user = new User(
+            (string)($row['username'] ?? ''),
+            (string)($row['email'] ?? ''),
+            (string)($row['password_hash'] ?? ''),
+            (string)($row['first_name'] ?? ''),
+            (string)($row['last_name'] ?? ''),
+            $role,
+            isset($row['phone']) ? (string)$row['phone'] : null,
+            isset($row['profile_image_id']) ? (int)$row['profile_image_id'] : null
+        );
+
+        $user->user_id = isset($row['user_id']) ? (int)$row['user_id'] : null;
+        $user->created_at = isset($row['created_at']) ? (string)$row['created_at'] : null;
+        $user->updated_at = isset($row['updated_at']) ? (string)$row['updated_at'] : null;
+
+        return $user;
     }
 }

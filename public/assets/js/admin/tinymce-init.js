@@ -16,8 +16,7 @@
 				"undo redo | styles | bold italic underline | bullist numlist | link image | table | code",
 			branding: true,
 
-			// ADD THIS 👇
-			extended_valid_elements: `
+		extended_valid_elements: `
         svg[class|xmlns|width|height|viewBox|fill|stroke|stroke-width|stroke-linecap|stroke-linejoin],
         path[d|fill|stroke|stroke-width|stroke-linecap|stroke-linejoin],
         g[class|fill|stroke|transform],

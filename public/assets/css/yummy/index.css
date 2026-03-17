@@ -1,11 +1,9 @@
 /** @format */
 /* ===================== Welcome banner ===================== */
- /* HERO BACKGROUND IS NOW THE SECTION */
 
     .welcome-banner {
         background-image: url('/assets/images/admin/9b6d4a6e36ebd72fc86d1d10f2c39660.jpg') !important;
         background-size: cover;
-        background-position: top;
         background-repeat: no-repeat;
         min-height: 600px;
         align-content: center;
@@ -13,7 +11,7 @@
 
     .welcome-card-inner {
         position: relative;
-        display: flex;
+        display: inline-flex;
         flex-direction: column;
         z-index: 100;
         padding: 56px 56px;

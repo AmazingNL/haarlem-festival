@@ -61,14 +61,12 @@ final class PageSectionService implements IPageSectionService
         } catch (\Throwable $e) {
             $this->pageSectionRepository->rollBack();
 
-            // Optional: delete uploaded file if DB failed (prevents orphan files)
             if ($tmpImagePath) {
                 $filePath = dirname(__DIR__, 2) . $tmpImagePath;
                 if (is_file($filePath)) {
                     @unlink($filePath);
                 }
             }
-
             throw $e;
         }
     }

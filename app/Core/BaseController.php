@@ -39,8 +39,21 @@ abstract class BaseController
     // ---------- Redirect ----------
     protected function redirect(string $to, $status = 302): void
     {
-        header('Location: ' . $to, true,  $status);
+        $statusCode = (int) $status;
+        if (!headers_sent()) {
+            header('Location: ' . $to, true, $statusCode);
+            exit;
+        }
 
+        // Fallback when output has already started in the current request.
+        http_response_code($statusCode);
+        $safeUrl = htmlspecialchars($to, ENT_QUOTES, 'UTF-8');
+        echo '<!doctype html><html><head><meta charset="utf-8">';
+        echo '<meta http-equiv="refresh" content="0;url=' . $safeUrl . '">';
+        echo '<script>window.location.replace(' . json_encode($to, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) . ');</script>';
+        echo '</head><body>';
+        echo 'Redirecting to <a href="' . $safeUrl . '">' . $safeUrl . '</a>...';
+        echo '</body></html>';
         exit;
     }
 
