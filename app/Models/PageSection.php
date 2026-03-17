@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Core\BaseEntity;
 use DateTime;
+use App\Enums\SectionType;
 
 final class PageSection extends BaseEntity
 {

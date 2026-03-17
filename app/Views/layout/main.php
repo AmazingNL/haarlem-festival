@@ -4,9 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, width=device-width">
-    <title>Haarlem Festival</title>
+    <title><?= htmlspecialchars((string) ($title ?? 'Haarlem Festival'), ENT_QUOTES, 'UTF-8') ?></title>
     <meta name="description" content="Haarlem Festival — events, programs and city guides">
-    <link rel="stylesheet" href="{{ assets('/css/home.css') }}" />
+    <link rel="stylesheet" href="/assets/css/home.css" />
+    <link rel="stylesheet" href="/assets/css/dance.css" />
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/yummy/index.css" />
     <link rel="stylesheet" href="/assets/css/yummy/restaurant_card.css" />
@@ -40,7 +41,7 @@
                 <li><a href="#" class="nav-link">Stories</a></li>
                 <li><a href="/yummy" class="nav-link">Restaurants</a></li>
                 <li><a href="#" class="nav-link">Jazz</a></li>
-                <li><a href="#" class="nav-link">Dance</a></li>
+                <li><a href="/dance" class="nav-link">Dance</a></li>
                 <li><a href="#" class="nav-link">My Programs</a></li>
             </ul>
 

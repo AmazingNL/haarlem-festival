@@ -158,6 +158,7 @@ final class Router
             $r->get('/home', [HomeController::class, 'index']);
             $r->get('/yummy', [HomeController::class, 'yummy']);
             $r->get('/yummy/ratatouille', [HomeController::class, 'ratatouille']);
+            $r->get('/dance', [HomeController::class, 'dance']);
 
 
 

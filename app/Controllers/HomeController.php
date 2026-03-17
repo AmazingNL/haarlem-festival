@@ -21,18 +21,22 @@ final class HomeController extends BaseController
     {
         try {
             $this->ensureSession();
-            $pages = $this->adminPageService->getPageBySlug('home');
-            $page_id = $pages->page_id ?? null;
-            $homePage = $this->pageSectionService->getSectionsByPageId($page_id);
+
+            $page = $this->adminPageService->getPageBySlug('home');
+            if ($page === null) {
+                $this->view('no_page/index', ['error' => 'Home page not found']);
+                return;
+            }
+
+            $sections = $this->pageSectionService->getSectionsByPageId((int) $page->page_id);
 
             $this->view('/home/home', [
-                'sections' => $homePage,
-                'title' => 'Haarlem Festival',
-                'message' => 'Home page loaded successfully.'
+                'page' => $page,
+                'sections' => $sections,
+                'title' => $page->title ?? 'Haarlem Festival',
             ]);
-
-        } catch (\Exception $e) {
-            $this->setFlash('error', 'Failed to load home page: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            $this->view('no_page/index', ['error' => 'Failed to load home page']);
         }
     }
 
@@ -64,6 +68,30 @@ final class HomeController extends BaseController
                 'no_page/index',
                 ['error' => 'Yummy page not available']
             );
+        }
+    }
+
+    public function dance(): void
+    {
+        try {
+            $this->ensureSession();
+
+            $page = $this->adminPageService->getPageBySlug('dance');
+            if ($page === null) {
+                $this->view('no_page/index', ['error' => 'Dance page not found']);
+                return;
+            }
+
+            $sections = $this->pageSectionService->getSectionsByPageId((int) $page->page_id);
+
+
+            $this->view('/dance/index', [
+                'page' => $page,
+                'sections' => $sections,
+                'title' => $page->title ?? 'Dance',
+            ]);
+        } catch (\Throwable $e) {
+            $this->view('no_page/index', ['error' => 'Failed to load Dance page']);
         }
     }
 

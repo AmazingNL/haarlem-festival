@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
-require_once __DIR__ . '/../app/config.php';
+require_once __DIR__ . '/../app/Config.php';
 
 $envFile = __DIR__ . '/../.env';
 if (is_file($envFile)) {
