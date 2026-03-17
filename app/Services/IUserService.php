@@ -8,7 +8,7 @@ use App\Models\User;
 
 interface IUserService
 {
-    public function registerUser(User $user, string $plainPassword): User;
+    public function registerUser(User $user, string $plainPassword): void;
     public function authenticate(string $emailOrUsername, string $plainPassword): ?User;
     public function getUserById(int $id): ?User;
     public function getUserByEmail(string $email): ?User;
