@@ -1,9 +1,20 @@
 <?php
 declare(strict_types=1);
 
+
+use FastRoute\RouteCollector;
+use FastRoute\Dispatcher;
+use function FastRoute\simpleDispatcher;
+
+use App\Controllers\AuthController;
+use App\Controllers\AdminPageController;
+use App\Controllers\HomeController;
+
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
 require_once __DIR__ . '/../app/config.php';
+
+session_start();
 
 $envFile = __DIR__ . '/../.env';
 if (is_file($envFile)) {
@@ -13,13 +24,168 @@ if (is_file($envFile)) {
     }
 }
 
-// ensure sessions are started for all requests
-
 $debug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
 error_reporting(E_ALL);
 ini_set('display_errors', $debug ? '1' : '0');
 
 
-$router = new \App\Core\Router();
-$router->dispatch();
+$dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
+    $r->get('/admin/register', [AuthController::class, 'showRegisterForm']);
+    $r->post('/admin/register', [AuthController::class, 'register']);
+
+    $r->get('/admin/loginForm', [AuthController::class, 'showLogin']);
+    $r->post('/admin/login', [AuthController::class, 'login']);
+
+    $r->get('/admin/logout', [AuthController::class, 'logout']);
+
+
+    $r->get('/admin', [AdminPageController::class, 'index']);
+    $r->get('/admin/dashboard', [AdminPageController::class, 'index']);
+
+    $r->get('/admin/dashboard/{page_id:\d+}/delete', [AdminPageController::class, 'deletePage']);
+
+
+    $r->get('/admin/pages/createPage', [AdminPageController::class, 'createPageForm']);
+    $r->post('/admin/pages/create', [AdminPageController::class, 'createPage']);
+
+    $r->get('/admin/pages/{page_id:\d+}/editForm', [AdminPageController::class, 'editPageForm']);
+    $r->post('/admin/pages/{page_id:\d+}/edit', [AdminPageController::class, 'editPage']);
+
+    $r->get('/admin/pages/viewPage', [AdminPageController::class, 'viewPages']);
+
+
+    $r->get('/admin/pageSection/{page_id:\d+}/pageSectionForm', [AdminPageController::class, 'pageSectionForm']);
+    $r->post('/admin/pageSection/{page_id:\d+}/createPage', [AdminPageController::class, 'createPageSection']);
+
+    $r->get('/admin/pageSection/{page_id:\d+}/editSectionForm', [AdminPageController::class, 'editSectionForm']);
+    $r->post('/admin/pageSection/{page_id:\d+}/editSection', [AdminPageController::class, 'editSection']);
+
+    $r->get('/admin/pageSection/{page_id:\d+}/pageSectionList', [AdminPageController::class, 'pageSectionList']);
+    $r->get('/admin/pageSection/editPage', [AdminPageController::class, 'updatePageSection']);
+
+
+    $r->get('/admin/users', [AdminPageController::class, 'manageUsersPage']);
+
+    $r->get('/admin/events/{event_id:\d+}', [AdminPageController::class, 'viewEventPage']);
+    $r->get('/admin/events/{event_id:\d+}/delete', [AdminPageController::class, 'deleteEventPage']);
+    $r->get('/admin/events/{event_id:\d+}/edit', [AdminPageController::class, 'updateEventPage']);
+
+
+    $r->post('/admin/media/upload', [AdminPageController::class, 'uploadImage']);
+
+
+    $r->get('/registerForm', [AuthController::class, 'showRegisterForm']);
+    $r->post('/register', [AuthController::class, 'register']);
+
+    $r->get('/loginForm', [AuthController::class, 'showLogin']);
+    $r->post('/login', [AuthController::class, 'login']);
+
+    $r->get('/logout', [AuthController::class, 'logout']);
+
+
+    $r->get('/', [HomeController::class, 'index']);
+    $r->get('/home', [HomeController::class, 'index']);
+
+    $r->get('/yummy', [HomeController::class, 'yummy']);
+    $r->get('/yummy/ratatouille', [HomeController::class, 'ratatouille']);
+
+    $r->get('/stories', [HomeController::class, 'stories']);
+    $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
+});
+
+
+$httpMethod = $_SERVER['REQUEST_METHOD'];
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+$publicAdminRoutes = [
+    '/admin/loginForm',
+    '/admin/login',
+    '/admin/register',
+    '/admin/logout',
+];
+
+$routeInfo = $dispatcher->dispatch($httpMethod, $uri);
+
+switch ($routeInfo[0]) {
+
+    case Dispatcher::NOT_FOUND:
+        http_response_code(404);
+        echo "404 - Page not found";
+        break;
+
+    case Dispatcher::METHOD_NOT_ALLOWED:
+        http_response_code(405);
+        echo "405 - Method not allowed";
+        break;
+
+    case Dispatcher::FOUND:
+
+        [$controllerClass, $method] = $routeInfo[1];
+        $vars = $routeInfo[2];
+
+        if (
+            str_starts_with($uri, '/admin')
+            && !in_array($uri, $publicAdminRoutes)
+            && empty($_SESSION['admin'])
+        ) {
+            header('Location: /admin/loginForm');
+            exit;
+        }
+
+        $controller = createController($controllerClass);
+        call_user_func_array([$controller, $method], $vars);
+
+        break;
+}
+
+function createController(string $controllerClass)
+{
+    switch ($controllerClass) {
+
+        case App\Controllers\HomeController::class:
+
+            $pageRepo = new App\Repositories\AdminPageRepository();
+            $pageService = new App\Services\AdminPageService($pageRepo);
+
+            $imageRepo = new App\Repositories\ImageRepository();
+
+            $sectionRepo = new App\Repositories\PageSectionRepository();
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageRepo);
+
+            return new App\Controllers\HomeController($sectionService, $pageService);
+
+
+        case App\Controllers\AuthController::class:
+
+            $repo = new App\Repositories\UserRepository();
+            $service = new App\Services\UserService($repo);
+
+            return new App\Controllers\AuthController($service);
+
+
+        case App\Controllers\AdminPageController::class:
+
+            $pageRepo = new App\Repositories\AdminPageRepository();
+            $pageService = new App\Services\AdminPageService($pageRepo);
+
+            $userRepo = new App\Repositories\UserRepository();
+            $userService = new App\Services\UserService($userRepo);
+
+            $imageRepo = new App\Repositories\ImageRepository();
+            $imageService = new App\Services\ImageService($imageRepo);
+
+            $sectionRepo = new App\Repositories\PageSectionRepository();
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageRepo);
+
+            return new App\Controllers\AdminPageController(
+                $pageService,
+                $sectionService,
+                $userService,
+                $imageService
+            );
+
+        default:
+            return new $controllerClass();
+    }
+}
