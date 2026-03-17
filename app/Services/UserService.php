@@ -15,10 +15,10 @@ final class UserService implements IUserService
         $this->userRepo = $userRepo;
     }
 
-    public function registerUser(User $user, string $plainPassword): User
+    public function registerUser(User $user, string $plainPassword): void
     {
         $user->password_hash = password_hash($plainPassword, PASSWORD_DEFAULT);
-        return $this->userRepo->createUser($user);
+        $this->userRepo->createUser($user);
     }
 
     public function authenticate(string $emailOrUsername, string $plainPassword): ?User
