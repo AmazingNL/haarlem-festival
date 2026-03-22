@@ -18,14 +18,13 @@ final class ImageRepository extends BaseRepository implements IImageRepository
 public function saveImage(Image $image): int
 {
     $sql = "INSERT INTO image (file_path, alt_text, uploaded_by_user_id, created_at)
-            VALUES (:file_path, :alt_text, :uploaded_by_user_id, :created_at)";
+            VALUES (:file_path, :alt_text, :uploaded_by_user_id, NOW())";
     $stmt = $this->getConnection()->prepare($sql);
 
     $stmt->execute([
         ':file_path' => $image->file_path,
         ':alt_text' => $image->alt_text,
         ':uploaded_by_user_id' => $image->uploaded_by_user_id,
-        ':created_at' => $image->created_at,
     ]);
 
     return (int)$this->getConnection()->lastInsertId();

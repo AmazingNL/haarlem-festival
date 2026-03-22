@@ -1,103 +1,99 @@
 /** @format */
 /* ===================== Welcome banner ===================== */
 
-    .welcome-banner {
-        background-image: url('/assets/images/admin/9b6d4a6e36ebd72fc86d1d10f2c39660.jpg') !important;
-        background-size: cover;
-        background-repeat: no-repeat;
-        min-height: 600px;
-        align-content: center;
-    }
+.welcome-banner {
+	position: relative;
+    max-height: 721px;
+}
 
-    .welcome-card-inner {
-        position: relative;
-        display: inline-flex;
-        flex-direction: column;
-        z-index: 100;
-        padding: 56px 56px;
-        gap: 40px;
-        max-width: 640px;
-    }
+.welcome-card-inner {
+	position: absolute;
+    top: 0;
+	display: inline-flex;
+	flex-direction: column;
+	z-index: 100;
+	padding: 0px 70px;
+	gap: 10px;
+	max-width: 640px;
+}
 
-    .welcome-card-title {
-        text-transform: uppercase;
-        font-size: xx-large;
-        line-height: 1.1;
-        display: flex;
-        flex-direction: column;
-        gap: 100px;
-    }
+.welcome-card-title {
+	text-transform: uppercase;
+	display: inline-flex;
+	flex-direction: column;
+}
 
-    .welcome-card-title--accent {
-        font-size: 4.1rem;
-        font-weight: 1000;
-        background: linear-gradient(90deg, #f2b53a 0%, #e24a2b 45%, #c21f1f 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        white-space: nowrap;
-    }
+.welcome-card-title--accent {
+    
+	font-size: 11rem;
+	font-weight: 1000;
+	background: linear-gradient(90deg, #f2b53a 0%, #e24a2b 45%, #c21f1f 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	white-space: nowrap;
+}
 
-    .welcome-card-title--main {
-        font-size: 3.5rem;
-        font-weight: 900;
-        color: var(--color-text-primary);
-        white-space: nowrap;
-    }
+.welcome-card-title--main {
+    position: absolute;
+    top: 290px;
+	font-size: 6.5rem;
+	font-weight: 900;
+	color: var(--color-text-primary);
+	white-space: nowrap;
+}
 
-    .welcome-card-content {
-        max-width: 520px;
-        font-size: 1.02rem;
-        line-height: 1.75;
-        color: var(--color-text-primary);
-        margin-bottom: 22px;
+.welcome-card-content {
+	max-width: 520px;
+	font-size: 1.02rem;
+	line-height: 1.75;
+	color: var(--color-text-primary);
+	margin-bottom: 22px;
+}
 
-    }
+.primary-button .icon-explore {
+	margin-left: 20px;
+	stroke: var(--color-text-primary);
+}
 
-    .primary-button .icon-explore {
-        margin-left: 20px;
-        stroke: var(--color-text-primary);
-    }
+.primary-button:hover .icon-explore {
+	stroke: var(--color-text-header);
+	transform: rotate(90deg);
+}
 
-    .primary-button:hover .icon-explore {
-        stroke: var(--color-text-header);
-        transform: rotate(90deg);
+@media (max-width: 1100px) {
+	.welcome-card-inner {
+		padding: 56px 44px;
+	}
 
-    }
+	.welcome-card-title--accent {
+		font-size: 3.1rem;
+	}
 
-    @media (max-width: 1100px) {
-        .welcome-card-inner {
-            padding: 56px 44px;
-        }
+	.welcome-card-title--main {
+		font-size: 2.7rem;
+	}
+}
 
-        .welcome-card-title--accent {
-            font-size: 3.1rem;
-        }
+@media (max-width: 600px) {
+	.welcome-card {
+		width: calc(100% - 28px);
+	}
 
-        .welcome-card-title--main {
-            font-size: 2.7rem;
-        }
-    }
+	.welcome-card-inner {
+		padding: 64px 22px 28px;
+		max-width: 100%;
+	}
 
-    @media (max-width: 600px) {
-        .welcome-card {
-            width: calc(100% - 28px);
-        }
-
-        .welcome-card-inner {
-            padding: 64px 22px 28px;
-            max-width: 100%;
-        }
-
-
-        .welcome-banner::after {
-            background: linear-gradient(180deg,
-                    rgba(8, 9, 10, 0.88) 0%,
-                    rgba(8, 9, 10, 0.55) 60%,
-                    rgba(8, 9, 10, 0.45) 100%);
-        }
-    }
-
+	.welcome-banner::after {
+		background: linear-gradient(
+			180deg,
+			rgba(8, 9, 10, 0.88) 0%,
+			rgba(8, 9, 10, 0.55) 60%,
+			rgba(8, 9, 10, 0.45) 100%
+		);
+	}
+}
 
 /* ===================== BreadCrumb ===================== */
 .icon-fixed svg {
@@ -111,7 +107,7 @@
 	box-sizing: border-box;
 	position: relative;
 	z-index: 50;
-    margin: 0;
+	margin: 0;
 }
 
 .yummy-breadcrumb-inner {
@@ -128,16 +124,15 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-    margin-left: 20px;
+	margin-left: 20px;
 	text-decoration: none;
 	font-size: 18px;
 	font-weight: 600;
 	position: relative;
 	z-index: 60;
-
 }
-.crumb--home span{
-    color: var(--color-accent-yellow);
+.crumb--home span {
+	color: var(--color-accent-yellow);
 }
 
 .crumb--home:hover {
@@ -162,5 +157,3 @@
 		font-size: 16px;
 	}
 }
-
-
