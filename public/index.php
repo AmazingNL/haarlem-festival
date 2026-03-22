@@ -57,12 +57,14 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/admin/pageSection/{page_id:\d+}/pageSectionForm', [AdminPageController::class, 'pageSectionForm']);
     $r->post('/admin/pageSection/{page_id:\d+}/createPage', [AdminPageController::class, 'createPageSection']);
+    $r->get('/admin/pageSection/render-fields', [AdminPageController::class, 'renderSectionForm']);
 
     $r->get('/admin/pageSection/{page_id:\d+}/editSectionForm', [AdminPageController::class, 'editSectionForm']);
-    $r->post('/admin/pageSection/{page_id:\d+}/editSection', [AdminPageController::class, 'editSection']);
+    $r->post('/admin/pageSection/{section_id:\d+}/editSection', [AdminPageController::class, 'editSection']);
 
-    $r->get('/admin/pageSection/{page_id:\d+}/pageSectionList', [AdminPageController::class, 'pageSectionList']);
+    $r->get('/admin/pageSection/{page_id:\d+}/viewPageSections', [AdminPageController::class, 'viewPageSections']);
     $r->get('/admin/pageSection/editPage', [AdminPageController::class, 'updatePageSection']);
+    $r->get('/admin/pageSection/{section_id:\d+}/deleteSection', [AdminPageController::class, 'deleteSection']);
 
 
     $r->get('/admin/users', [AdminPageController::class, 'manageUsersPage']);
@@ -124,10 +126,11 @@ switch ($routeInfo[0]) {
         [$controllerClass, $method] = $routeInfo[1];
         $vars = $routeInfo[2];
 
-        if (str_starts_with($uri, '/admin')
+        if (
+            str_starts_with($uri, '/admin')
             && !in_array($uri, $publicAdminRoutes)
-            && empty($_SESSION['admin']))
-        {
+            && empty($_SESSION['admin'])
+        ) {
             header('Location: /admin/loginForm');
             exit;
         }
@@ -149,9 +152,10 @@ function createController(string $controllerClass)
             $pageService = new App\Services\AdminPageService($pageRepo);
 
             $imageRepo = new App\Repositories\ImageRepository();
+            $imageService = new App\Services\ImageService($imageRepo);
 
             $sectionRepo = new App\Repositories\PageSectionRepository();
-            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageRepo);
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
 
             return new App\Controllers\HomeController($sectionService, $pageService);
 
@@ -176,7 +180,7 @@ function createController(string $controllerClass)
             $imageService = new App\Services\ImageService($imageRepo);
 
             $sectionRepo = new App\Repositories\PageSectionRepository();
-            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageRepo);
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
 
             return new App\Controllers\AdminPageController(
                 $pageService,

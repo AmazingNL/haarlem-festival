@@ -1,7 +1,22 @@
+<?php
+$sectionImage = $s['section_image'] ?? '';
+$img = '';
+
+if (is_array($sectionImage)) {
+    $img = (string) ($sectionImage[0] ?? '');
+} else {
+    $img = (string) $sectionImage;
+}
+
+?>
 
 <section class=" welcome-banner">
-    <?php require __DIR__ . '../../layout/go_back_button.php'; ?>
+    <?php if ($img !== ''): ?>
+        <img src="<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>" alt="Welcome banner image">
+    <?php endif; ?>
     <div class="welcome-card-inner">
+        <?php require __DIR__ . '../../layout/go_back_button.php'; ?>
+
         <?php if (!empty($s['title'])):
             $title = (string) $s['title'];
             $spacePos = strpos($title, ' ');
@@ -24,9 +39,9 @@
             </section>
         <?php endif; ?>
 
-        <?php if (!empty($s['content'])): ?>
+        <?php if (!empty($s['introduction'])): ?>
             <article class="welcome-card-content">
-                <?= $s['content'] ?>
+                <?= $s['introduction'] ?>
             </article>
         <?php endif; ?>
 
@@ -41,6 +56,5 @@
             </section>
 
         <?php endif; ?>
-    </div>
     </div>
 </section>

@@ -17,8 +17,8 @@ foreach (($section ?? []) as $s) {
             require __DIR__ . '/breadcrumb.php';
             break;
 
-        case 'food_culture':
-            require __DIR__ . '/food_culture.php';
+        case 'text_block':
+            require __DIR__ . '/text_block.php';
             break;
 
         case 'haarlem_unique':
