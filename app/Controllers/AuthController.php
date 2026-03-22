@@ -32,31 +32,24 @@ final class AuthController extends BaseController
     public function register(): void
     {
         $this->verifyCsrf();
-        [$user, $plainPassword] = $this->hydrateRegistrationUser();
-        $this->ensureRegistrationIsUnique($user);
-        $created = $this->userService->registerUser($user, $plainPassword);
-        $this->loginAndRedirect($created);
-    }
 
-    // do in constructor / base controller method>
-    private function hydrateRegistrationUser(): array
-    {
         $this->requireFields(['first_name', 'last_name', 'username', 'email', 'password']);
 
         $email = $this->str('email');
         $password = $this->str('password');
-
         $this->validateRegistrationInput($email, $password);
 
-        $user = new User();
-        $user->first_name = $this->str('first_name');
-        $user->last_name = $this->str('last_name');
-        $user->username = $this->str('username');
-        $user->email = $email;
-        $user->phone = isset($_POST['phone']) ? trim((string) $_POST['phone']) : null;
-        $user->role = UserRole::customer;
+        $first_name = $this->str('first_name');
+        $last_name = $this->str('last_name');
+        $username = $this->str('username');
+        $phone = isset($_POST['phone']) ? trim((string) $_POST['phone']) : null;
+        $role = UserRole::customer;
 
-        return [$user, $password];
+        $user = new User($username, $email, $password, $first_name, $last_name, $phone, $role);
+
+        $this->ensureRegistrationIsUnique($user);
+        $this->userService->registerUser($user, $password);
+        $this->loginAndRedirect($user);
     }
 
     private function validateRegistrationInput(string $email, string $password): void
@@ -139,20 +132,6 @@ final class AuthController extends BaseController
     {
 
         $isAdmin = ($user->role === UserRole::admin);
-
-        $sessionName = $isAdmin ? 'HF_ADMIN' : 'HF_APP';
-        if (session_name() !== $sessionName) {
-            session_write_close();
-            session_name($sessionName);
-            session_start();
-        }
-
-        $fullName = trim($user->first_name . ' ' . $user->last_name);
-        $_SESSION['user_id']      = $user->user_id;
-        $_SESSION['role']         = $user->role->value;
-        $_SESSION['display_name'] = $fullName ?: $user->username;
-
-        $_SESSION['admin'] = $isAdmin;
 
         if ($isAdmin) {
             $this->redirect('/admin/dashboard');

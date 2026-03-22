@@ -3,9 +3,8 @@
 
 declare(strict_types=1);
 namespace App\Models;
-use App\Core\BaseEntity;
 
-final class TicketType extends BaseEntity
+final class TicketType
 {
     public ?int $ticket_type_id = null;
     public int $event_id = 0;
