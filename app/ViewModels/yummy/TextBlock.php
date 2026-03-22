@@ -22,7 +22,7 @@ final class TextBlock extends BaseSection
             parent::__construct(
         $pageId,
         $sectionId,
-        'welcome_banner',
+        'text_block',
         $customClass,
         $sortOrder
     );
