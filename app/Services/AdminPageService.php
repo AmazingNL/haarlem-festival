@@ -33,6 +33,16 @@ final class AdminPageService implements IAdminPageService
         return $this->repository->getPageById($id);
     }
 
+    public function preparePageData(string $title, string $slug, string $content, string $status = 'draft'): array
+    {
+        return [
+            'title' => $title,
+            'slug' => $slug,
+            'content' => $this->sanitizeCmsHtml($content),
+            'status' => $status,
+        ];
+    }
+
 
     public function createPage(array $pageData): int
     {
@@ -71,6 +81,17 @@ final class AdminPageService implements IAdminPageService
             }
         }
         return null;
+    }
+
+    private function sanitizeCmsHtml(string $html): string
+    {
+        $html = preg_replace('#<\s*(script|style)\b[^>]*>.*?<\s*/\s*\1\s*>#is', '', $html) ?? '';
+        $allowed = '<p><br><b><strong><i><em><u><h1><h2><h3><h4><h5><h6><ul><ol>
+        <li><a><img><blockquote><hr><span><div><section><article><figure><figcaption><table><thead><tbody><tr><th><td>';
+        $html = strip_tags($html, $allowed);
+        $html = preg_replace('/\son\w+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $html) ?? '';
+        $html = preg_replace('/\s(href|src)\s*=\s*("|\')\s*javascript:[^"\']*\2/i', ' $1=$2#$2', $html) ?? '';
+        return trim($html);
     }
 
 }
