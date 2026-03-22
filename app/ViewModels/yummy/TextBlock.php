@@ -19,6 +19,13 @@ final class TextBlock extends BaseSection
         string $subTitle = '',
         string $article = ''
     ) {
+            parent::__construct(
+        $pageId,
+        $sectionId,
+        'welcome_banner',
+        $customClass,
+        $sortOrder
+    );
         $this->page_id = $pageId;
         $this->section_id = $sectionId;
         $this->type = 'text_block';
