@@ -124,10 +124,11 @@ switch ($routeInfo[0]) {
         [$controllerClass, $method] = $routeInfo[1];
         $vars = $routeInfo[2];
 
-        if (str_starts_with($uri, '/admin')
+        if (
+            str_starts_with($uri, '/admin')
             && !in_array($uri, $publicAdminRoutes)
-            && empty($_SESSION['admin']))
-        {
+            && empty($_SESSION['admin'])
+        ) {
             header('Location: /admin/loginForm');
             exit;
         }
