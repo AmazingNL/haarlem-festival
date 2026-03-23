@@ -16,7 +16,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         parent::__construct();
     }
 
-    public function findUserByEmail(string $email): ?User
+    public function findUserByEmail(string $email): void
     {
         // Login requirement says "username OR e-mail", so we search both.
         try {
@@ -27,17 +27,12 @@ class UserRepository extends BaseRepository implements IUserRepository
 
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute([':value' => $email]);
-            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-            if ($row) {
-                return User::fromArray($row);
-            }
-            return null;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
         }
     }
 
-    public function findUserById(int $id): ?User
+    public function findUserById(int $id): void
     {
         try {
 
@@ -50,36 +45,31 @@ class UserRepository extends BaseRepository implements IUserRepository
             $stmt->execute([':id' => $id]);
             $row = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-            return $row ? User::fromArray($row) : null;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
         }
     }
 
-    public function createUser(User $user): User
+    public function createUser(User $user): void
     {
         try {
         $sql = "INSERT INTO " . self::TABLE . "
                 (email, username, password_hash, first_name, last_name, role, created_at, updated_at)
                 VALUES
-                (:email, :username, :password_hash, :first_name, :last_name, :role, NOW(), NOW())";
+                (:email, :username, :password_hash, :first_name, :last_name, :role, :created_at, :updated_at)";
 
-        $data = $user->toArray();
         $stmt = $this->getConnection()->prepare($sql);
-        $stmt->execute([
-            ':email' => $data['email'],
-            ':username' => $data['username'],
-            ':password_hash' => $data['password_hash'],
-            ':first_name' => $data['first_name'],
-            ':last_name' => $data['last_name'],
-            ':role' => $data['role'] ?? null
-        ]);
+        $stmt->execute(["email" => $user->email,
+            "username" => $user->username,
+            "password_hash" => $user->password_hash,
+            "first_name" => $user->first_name,
+            "last_name" => $user->last_name,
+            "role" => $user->role->name,
+            "created_at" => date("Y-m-d H:i:s"),
+            "updated_at" => date("Y-m-d H:i:s")]);
 
-        $newId = (int) $this->getConnection()->lastInsertId();
-
-        // Return freshly loaded user
-        return $this->findUserById($newId) ?? $user;
-        } 
+        $this->getConnection()->lastInsertId();
+        }
         catch (\Exception $e) {
             throw new \RuntimeException('Failed to create user. ' . $e->getMessage());
         }
