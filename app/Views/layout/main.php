@@ -7,7 +7,7 @@
     <title><?= htmlspecialchars((string) ($title ?? 'Haarlem Festival'), ENT_QUOTES, 'UTF-8') ?></title>
     <meta name="description" content="Haarlem Festival — events, programs and city guides">
     <link rel="stylesheet" href="/assets/css/home.css" />
-    <link rel="stylesheet" href="/assets/css/dance.css" />
+    <link rel="stylesheet" href="/assets/css/dance/index.css" />
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/yummy/index.css" />
     <link rel="stylesheet" href="/assets/css/yummy/restaurant_card.css" />
