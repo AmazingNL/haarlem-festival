@@ -17,42 +17,19 @@ final class PageSectionRepository extends BaseRepository implements IPageSection
     public function getSectionsByPageId(int $pageId): array
     {
         try {
-            $sql = "SELECT ps.*,
-                       i.file_path AS image_path,
-                       i.alt_text AS image_alt
-                FROM " . self::TABLE . " ps
-                LEFT JOIN image i ON ps.image_id = i.image_id
-                WHERE ps.page_id = :page_id
-                  AND ps.is_published = 1
-                ORDER BY ps.sort_order ASC";
-
+            $sql = "SELECT ps.*, i.file_path AS image_path
+                    FROM " . self::TABLE . " ps
+                    LEFT JOIN image i ON i.image_id = ps.image_id
+                    WHERE ps.page_id = ?
+                    ORDER BY ps.sort_order ASC";
             $stmt = $this->getConnection()->prepare($sql);
-            $stmt->bindValue(':page_id', $pageId, \PDO::PARAM_INT);
-            $stmt->execute();
-
-            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            foreach ($rows as &$row) {
-                if (($row['section_type'] ?? '') === 'two_image_row') {
-                    $gallerySql = "SELECT i.file_path, i.alt_text
-                               FROM page_section_image psi
-                               INNER JOIN image i ON psi.image_id = i.image_id
-                               WHERE psi.section_id = :section_id
-                               ORDER BY psi.sort_order ASC";
-
-                    $galleryStmt = $this->getConnection()->prepare($gallerySql);
-                    $galleryStmt->bindValue(':section_id', (int)$row['section_id'], \PDO::PARAM_INT);
-                    $galleryStmt->execute();
-
-                    $row['gallery_images'] = $galleryStmt->fetchAll(\PDO::FETCH_ASSOC);
-                }
-            }
-
-            return $rows;
+            $stmt->execute([$pageId]);
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve page sections. ' . $e->getMessage());
         }
     }
+
     public function getSectionById(int $sectionId): ?PageSection
     {
         try {

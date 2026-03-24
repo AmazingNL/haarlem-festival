@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="/assets/css/home.css" />
     <link rel="stylesheet" href="/assets/css/dance/index.css" />
     <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/home.css" />
+    <link rel="stylesheet" href="/assets/css/stories/index.css" />
     <link rel="stylesheet" href="/assets/css/yummy/index.css" />
     <link rel="stylesheet" href="/assets/css/yummy/restaurant_card.css" />
     <link rel="stylesheet" href="/assets/css/yummy/ratatouille.css" />
@@ -38,6 +40,7 @@
             <!-- Navigation Links -->
             <ul class="nav-links">
                 <li><a href="#" class="nav-link">History</a></li>
+                <li><a href="/stories" class="nav-link">Stories</a></li>
                 <li><a href="#" class="nav-link">Stories</a></li>
                 <li><a href="/yummy" class="nav-link">Restaurants</a></li>
                 <li><a href="#" class="nav-link">Jazz</a></li>
@@ -129,6 +132,7 @@
     </footer>
 
     <script src="/assets/js/navbar.js"></script>
+    <script src="/assets/js/stories.js"></script>
 </body>
 
 </html>
