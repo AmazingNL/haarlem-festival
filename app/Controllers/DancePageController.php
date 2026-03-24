@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 use App\Core\BaseController;
-use App\Models\Page;
 use App\Services\IPageSectionService;
 use App\Services\IAdminPageService;
-final class HomeController extends BaseController
+final class DancePageController extends BaseController
 {
 
     private IPageSectionService $pageSectionService;

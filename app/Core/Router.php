@@ -10,7 +10,7 @@ use FastRoute\RouteCollector;
 use function FastRoute\cachedDispatcher;
 use App\Core\Middleware;
 use App\Controllers\AuthController;
-use App\Controllers\HomeController;
+use App\Controllers\DancePageController;
 use App\Controllers\AdminPageController;
 use App\Repositories\AdminPageRepository;
 use App\Services\AdminPageService;
@@ -73,7 +73,7 @@ final class Router
                     $repo = new UserRepository();
                     $service = new UserService($repo);
                     $controller = new $class($service);
-                } elseif ($class === HomeController::class) {
+                } elseif ($class === DancePageController::class) {
                     $pageRepo = new AdminPageRepository();
                     $pageservice = new AdminPageService($pageRepo);
                     $imageRepo = new ImageRepository();
@@ -154,11 +154,11 @@ final class Router
 
             $r->get('/logout', [AuthController::class, 'logout']);
 
-            $r->get('/', [HomeController::class, 'index']);
-            $r->get('/home', [HomeController::class, 'index']);
-            $r->get('/yummy', [HomeController::class, 'yummy']);
-            $r->get('/yummy/ratatouille', [HomeController::class, 'ratatouille']);
-            $r->get('/dance', [HomeController::class, 'dance']);
+            $r->get('/', [DancePageController::class, 'index']);
+            $r->get('/home', [DancePageController::class, 'index']);
+            $r->get('/yummy', [DancePageController::class, 'yummy']);
+            $r->get('/yummy/ratatouille', [DancePageController::class, 'ratatouille']);
+            $r->get('/dance', [DancePageController::class, 'dance']);
 
 
 
