@@ -76,17 +76,16 @@ class UserRepository extends BaseRepository implements IUserRepository
         }
     }
 
-    public function updateUser(User $user): User
+    public function updateUser(User $user): void
     {
         try {
-        $id = (int) ($user->getUserId() ?? 0);
+            $id = $user->user_id;
 
         if ($id <= 0) {
             throw new \InvalidArgumentException("User id is required for update.");
         }
 
-        // If password_hash is empty, don't overwrite it.
-        $setPassword = ($user->getPasswordHash() !== '');
+            $setPassword = $user->password_hash;
 
         $sql = "UPDATE " . self::TABLE . "
                 SET email = :email,
@@ -100,36 +99,32 @@ class UserRepository extends BaseRepository implements IUserRepository
                 WHERE " . self::PK . " = :id";
 
         $params = [
-            ':email' => $user->getEmail(),
-            ':username' => $user->getUsername(),
-            ':first_name' => $user->getFirstName(),
-            ':last_name' => $user->getLastName(),
-            ':role' => $user->getRole()->value,
+            ':email' => $user->email,
+            ':username' => $user->username,
+            ':first_name' => $user->first_name,
+            ':last_name' => $user->last_name,
+            ':role' => $user->role->value,
             ':id' => $id,
         ];
 
         if ($setPassword) {
-            $params[':password_hash'] = $user->getPasswordHash();
+            $params[':password_hash'] = $user->password_hash;
         }
 
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute($params);
-
-        return $this->findUserById($id) ?? $user;
         } 
         catch (\Exception $e) {
             throw new \RuntimeException('Failed to update user. ' . $e->getMessage());
         }
     }
 
-    public function deleteUser(int $id): bool
+    public function deleteUser(int $id): void
     {
         try {
         $sql = "DELETE FROM " . self::TABLE . " WHERE " . self::PK . " = :id";
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([':id' => $id]);
-
-        return $stmt->rowCount() > 0;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to delete user. ' . $e->getMessage());
         }

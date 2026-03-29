@@ -3,10 +3,10 @@
 declare(strict_types=1);
 namespace App\Models\Enum;
 
-enum UserRole{
-    case admin;
-    case customer;
-    case employee;
+enum UserRole: string{
+    case admin = 'admin';
+    case customer = 'customer';
+    case employee = 'employee';
     }
 
 enum OrderStatus: string

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Models\Page;
 use App\Models\User;
 use App\Models\Enum\SectionType;
 use App\Models\Enum\UserRole;
@@ -56,7 +55,7 @@ final class AdminPageController extends BaseController
         );
     }
 
-    public function viewPages()
+    public function viewPages(): void
     {
         $pages = $this->adminPageService->getAllPages();
         $this->view(
