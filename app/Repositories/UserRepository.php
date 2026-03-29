@@ -31,7 +31,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
         }
-    }
+    } // test comment
 
     public function findUserById(int $id): void
     {
