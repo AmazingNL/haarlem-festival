@@ -9,6 +9,7 @@ use function FastRoute\simpleDispatcher;
 use App\Controllers\AuthController;
 use App\Controllers\AdminPageController;
 use App\Controllers\HomeController;
+use App\Controllers\HistoryController;
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
@@ -94,6 +95,14 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/stories', [HomeController::class, 'stories']);
     $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
+    $r->get('/history', [HistoryController::class, 'index']);
+    $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
+    $r->post('/history/book-tour/add-to-program', [HistoryController::class, 'addBookTourToProgram']);
+    $r->get('/history/route-map', [HistoryController::class, 'routeMap']);
+    $r->get('/history/st-bavos-church', [HistoryController::class, 'stBavosChurch']);
+    $r->get('/history/molen-de-adriaan', [HistoryController::class, 'molenDeAdriaan']);
+    $r->get('/program', [HistoryController::class, 'program']);
+    $r->post('/program/remove', [HistoryController::class, 'removeProgramItem']);
 });
 
 
@@ -158,6 +167,20 @@ function createController(string $controllerClass)
             $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
 
             return new App\Controllers\HomeController($sectionService, $pageService);
+
+
+        case App\Controllers\HistoryController::class:
+
+            $pageRepo = new App\Repositories\AdminPageRepository();
+            $pageService = new App\Services\AdminPageService($pageRepo);
+
+            $imageRepo = new App\Repositories\ImageRepository();
+            $imageService = new App\Services\ImageService($imageRepo);
+
+            $sectionRepo = new App\Repositories\PageSectionRepository();
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
+
+            return new App\Controllers\HistoryController($sectionService, $pageService);
 
 
         case App\Controllers\AuthController::class:

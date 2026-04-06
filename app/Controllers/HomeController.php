@@ -54,14 +54,7 @@ final class HomeController extends BaseController
                 return;
             }
 
-            $section = array_map(
-                function (array $s): array {
-                $content = json_decode((string) ($s['content'] ?? ''), true);
-                if (is_array($content)) {
-                    $s = array_merge($s, $content);
-                }
-                return $s;
-            }, $pageSection);
+            $section = $this->mergeSectionContent($pageSection);
             
 
             $this->view(
@@ -76,7 +69,6 @@ final class HomeController extends BaseController
             );
         }
     }
-
 
     public function stories(): void
     {
@@ -122,6 +114,21 @@ final class HomeController extends BaseController
             );
 
         }
+    }
+
+    private function mergeSectionContent(array $sections): array
+    {
+        return array_map(
+            function (array $section): array {
+                $content = json_decode((string) ($section['content'] ?? ''), true);
+                if (is_array($content)) {
+                    $section = array_merge($section, $content);
+                }
+
+                return $section;
+            },
+            $sections
+        );
     }
 }
 

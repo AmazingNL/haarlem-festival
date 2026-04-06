@@ -93,7 +93,10 @@ final class PageSectionService implements IPageSectionService
                 $content[$fieldName] = (string) ($post[$fieldName] ?? '');
 
                 if (!empty($files[$fieldName]) && (($files[$fieldName]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK)) {
-                    $filePath = $this->imageService->storeUploadedImage($files[$fieldName]);
+                    $filePath = $this->imageService->storeUploadedImage($files[$fieldName], [
+                        'folder' => (string) ($config['folder'] ?? 'admin'),
+                        'prefix' => (string) ($config['prefix'] ?? $fieldName),
+                    ]);
                     $content[$fieldName] = $filePath;
                     $sectionImages[] = $filePath;
                 }
@@ -104,7 +107,11 @@ final class PageSectionService implements IPageSectionService
             $content[$fieldName] = $fieldValue;
 
             if ($fieldValue !== '') {
-                $sectionImages = array_merge($sectionImages, $this->imageService->extractUrls($fieldValue));
+                try {
+                    $sectionImages = array_merge($sectionImages, $this->imageService->extractUrls($fieldValue));
+                } catch (\Throwable $e) {
+                    // Plain text content does not contain embedded images.
+                }
             }
         }
 

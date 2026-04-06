@@ -1,4 +1,4 @@
-FROM php:fpm-F
+FROM php:fpm
 
 # Install system dependencies and Composer
 RUN apt-get update \
