@@ -1,12 +1,11 @@
 <?php
-// src/Domain/ProgramItem.php
 
 declare(strict_types=1);
 namespace App\Models;
 use App\Core\BaseEntity;
 use App\Models\Enum\ProgramItemSource;
 
-final class ProgramItem extends BaseEntity
+final class ProgramItem
 {
     public ?int $program_item_id = null;
     public int $user_id = 0;

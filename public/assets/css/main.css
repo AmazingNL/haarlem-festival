@@ -35,7 +35,6 @@
 	box-sizing: border-box;
 	line-height: 2.2em;
 	--font-primary: Arimo, sans-serif;
-	color: var(--color-text-header);
 }
 
 html {

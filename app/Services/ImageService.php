@@ -7,7 +7,6 @@ use App\Repositories\IImageRepository;
 use DateTime;
 use Exception;
 use Throwable;
-use Dom\HTMLDocument;
 
 
 
@@ -142,26 +141,25 @@ final class ImageService implements IImageService
             return [];
         }
 
-        $dom = HTMLDocument::createFromString($html, LIBXML_NOERROR);
-        $error = libxml_get_errors();
-        if (!empty($error)) {
-            throw new \ErrorException('No HTML file found');
-        }
-
-        $images = $dom->getElementsByTagName('img');
         $urls = [];
+        $previous = libxml_use_internal_errors(true);
 
-        if (empty($images)) {
-            throw new \ErrorException('No img tag');
-        }
-
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<!DOCTYPE html><html><body>' . $html . '</body></html>', LIBXML_NOERROR | LIBXML_NOWARNING);
+        $images = $dom->getElementsByTagName('img');
         foreach ($images as $img) {
+            if (!($img instanceof \DOMElement)) {
+                continue;
+            }
             $src = trim($img->getAttribute('src'));
             if ($src === '' || str_starts_with($src, 'data:')) {
-                throw new \ErrorException('src can not be empty');
+                continue;
             }
             $urls[] = $src;
         }
+
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
 
         return array_values(array_unique($urls));
     }

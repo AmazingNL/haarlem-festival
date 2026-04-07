@@ -12,10 +12,10 @@ if (is_array($sectionImage)) {
 
 <section class=" welcome-banner">
     <?php if ($img !== ''): ?>
-        <img src="<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>" alt="Welcome banner image">
+        <img class="welcome-banner-image" src="<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>" alt="Welcome banner image">
     <?php endif; ?>
     <div class="welcome-card-inner">
-        <?php require __DIR__ . '../../layout/go_back_button.php'; ?>
+        <?php require __DIR__ . '/../layout/go_back_button.php'; ?>
 
         <?php if (!empty($s['title'])):
             $title = (string) $s['title'];

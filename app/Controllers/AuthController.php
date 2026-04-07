@@ -130,17 +130,25 @@ final class AuthController extends BaseController
 
     private function loginAndRedirect(User $user): void
     {
+        $this->ensureSession();
+        session_regenerate_id(true);
 
-        $isAdmin = ($user->role === UserRole::admin);
+        $roleValue = $user->role instanceof UserRole
+            ? $user->role->value
+            : strtolower((string) $user->role);
 
-        if ($isAdmin) {
+        $_SESSION['user_id'] = $user->user_id;
+        $_SESSION['role'] = $roleValue;
+        $_SESSION['admin'] = ($roleValue === UserRole::admin->value);
+
+        if ($_SESSION['admin']) {
             $this->redirect('/admin/dashboard');
         } else {
-            switch ($user->role) {
-                case UserRole::customer:
+            switch ($roleValue) {
+                case UserRole::customer->value:
                     $this->redirect('/');
                     break;
-                case UserRole::employee:
+                case UserRole::employee->value:
                     $this->redirect('/employee/dashboard');
                     break;
                 default:

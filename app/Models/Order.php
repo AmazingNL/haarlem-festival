@@ -6,29 +6,25 @@ namespace App\Models;
 use App\Core\BaseEntity;
 use App\Models\Enum\OrderStatus;
 
-final class Order extends BaseEntity
+final class Order
 {
-    public ?int $order_id = null;
-    public int $user_id = 0;
-    public ?string $order_datetime = null;
-
-    public float $subtotal_amount = 0.0;
-    public float $vat_amount = 0.0;
-    public float $total_price = 0.0;
-    public string $currency = 'EUR';
-
+    public ?int $orderId = null;
+    public int $userId = 0;
+    public float $amount = 0.0;
+    public float $vat = 0.0;
     public OrderStatus $status = OrderStatus::pending;
-    public ?string $payment_due_at = null;
-    public ?string $cancelled_at = null;
+    public ?string $createdAt = null;
 
-    public ?string $created_at = null;
-    public ?string $updated_at = null;
-
-    /** @param array<string,mixed> $row */
-    public static function fromArray(array $row): static
-    {
-        $o = parent::fromArray($row);
-        if (isset($row['status'])) $o->status = OrderStatus::from((string)$row['status']);
-        return $o;
+    public function __construct(
+        int $orderId,int $userId, float $amount, float $vat,
+        OrderStatus $status, string $createdAt
+    ){
+        $this->orderId = $orderId;
+        $this->userId = $userId;
+        $this->amount = $amount;
+        $this->vat = $vat;
+        $this->status = $status;
+        $this->createdAt = $createdAt;
     }
+
 }

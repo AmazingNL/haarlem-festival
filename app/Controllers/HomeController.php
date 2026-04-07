@@ -1,11 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Controllers;
 use App\Core\BaseController;
 use App\Services\IPageSectionService;
 use App\Services\IAdminPageService;
+
 final class HomeController extends BaseController
 {
 
@@ -31,7 +30,10 @@ final class HomeController extends BaseController
             ]);
 
         } catch (\Exception $e) {
-            $this->setFlash('error', 'Failed to load home page: ' . $e->getMessage());
+            $this->view(
+                'no_page/index',
+                ['error' => 'Failed to load home page: ' . $e->getMessage()]
+            );
         }
     }
 
@@ -54,8 +56,17 @@ final class HomeController extends BaseController
                 return;
             }
 
-            $section = $this->mergeSectionContent($pageSection);
-            
+            $section = array_map(
+                function (array $s): array {
+                    $content = json_decode((string) ($s['content'] ?? ''), true);
+                    if (is_array($content)) {
+                        $s = array_merge($s, $content);
+                    }
+                    return $s;
+                },
+                $pageSection
+            );
+
 
             $this->view(
                 'yummy/index',
@@ -86,7 +97,7 @@ final class HomeController extends BaseController
             );
         } catch (\Exception $e) {
             $this->view(
-                template: 'no_page/index',
+                'no_page/index',
                 data: ['error' => 'Stories page not available']
             );
         }
@@ -131,5 +142,3 @@ final class HomeController extends BaseController
         );
     }
 }
-
-

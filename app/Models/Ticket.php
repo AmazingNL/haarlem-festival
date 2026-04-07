@@ -9,13 +9,20 @@ use App\Models\Enum\TicketStatus;
 final class Ticket extends TicketStatus
 {
 
-    public ?int $ticket_id = null;
-    public int $order_ticket_id = 0;
-    public string $qr_token = '';
+    public ?int $id = null;
+    public int $ticketTypeId = 0;
+    public int $orderItemId = 0;
+    public string $qrCode = '';
+    public string $scannedAt = date("Y-m-d H:i:s");
 
-    public TicketStatus $status = TicketStatus::valid;
-    public ?string $scanned_at = null;
-    public ?int $scanned_by_user_id = null;
-
+    public function __construct(
+        int $id, int $ticketTypeId, int $orderItemId, string $qrCode, string $scannedAt
+    ){
+        $this->id = $id;
+        $this->ticketTypeId = $ticketTypeId;
+        $this->orderItemId = $orderItemId;
+        $this->qrCode = $qrCode;
+        $this->scanAt = $scannedAt;
+    }
 
 }

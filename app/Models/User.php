@@ -14,16 +14,24 @@ final class User
     public string $password_hash = '';
     public string $first_name = '';
     public string $last_name = '';
-    public UserRole $role = UserRole::customer;
+    public UserRole|string $role = UserRole::customer;
 
     public ?string $phone = null;
     public ?int $profile_image_id = null;
+    public bool $is_active = true;
 
     public ?string $created_at = null;
     public ?string $updated_at = null;
 
-    public function __construct(string $username, string $email, string $password_hash,
-                                string $first_name, string $last_name, ?string $phone, UserRole $role)
+    public function __construct(
+        string $username = '',
+        string $email = '',
+        string $password_hash = '',
+        string $first_name = '',
+        string $last_name = '',
+        ?string $phone = null,
+        UserRole|string $role = UserRole::customer
+    )
     {
         $this->username = $username;
         $this->email = $email;

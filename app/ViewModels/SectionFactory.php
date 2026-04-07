@@ -33,6 +33,8 @@ use App\ViewModels\history\HistoryMolenSidebar;
 use App\ViewModels\history\HistoryTimeline;
 use App\ViewModels\yummy\TextBlock;
 use App\ViewModels\yummy\WelcomeBanner;
+use App\ViewModels\yummy\HaarlemUnique;
+
 
 class SectionFactory 
 {
