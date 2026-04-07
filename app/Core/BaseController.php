@@ -9,11 +9,11 @@ abstract class BaseController
     protected function view(string $template, array $data = [], ?string $layout = 'main', int $status = 200): void
     {
         $data['csrf'] ??= $this->csrfToken();
-        // inject any flash messages stored in session so layouts can render them
+        // inject any flash messages stored in session 
         $data['flash'] = $data['flash'] ?? $this->getAllFlash();
         extract($data, EXTR_SKIP);
 
-            $content = __DIR__ . '/../Views/' . ltrim($template, '/') . '.php';
+            $content = __DIR__ . '/../Views/' . $template. '.php';
         if (!is_file($content)) {
             $this->abort(500, "View not found: {$template}");
         }
@@ -39,9 +39,11 @@ abstract class BaseController
     // ---------- Redirect ----------
     protected function redirect(string $to, $status = 302): void
     {
-        header('Location: ' . $to, true,  $status);
-
-        exit;
+        $statusCode = (int) $status;
+        if (!headers_sent()) {
+            header('Location: ' . $to, true, $statusCode);
+            exit;
+        }
     }
 
     // ---------- Request helpers ----------
@@ -85,34 +87,26 @@ abstract class BaseController
 
     // ---------- Auth helpers ----------
 
-    protected function userId(): ?int
-    {
-        return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
-    }
+    // protected function userId(): ?int
+    // {
+    //     return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
+    // }
 
-    protected function adminId(): ?int
-    {
-        return isset($_SESSION['admin_user_id']) ? (int) $_SESSION['admin_user_id'] : null;
-    }
-    protected function userRole(): ?string
-    {
-        return isset($_SESSION['role']) ? (string) $_SESSION['role'] : null;
-    }
+    // protected function adminId(): ?int
+    // {
+    //     return isset($_SESSION['admin_user_id']) ? (int) $_SESSION['admin_user_id'] : null;
+    // }
+    // protected function userRole(): ?string
+    // {
+    //     return isset($_SESSION['role']) ? (string) $_SESSION['role'] : null;
+    // }
 
-    protected function requireLogin(): void
-    {
-        if ($this->userId() === null) {
-            $this->redirect('/login');
-        }
-    }
-
-    protected function requireRole(string ...$roles): void
-    {
-        $role = $this->userRole();
-        if ($role === null || !in_array($role, $roles, true)) {
-            $this->abort(403, 'Forbidden');
-        }
-    }
+    // protected function requireLogin(): void
+    // {
+    //     if ($this->userId() === null) {
+    //         $this->redirect('/login');
+    //     }
+    // }
 
     // ---------- CSRF ----------
 
@@ -133,7 +127,7 @@ abstract class BaseController
 
     protected function verifyCsrf(): void
     {
-        if ($this->httpMethod() !== 'POST')
+        if (!$this->isPost())
             return;
 
         $this->ensureSession();

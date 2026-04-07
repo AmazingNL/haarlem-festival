@@ -100,7 +100,7 @@ foreach ($allPages as $p) {
                                 <a href="/admin/pages/<?= $id ?>/editForm" class="btn-secondary">Edit</a>
                                 <a href="/admin/pageSection/<?= $id ?>/pageSectionForm" class="btn-secondary">Sections</a>
                                 <a href="/admin/dashboard/<?= $id ?>/delete" class="pill btn-danger"
-                                   onclick="return confirm('Delete \'<?= addslashes($title) ?>\'?')">Delete</a>
+                                onclick="return confirm('Delete \'<?= addslashes($title) ?>\'?')">Delete</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

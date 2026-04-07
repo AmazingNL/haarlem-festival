@@ -8,13 +8,13 @@ use App\Models\User;
 
 interface IUserService
 {
-    public function registerUser(User $user, string $plainPassword): User;
+    public function registerUser(User $user, string $plainPassword): void;
     public function authenticate(string $emailOrUsername, string $plainPassword): ?User;
     public function getUserById(int $id): ?User;
     public function getUserByEmail(string $email): ?User;
     public function getAllUsers(): array;
-    public function updateUser(User $user): User;
-    public function deleteUser(int $id): bool;
+    public function updateUser(User $user): void;
+    public function deleteUser(int $id): void;
     public function listUsers(): array;
     public function userExists(string $email, string $username): bool;
 

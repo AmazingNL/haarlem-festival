@@ -15,10 +15,10 @@ final class UserService implements IUserService
         $this->userRepo = $userRepo;
     }
 
-    public function registerUser(User $user, string $plainPassword): User
+    public function registerUser(User $user, string $plainPassword): void
     {
         $user->password_hash = password_hash($plainPassword, PASSWORD_DEFAULT);
-        return $this->userRepo->createUser($user);
+        $this->userRepo->createUser($user);
     }
 
     public function authenticate(string $emailOrUsername, string $plainPassword): ?User
@@ -35,9 +35,9 @@ final class UserService implements IUserService
         return $this->userRepo->findUserById($id);
     }
 
-    public function updateUser(User $user): User
+    public function updateUser(User $user): void
     {
-        return $this->userRepo->updateUser($user);
+        $this->userRepo->updateUser($user);
     }
 
     public function getAllUsers(): array
@@ -50,9 +50,9 @@ final class UserService implements IUserService
         return $this->userRepo->findUserByEmail($email);
     }
 
-    public function deleteUser(int $id): bool
+    public function deleteUser(int $id): void
     {
-        return $this->userRepo->deleteUser($id);
+        $this->userRepo->deleteUser($id);
     }
 
     public function listUsers(): array

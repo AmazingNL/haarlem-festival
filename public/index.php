@@ -9,12 +9,11 @@ use function FastRoute\simpleDispatcher;
 use App\Controllers\AuthController;
 use App\Controllers\AdminPageController;
 use App\Controllers\HomeController;
-use App\Controllers\DancePageController;
-
+use App\Controllers\HistoryController;
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
-require_once __DIR__ . '/../app/Config.php';
+require_once __DIR__ . '/../app/config.php';
 
 session_start();
 
@@ -59,12 +58,14 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/admin/pageSection/{page_id:\d+}/pageSectionForm', [AdminPageController::class, 'pageSectionForm']);
     $r->post('/admin/pageSection/{page_id:\d+}/createPage', [AdminPageController::class, 'createPageSection']);
+    $r->get('/admin/pageSection/render-fields', [AdminPageController::class, 'renderSectionForm']);
 
     $r->get('/admin/pageSection/{page_id:\d+}/editSectionForm', [AdminPageController::class, 'editSectionForm']);
-    $r->post('/admin/pageSection/{page_id:\d+}/editSection', [AdminPageController::class, 'editSection']);
+    $r->post('/admin/pageSection/{section_id:\d+}/editSection', [AdminPageController::class, 'editSection']);
 
-    $r->get('/admin/pageSection/{page_id:\d+}/pageSectionList', [AdminPageController::class, 'pageSectionList']);
+    $r->get('/admin/pageSection/{page_id:\d+}/viewPageSections', [AdminPageController::class, 'viewPageSections']);
     $r->get('/admin/pageSection/editPage', [AdminPageController::class, 'updatePageSection']);
+    $r->get('/admin/pageSection/{section_id:\d+}/deleteSection', [AdminPageController::class, 'deleteSection']);
 
 
     $r->get('/admin/users', [AdminPageController::class, 'manageUsersPage']);
@@ -94,6 +95,14 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/stories', [HomeController::class, 'stories']);
     $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
+    $r->get('/history', [HistoryController::class, 'index']);
+    $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
+    $r->post('/history/book-tour/add-to-program', [HistoryController::class, 'addBookTourToProgram']);
+    $r->get('/history/route-map', [HistoryController::class, 'routeMap']);
+    $r->get('/history/st-bavos-church', [HistoryController::class, 'stBavosChurch']);
+    $r->get('/history/molen-de-adriaan', [HistoryController::class, 'molenDeAdriaan']);
+    $r->get('/program', [HistoryController::class, 'program']);
+    $r->post('/program/remove', [HistoryController::class, 'removeProgramItem']);
 });
 
 
@@ -126,16 +135,18 @@ switch ($routeInfo[0]) {
         [$controllerClass, $method] = $routeInfo[1];
         $vars = $routeInfo[2];
 
-        if (str_starts_with($uri, '/admin')
+        if (
+            str_starts_with($uri, '/admin')
             && !in_array($uri, $publicAdminRoutes)
-            && empty($_SESSION['admin']))
-        {
+            && empty($_SESSION['admin'])
+        ) {
             header('Location: /admin/loginForm');
             exit;
         }
 
         $controller = createController($controllerClass);
-        call_user_func_array([$controller, $method], $vars);
+        // FastRoute provides associative params; pass positionally to avoid PHP named-arg binding.
+        call_user_func_array([$controller, $method], array_values($vars));
 
         break;
 }
@@ -150,11 +161,26 @@ function createController(string $controllerClass)
             $pageService = new App\Services\AdminPageService($pageRepo);
 
             $imageRepo = new App\Repositories\ImageRepository();
+            $imageService = new App\Services\ImageService($imageRepo);
 
             $sectionRepo = new App\Repositories\PageSectionRepository();
-            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageRepo);
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
 
             return new App\Controllers\HomeController($sectionService, $pageService);
+
+
+        case App\Controllers\HistoryController::class:
+
+            $pageRepo = new App\Repositories\AdminPageRepository();
+            $pageService = new App\Services\AdminPageService($pageRepo);
+
+            $imageRepo = new App\Repositories\ImageRepository();
+            $imageService = new App\Services\ImageService($imageRepo);
+
+            $sectionRepo = new App\Repositories\PageSectionRepository();
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
+
+            return new App\Controllers\HistoryController($sectionService, $pageService);
 
 
         case App\Controllers\AuthController::class:
@@ -177,7 +203,7 @@ function createController(string $controllerClass)
             $imageService = new App\Services\ImageService($imageRepo);
 
             $sectionRepo = new App\Repositories\PageSectionRepository();
-            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageRepo);
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
 
             return new App\Controllers\AdminPageController(
                 $pageService,

@@ -6,7 +6,7 @@ namespace App\Models;
 use App\Core\BaseEntity;
 use App\Models\Enum\PageStatus;
 
-final class Page extends BaseEntity
+final class Page 
 {
 
     public ?int $page_id = null;
@@ -35,20 +35,5 @@ final class Page extends BaseEntity
         $this->updated_at = $updated_at;
         $this->status = $status;
     }
-    public static function fromArray(array $row): static
-    {
-        $rawRole = $row['status'] ?? null;
-        unset($row['status']);
 
-        $p = parent::fromArray($row);
-
-        if ($rawRole !== null) {
-            $role = PageStatus::tryFrom((string) $rawRole);
-            if ($role !== null)
-                $p->status = $role;
-        }
-
-        return $p;
-
-    }
 }

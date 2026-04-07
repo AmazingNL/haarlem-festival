@@ -4,10 +4,9 @@
 declare(strict_types=1);
 
 namespace App\Models;
-use App\Core\BaseEntity;
 use App\Models\Enum\UserRole;
 
-final class User extends BaseEntity
+final class User
 {
     public ?int $user_id = null;
     public string $username = '';
@@ -23,29 +22,15 @@ final class User extends BaseEntity
     public ?string $created_at = null;
     public ?string $updated_at = null;
 
-
-    public static function fromArray(array $row): static
+    public function __construct(string $username, string $email, string $password_hash,
+                                string $first_name, string $last_name, ?string $phone, UserRole $role)
     {
-        $rawRole = $row['role'] ?? null;
-        unset($row['role']); // prevent parent from assigning a raw string to the enum-typed property
-
-        $user = parent::fromArray($row);
-
-        if ($rawRole !== null) {
-            //  tryFrom to avoid ValueError on invalid values 
-            $role = UserRole::tryFrom((string) $rawRole);
-            if ($role !== null)
-                $user->role = $role;
-        }
-
-        return $user;
+        $this->username = $username;
+        $this->email = $email;
+        $this->password_hash = $password_hash;
+        $this->first_name = $first_name;
+        $this->last_name = $last_name;
+        $this->phone = $phone;
+        $this->role = $role;
     }
-
-    public function toArray(): array
-    {
-        $data = parent::toArray();
-        $data['role'] = $this->role->value; // store enum as its string value in DB
-        return $data;
-    }
-
 }

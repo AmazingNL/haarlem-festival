@@ -1,0 +1,35 @@
+USE haarlem_festival;
+
+ALTER TABLE page_section
+MODIFY section_type ENUM(
+  'cta',
+  'text_block',
+  'image_text',
+  'hero',
+  'feature',
+  'image_left',
+  'image_right',
+  'journey',
+  'stat',
+  'timeline',
+  'transport',
+  'two_image_row',
+  'venue',
+  'cards_grid',
+  'restaurants_card',
+  'welcome_banner',
+  'gallery',
+  'stories_hero',
+  'what_is_stories',
+  'stories_preview',
+  'storytelling_schedule',
+  'haarlem_unique',
+  'haarlem_taste',
+  'history_hero',
+  'history_timeline',
+  'history_gallery',
+  'history_featured_locations',
+  'history_route',
+  'history_info',
+  'history_cta'
+) NOT NULL;

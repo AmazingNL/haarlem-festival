@@ -47,25 +47,28 @@ final class HomeController extends BaseController
                 );
                 return;
             }
-
-            $yummy = $this->pageSectionService->getSectionsByPageId($page_id);
-            if (empty($yummy)) {
+            $pageSection = $this->pageSectionService->getSectionsByPageId($page_id);
+            if (empty($pageSection)) {
                 $this->setFlash('error', 'page does not exist');
                 $this->redirect('/');
+                return;
             }
+
+            $section = $this->mergeSectionContent($pageSection);
+            
+
             $this->view(
                 'yummy/index',
-                ['section' => $yummy, 'page' => $page, 'title' => 'Yummy']
+                ['section' => $section, 'page' => $page, 'title' => 'Yummy']
             );
 
         } catch (\Throwable $e) {
             $this->view(
                 'no_page/index',
-                ['error' => 'Yummy page not available']
+                ['error' => 'Something went wrong' . $e]
             );
         }
     }
-
 
     public function stories(): void
     {
@@ -88,6 +91,7 @@ final class HomeController extends BaseController
             );
         }
     }
+
     public function ratatouille(): void
     {
         try {
@@ -110,6 +114,21 @@ final class HomeController extends BaseController
             );
 
         }
+    }
+
+    private function mergeSectionContent(array $sections): array
+    {
+        return array_map(
+            function (array $section): array {
+                $content = json_decode((string) ($section['content'] ?? ''), true);
+                if (is_array($content)) {
+                    $section = array_merge($section, $content);
+                }
+
+                return $section;
+            },
+            $sections
+        );
     }
 }
 

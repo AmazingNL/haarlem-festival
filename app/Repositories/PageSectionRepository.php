@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace App\Repositories;
 use App\Models\PageSection;
+use App\Models\Enum\SectionType;
 use App\Core\BaseRepository;
 
 final class PageSectionRepository extends BaseRepository implements IPageSectionRepository
@@ -41,7 +42,7 @@ final class PageSectionRepository extends BaseRepository implements IPageSection
             $stmt->bindValue(':section_id', $sectionId, \PDO::PARAM_INT);
             $stmt->execute();
             $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-            return $row ? PageSection::fromArray($row) : null;
+            return $row ? $this->hydrateSection($row) : null;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve page section. ' . $e->getMessage());
         }
@@ -51,9 +52,9 @@ final class PageSectionRepository extends BaseRepository implements IPageSection
     {
         try {
             $sql = "INSERT INTO " . self::TABLE . "
-                    (page_id, section_type, title, content, image_id, button_text, button_link, sort_order, is_published)
+                    (page_id, section_type, content, sort_order, is_published, created_at)
                     VALUES
-                    (:page_id, :section_type, :title, :content, :image_id, :button_text, :button_link, :sort_order, :is_published)";
+                    (:page_id, :section_type, :content, :sort_order, :is_published, NOW())";
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute($this->sectionToDbArray($section));
             return (int) $this->getConnection()->lastInsertId();
@@ -68,13 +69,10 @@ final class PageSectionRepository extends BaseRepository implements IPageSection
             $sql = "UPDATE " . self::TABLE . "
                     SET page_id = :page_id,
                         section_type = :section_type,
-                        title = :title,
                         content = :content,
-                        image_id = :image_id,
-                        button_text = :button_text,
-                        button_link = :button_link,
                         sort_order = :sort_order,
-                        is_published = :is_published
+                        is_published = :is_published,
+                        updated_at = NOW()
                     WHERE " . self::PK . " = :section_id";
             $stmt = $this->getConnection()->prepare($sql);
             return $stmt->execute(array_merge($this->sectionToDbArray($section), [':section_id' => $section->section_id]) );
@@ -100,14 +98,30 @@ final class PageSectionRepository extends BaseRepository implements IPageSection
     {
         return [
             ':page_id' => $section->page_id,
-            ':section_type' => $section->section_type,
-            ':title' => $section->title,
+            ':section_type' => $section->section_type->value,
             ':content' => $section->content,
-            ':image_id' => $section->image_id,
-            ':button_text' => $section->button_text,
-            ':button_link' => $section->button_link,
             ':sort_order' => $section->sort_order,
-            ':is_published' => $section->is_published ? 1 : 0,
+            ':is_published' => $section->is_published ? 1 : 0            
         ];
+    }
+
+    /** @param array<string,mixed> $row */
+    private function hydrateSection(array $row): PageSection
+    {
+        $sectionType = SectionType::tryFrom((string) ($row['section_type'] ?? '')) ?? SectionType::TEXT_BLOCK;
+
+        $section = new PageSection(
+            isset($row['section_id']) ? (int) $row['section_id'] : 0,
+            isset($row['page_id']) ? (int) $row['page_id'] : 0,
+            $sectionType,
+            isset($row['content']) ? (string) $row['content'] : null,
+            isset($row['sort_order']) ? (int) $row['sort_order'] : 0,
+            isset($row['is_published']) ? (bool) $row['is_published'] : true,
+        );
+
+        $section->created_at = isset($row['created_at']) ? (string) $row['created_at'] : null;
+        $section->updated_at = isset($row['updated_at']) ? (string) $row['updated_at'] : null;
+
+        return $section;
     }
 }
