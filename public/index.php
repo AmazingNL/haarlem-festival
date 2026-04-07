@@ -9,6 +9,8 @@ use function FastRoute\simpleDispatcher;
 use App\Controllers\AuthController;
 use App\Controllers\AdminPageController;
 use App\Controllers\HomeController;
+use App\Controllers\DancePageController;
+
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
