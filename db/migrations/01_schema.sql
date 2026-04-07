@@ -337,3 +337,27 @@ CREATE TABLE IF NOT EXISTS program_item (
     ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 
 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- RESTAURANT RESERVATION
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS restaurant (
+  restaurant_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  event_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  order_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  
+  adult_count INT UNSIGNED NOT NULL DEFAULT 0,
+  child_count INT UNSIGNED NOT NULL DEFAULT 0,
+  
+  adult_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+  child_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+  total_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (restaurant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 
+COLLATE=utf8mb4_unicode_ci;

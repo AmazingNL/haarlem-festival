@@ -229,7 +229,9 @@ final class AdminPageController extends BaseController
             $this->setFlash('success', 'Section created successful');
             $this->redirect('/admin/dashboard');
         } catch (Throwable $e) {
-            $this->setFlash('error', 'Something went wrong: ' . $e->getMessage());
+            error_log('Section creation error: ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
+            error_log('Stack trace: ' . $e->getTraceAsString());
+            $this->setFlash('error', 'Something went wrong: ' . $e);
             $this->redirect('/admin/dashboard');
         }
     }

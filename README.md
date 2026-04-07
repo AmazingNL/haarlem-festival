@@ -1,39 +1,36 @@
 # Haarlem Festival
 
-## Quick Start
+## Project Setup
 
-1. Start services:
+### 1. Start Containers
 
 ```bash
 docker compose up --build
 ```
 
-2. Run schema migrations:
+### 2. Apply Database Schema
 
 ```bash
 docker compose exec php php /app/migrate.php up
 ```
 
-3. Load sample data (optional, recommended for local development):
 
-```bash
-docker compose exec php php /app/migrate.php seed
-```
+## Database Setup & Management
 
-## Database Commands
+### First Time Setup (Fresh Clone)
 
-- `up`: applies schema migrations from `db/migrations`.
-- `seed`: loads sample data from `db/seeds`.
-- `reset --force`: drops all tables, recreates schema, then reseeds.
+When you first clone the project:
 
 ```bash
 docker compose exec php php /app/migrate.php reset --force
 ```
 
-## Backup And Restore
+Warning: `reset --force` deletes your local DB data.
 
-Your local database data is stored in Docker volume `mysqldata` and is not committed to Git.
-To share real data between machines, export/import a SQL dump.
+## Real Data: Backup And Restore
+
+real local database data lives in Docker volume `mysqldata`.
+To share real data between teammates, use `backup.sql`.
 
 ### Create Backup
 
@@ -47,8 +44,48 @@ docker compose exec mysql sh -c 'mariadb-dump -uroot -psecret123 haarlem_festiva
 cat backup.sql | docker compose exec -T mysql sh -c 'mariadb -uroot -psecret123 haarlem_festival'
 ```
 
-## Team Workflow
+Note: restoring `backup.sql` replaces current data in `haarlem_festival`.
 
-- New clone: run `up` and `seed` to get schema + demo data.
-- Real project data: use backup/restore commands above.
-- Avoid running `reset --force` unless you intentionally want to wipe local DB data.
+## Team Workflow (Share DB Data)
+
+### A. You Share Your Data
+
+```bash
+# Export current DB to backup.sql
+docker compose exec mysql sh -c 'mariadb-dump -uroot -psecret123 haarlem_festival' > backup.sql
+```
+
+Then send `backup.sql` to your teammate using your team file-sharing method.
+
+### B. Teammate Pulls Your Data
+
+```bash
+# Restore shared snapshot
+cat backup.sql | docker compose exec -T mysql sh -c 'mariadb -uroot -psecret123 haarlem_festival'
+```
+
+### C. You Pull Teammate Data
+
+Exactly the same flow in reverse:
+
+```bash
+cat backup.sql | docker compose exec -T mysql sh -c 'mariadb -uroot -psecret123 haarlem_festival'
+```
+
+## Keep Your Own Local Data Before Restore
+
+If you want a safety copy before replacing your DB:
+
+```bash
+docker compose exec mysql sh -c 'mariadb-dump -uroot -psecret123 haarlem_festival' > my_local_backup_YYYYMMDD.sql
+```
+
+Then restore team `backup.sql`.
+
+## Practical Rules For Team
+
+1. Export `backup.sql` only when you intentionally want to share updated real data.
+2. Name shared files clearly if you keep versions (for example: `backup_2026-04-07.sql`).
+3. Always make a personal backup before restoring someone else's snapshot.
+4. Keep schema changes in migrations; keep test/demo data in seeds.
+5. Treat `backup.sql` as a shared snapshot, not a migration history.

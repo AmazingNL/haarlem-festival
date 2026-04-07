@@ -1,4 +1,6 @@
 <?php
+// Return section data info for editing - good dynamic view for creating sections and editing section
+
 $values = is_array($sectionData ?? null) ? $sectionData : [];
 
 $toFieldString = static function (mixed $data): string {
@@ -6,7 +8,6 @@ $toFieldString = static function (mixed $data): string {
         $first = $data[0] ?? '';
         return is_string($first) ? $first : '';
     }
-
     return is_string($data) ? $data : '';
 };
 ?>

@@ -80,5 +80,15 @@ use App\ViewModels\SectionFactory;
         sectionType.addEventListener('change', loadSection);
 
         loadSection();
+            // Ensure TinyMCE content is synced before form submission
+            const form = document.querySelector('.page-section-form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    // Sync TinyMCE editor content to textareas before submission
+                    if (typeof tinymce !== 'undefined' && tinymce.editors && tinymce.editors.length > 0) {
+                        tinymce.triggerSave();
+                    }
+                });
+            }
     });
 </script>

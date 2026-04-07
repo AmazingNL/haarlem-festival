@@ -6,7 +6,7 @@
     <meta name="viewport" content="initial-scale=1, width=device-width">
     <title>Haarlem Festival</title>
     <meta name="description" content="Haarlem Festival — events, programs and city guides">
-    <link rel="stylesheet" href="{{ assets('/css/home.css') }}" />
+    <link rel="stylesheet" href="/assets/css/output.css" />
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/home.css" />
     <link rel="stylesheet" href="/assets/css/stories/index.css" />

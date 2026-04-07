@@ -1,14 +1,33 @@
 <?php
 $resCard = [];
+$sectionData = isset($section) && is_array($section) ? $section : [];
+$sections = array_values($sectionData);
+$total = count($sections);
 
-foreach (($section ?? []) as $s) {
-    if (empty($s['is_published'])) continue;
+for ($i = 0; $i < $total; $i++) {
+    $s = $sections[$i];
+    if (empty($s['is_published'])) {
+        continue;
+    }
 
-    $type = trim($s['section_type'] ?? '');
+    $type = trim((string) ($s['section_type'] ?? ''));
 
     if ($type === 'restaurants_card') {
-        $resCard[] = $s;   // collect
-        continue;          
+        $resCard[] = $s;
+        continue;
+    }
+
+    // Pair a text_block followed immediately by a gallery into one row layout.
+    if ($type === 'text_block' && isset($sections[$i + 1])) {
+        $next = $sections[$i + 1];
+        $nextType = trim((string) ($next['section_type'] ?? ''));
+        if (!empty($next['is_published']) && $nextType === 'gallery') {
+            $textSection = $s;
+            $gallerySection = $next;
+            require __DIR__ . '/text_block_gallery.php';
+            $i++; // skip the paired gallery section
+            continue;
+        }
     }
 
     switch ($type) {
@@ -18,15 +37,18 @@ foreach (($section ?? []) as $s) {
             break;
 
         case 'text_block':
-            require __DIR__ . '/text_block.php';
+        case 'gallery':
+            $title = trim((string) ($s['title'] ?? ''));
+            if($title === "haarlem taste"){
+            require __DIR__ . '/haarlem_taste.php';
+            }
+            else{
+            require __DIR__ . '/text_block_gallery.php';
+            }
             break;
 
         case 'haarlem_unique':
             require __DIR__ . '/haarlem_unique.php';
-            break;
-
-        case 'haarlem_taste':
-            require __DIR__ . '/haarlem_taste.php';
             break;
 
         default:

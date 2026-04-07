@@ -3,10 +3,10 @@
 declare(strict_types=1);
 namespace App\Models\Enum;
 
-enum UserRole{
-    case admin;
-    case customer;
-    case employee;
+enum UserRole: string{
+    case admin = 'admin';
+    case customer = 'customer';
+    case employee = 'employee';
     }
 
 enum OrderStatus: string
@@ -53,5 +53,6 @@ enum SectionType: string
     case RESTAURANTS_CARD = 'restaurants_card';
     case WELCOME_BANNER = "welcome_banner";
     case GALLERY = "gallery";
+    case HAARLEM_UNIQUE = "haarlem_unique";
 }
 

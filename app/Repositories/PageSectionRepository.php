@@ -18,11 +18,11 @@ final class PageSectionRepository extends BaseRepository implements IPageSection
     public function getSectionsByPageId(int $pageId): array
     {
         try {
-            $sql = "SELECT ps.*, i.file_path AS image_path
+            $sql = "SELECT ps.*
                     FROM " . self::TABLE . " ps
-                    LEFT JOIN image i ON i.image_id = ps.image_id
                     WHERE ps.page_id = ?
                     ORDER BY ps.sort_order ASC";
+
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute([$pageId]);
             return $stmt->fetchAll(\PDO::FETCH_ASSOC);

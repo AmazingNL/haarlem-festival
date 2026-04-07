@@ -6,14 +6,17 @@ namespace App\Models;
 
 final class TicketType
 {
-    public ?int $ticket_type_id = null;
-    public int $event_id = 0;
+    public ?int $id = null;
+    public int $eventId = 0;
     public string $name = '';
     public float $price = 0.0;
-    public float $vat_rate = 0.21;
-    public int $max_quantity = 0;
-    public int $is_active = 1;
 
-    public ?string $created_at = null;
-    public ?string $updated_at = null;
+    public function __construct(
+        int $id, int $eventId, string $name, float $price
+    ){
+        $this->id = $id;
+        $this->eventId = $eventId;
+        $this->name = $name;
+        $this->price = $price;
+    }
 }
