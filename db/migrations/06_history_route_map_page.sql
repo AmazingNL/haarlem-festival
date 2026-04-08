@@ -1,50 +1,5 @@
 USE haarlem_festival;
 
-ALTER TABLE page_section
-MODIFY section_type ENUM(
-  'cta',
-  'text_block',
-  'image_text',
-  'hero',
-  'feature',
-  'image_left',
-  'image_right',
-  'journey',
-  'stat',
-  'timeline',
-  'transport',
-  'two_image_row',
-  'venue',
-  'cards_grid',
-  'restaurants_card',
-  'welcome_banner',
-  'gallery',
-  'stories_hero',
-  'what_is_stories',
-  'stories_preview',
-  'storytelling_schedule',
-  'haarlem_unique',
-  'haarlem_taste',
-  'history_hero',
-  'history_timeline',
-  'history_gallery',
-  'history_featured_locations',
-  'history_route',
-  'history_info',
-  'history_cta',
-  'history_book_tour_hero',
-  'history_book_tour_booking',
-  'history_book_tour_route',
-  'history_book_tour_schedule',
-  'history_book_tour_pricing',
-  'history_book_tour_notice',
-  'history_book_tour_alert',
-  'history_route_map_hero',
-  'history_route_map_stops',
-  'history_route_map_directions',
-  'history_route_map_cta'
-) NOT NULL;
-
 DELETE ps FROM page_section ps
 INNER JOIN page p ON p.page_id = ps.page_id
 WHERE p.slug = 'history-route-map';

@@ -20,8 +20,15 @@ final class HomeController extends BaseController
     {
         try {
             $this->ensureSession();
+
             $pages = $this->adminPageService->getPageBySlug('home');
             $page_id = $pages->page_id ?? null;
+
+            if ($page_id === null)
+            {
+             throw new \Exception("Home page doesn't exist");
+            }
+
             $homePage = $this->pageSectionService->getSectionsByPageId($page_id);
 
             $this->view('/home/home', [

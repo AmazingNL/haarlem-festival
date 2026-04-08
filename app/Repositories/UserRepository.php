@@ -6,6 +6,7 @@ use App\Core\BaseRepository;
 use App\Models\Enum\UserRole;
 use App\Models\User;
 use App\Repositories\IUserRepository;
+use PDO;
 
 class UserRepository extends BaseRepository implements IUserRepository
 {
@@ -17,7 +18,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         parent::__construct();
     }
 
-    public function findUserByEmail(string $email): void
+    public function findUserByEmail(string $email): ?User
     {
         // Login requirement says "username OR e-mail", so we search both.
         try {
@@ -28,12 +29,15 @@ class UserRepository extends BaseRepository implements IUserRepository
 
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute([':value' => $email]);
+            $stmt->setFetchMode(PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, User::class);
+            $user = $stmt->fetch();
+            return $user instanceof User ? $user : null;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
         }
     }
 
-    public function findUserById(int $id): void
+    public function findUserById(int $id): ?User
     {
         try {
 
@@ -44,8 +48,9 @@ class UserRepository extends BaseRepository implements IUserRepository
 
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute([':id' => $id]);
-            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
+            $stmt->setFetchMode(PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, User::class);
+            $user = $stmt->fetch();
+            return $user instanceof User ? $user : null;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
         }
