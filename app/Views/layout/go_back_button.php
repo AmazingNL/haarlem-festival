@@ -6,7 +6,7 @@
         background-color: var(--button-color-primary);
         color: var(--color-text-light);
         padding: 10px 15px 10px 10px;
-        margin: 0 60px;
+        margin: 0px;
         position: relative;
         top: 10px;
     }

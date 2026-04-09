@@ -91,7 +91,38 @@ CREATE TABLE IF NOT EXISTS page_section (
   section_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   page_id BIGINT UNSIGNED NOT NULL,
 
-  section_type VARCHAR(50) NOT NULL,
+  section_type ENUM(
+  'cta',
+  'text_block',
+  'image_text',
+  'hero',
+  'feature',
+  'image_left',
+  'image_right',
+  'journey',
+  'stat',
+  'timeline',
+  'transport',
+  'two_image_row',
+  'venue',
+  'cards_grid',
+  'restaurants_card',
+  'welcome_banner',
+  'gallery',
+  'stories_hero',
+  'what_is_stories',
+  'stories_preview',
+  'storytelling_schedule',
+  'haarlem_unique',
+  'haarlem_taste',
+  'history_hero',
+  'history_timeline',
+  'history_gallery',
+  'history_featured_locations',
+  'history_route',
+  'history_info',
+  'history_cta'
+) NOT NULL,
   title VARCHAR(255) NULL,
   content LONGTEXT NULL,
   image_id BIGINT UNSIGNED NULL,
@@ -101,7 +132,7 @@ CREATE TABLE IF NOT EXISTS page_section (
 
   sort_order INT NOT NULL DEFAULT 0,
   is_published TINYINT(1) NOT NULL DEFAULT 1,
-
+  setting_json JSON NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -329,5 +360,29 @@ CREATE TABLE IF NOT EXISTS program_item (
     FOREIGN KEY (event_id)
     REFERENCES event(event_id)
     ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 
+COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- RESTAURANT RESERVATION
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS restaurant (
+  restaurant_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  event_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  order_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  
+  adult_count INT UNSIGNED NOT NULL DEFAULT 0,
+  child_count INT UNSIGNED NOT NULL DEFAULT 0,
+  
+  adult_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+  child_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+  total_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (restaurant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 
 COLLATE=utf8mb4_unicode_ci;

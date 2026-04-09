@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 use App\Core\BaseEntity;
 
-final class Image extends BaseEntity
+final class Image
 {
 
     public ?int $image_id = null;

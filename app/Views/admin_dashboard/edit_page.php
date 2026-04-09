@@ -18,7 +18,7 @@ $valStatus = is_object($page->status) && property_exists($page->status, 'value')
                 <p class="admin-subtitle">Update page details, then manage its sections.</p>
             </div>
 
-            <a class="btn btn-secondary" href="/admin/pageSection/<?= $pageId ?>/pageSectionList">
+            <a class="btn btn-secondary" href="/admin/pageSection/<?= $pageId ?>/viewPageSections">
                 Manage Sections
             </a>
         </header>

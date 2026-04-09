@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Page;
+use App\Models\Enum\PageStatus;
 use App\Core\BaseRepository;
 final class AdminPageRepository extends BaseRepository implements IAdminPageRepository
 {
@@ -21,7 +22,7 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute();
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            return array_map(fn($row) => Page::fromArray($row), $rows);
+            return array_map(fn($row) => $this->hydratePage($row), $rows);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve pages. ' . $e->getMessage());
         }
@@ -37,8 +38,8 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
             $stmt->execute();
-            $row = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            return $row ? Page::fromArray($row[0]) : null;
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            return $row ? $this->hydratePage($row) : null;
         } 
         catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve page. ' . $e->getMessage());
@@ -48,8 +49,7 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
     public function createPage(array $pageData): int
     {
         try {
-            // Build Page model from provided array
-            $page = Page::fromArray($pageData);
+            $page = $this->hydratePage($pageData);
             $sql = "INSERT INTO " . self::TABLE . "
                 (title, slug, content, created_at, updated_at, status)
                 VALUES
@@ -73,8 +73,7 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
             if ($existingPage === null) {
                 throw new \InvalidArgumentException("Page with ID {$id} does not exist.");
             }
-            // Build Page model from provided array and ensure id
-            $page = Page::fromArray($pageData);
+            $page = $this->hydratePage($pageData);
             $page->page_id = $id;
             $sql = "UPDATE " . self::TABLE . "
                     SET title = :title, slug = :slug, content = :content, updated_at = NOW(), status = :status
@@ -124,6 +123,24 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
         }
 
         return $result;
+    }
+
+    private function hydratePage(array $data): Page
+    {
+        $statusRaw = $data['status'] ?? PageStatus::draft;
+        $status = $statusRaw instanceof PageStatus
+            ? $statusRaw
+            : (PageStatus::tryFrom((string) $statusRaw) ?? PageStatus::draft);
+
+        return new Page(
+            isset($data['page_id']) ? (int) $data['page_id'] : null,
+            (string) ($data['title'] ?? ''),
+            (string) ($data['slug'] ?? ''),
+            (string) ($data['content'] ?? ''),
+            $data['created_at'] ?? null,
+            $data['updated_at'] ?? null,
+            $status
+        );
     }
 
 }

@@ -2,10 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Core\BaseEntity;
-use App\Models\User;
 use App\Core\BaseRepository;
+use App\Models\Enum\UserRole;
+use App\Models\User;
 use App\Repositories\IUserRepository;
+
 class UserRepository extends BaseRepository implements IUserRepository
 {
     private const TABLE = 'user';
@@ -16,7 +17,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         parent::__construct();
     }
 
-    public function findUserByEmail(string $email): void
+    public function findUserByEmail(string $email): ?User
     {
         // Login requirement says "username OR e-mail", so we search both.
         try {
@@ -27,12 +28,15 @@ class UserRepository extends BaseRepository implements IUserRepository
 
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute([':value' => $email]);
+            $stmt->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, User::class);
+            $user = $stmt->fetch();
+            return $user instanceof User ? $user : null;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
         }
     }
 
-    public function findUserById(int $id): void
+    public function findUserById(int $id): ?User
     {
         try {
 
@@ -43,7 +47,9 @@ class UserRepository extends BaseRepository implements IUserRepository
 
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute([':id' => $id]);
-            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $stmt->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, User::class);
+            $user = $stmt->fetch();
+            return $user instanceof User ? $user : null;
 
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
@@ -64,7 +70,7 @@ class UserRepository extends BaseRepository implements IUserRepository
             "password_hash" => $user->password_hash,
             "first_name" => $user->first_name,
             "last_name" => $user->last_name,
-            "role" => $user->role->name,
+            "role" => $user->role instanceof UserRole ? $user->role->value : (string) $user->role,
             "created_at" => date("Y-m-d H:i:s"),
             "updated_at" => date("Y-m-d H:i:s")]);
 
@@ -75,18 +81,17 @@ class UserRepository extends BaseRepository implements IUserRepository
         }
     }
 
-    public function updateUser(User $user): User
+    public function updateUser(User $user): void
     {
         try {
-        $data = $user->toArray();
-        $id = (int) ($data[self::PK] ?? 0);
+        $id = (int) ($user->user_id ?? 0);
 
         if ($id <= 0) {
             throw new \InvalidArgumentException("User id is required for update.");
         }
 
         // If password_hash is empty, don't overwrite it.
-        $setPassword = (!empty($data['password_hash']));
+        $setPassword = ($user->password_hash !== '');
 
         $sql = "UPDATE " . self::TABLE . "
                 SET email = :email,
@@ -100,36 +105,32 @@ class UserRepository extends BaseRepository implements IUserRepository
                 WHERE " . self::PK . " = :id";
 
         $params = [
-            ':email' => $data['email'],
-            ':username' => $data['username'],
-            ':first_name' => $data['first_name'],
-            ':last_name' => $data['last_name'],
-            ':role' => $data['role'],
+            ':email' => $user->email,
+            ':username' => $user->username,
+            ':first_name' => $user->first_name,
+            ':last_name' => $user->last_name,
+            ':role' => $user->role instanceof UserRole ? $user->role->value : (string) $user->role,
             ':id' => $id,
         ];
 
         if ($setPassword) {
-            $params[':password_hash'] = $data['password_hash'];
+            $params[':password_hash'] = $user->password_hash;
         }
 
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute($params);
-
-        return $this->findUserById($id) ?? $user;
         } 
         catch (\Exception $e) {
             throw new \RuntimeException('Failed to update user. ' . $e->getMessage());
         }
     }
 
-    public function deleteUser(int $id): bool
+    public function deleteUser(int $id): void
     {
         try {
         $sql = "DELETE FROM " . self::TABLE . " WHERE " . self::PK . " = :id";
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([':id' => $id]);
-
-        return $stmt->rowCount() > 0;
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to delete user. ' . $e->getMessage());
         }
@@ -140,9 +141,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         try {
         $sql = "SELECT * FROM " . self::TABLE . " ORDER BY created_at DESC";
         $stmt = $this->getConnection()->query($sql);
-
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return array_map(fn($row) => User::fromArray($row), $rows);
+        return $stmt->fetchAll(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, User::class);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve users. ' . $e->getMessage());
         }
@@ -158,9 +157,7 @@ class UserRepository extends BaseRepository implements IUserRepository
 
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([':role' => $role]);
-
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return array_map(fn($row) => User::fromArray($row), $rows);
+        return $stmt->fetchAll(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, User::class);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve users by role. ' . $e->getMessage());
         }
@@ -178,9 +175,7 @@ class UserRepository extends BaseRepository implements IUserRepository
 
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([':q' => '%' . $name . '%']);
-
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return array_map(fn($row) => User::fromArray($row), $rows);
+        return $stmt->fetchAll(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, User::class);
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to retrieve users by name. ' . $e->getMessage());
         }
@@ -214,7 +209,7 @@ class UserRepository extends BaseRepository implements IUserRepository
         $sql  = 'SELECT * FROM ' . self::TABLE . $where . ' ORDER BY ' . $this->resolveOrder($sort);
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute($params);
-        return array_map(fn($r) => User::fromArray($r), $stmt->fetchAll(\PDO::FETCH_ASSOC));
+        return $stmt->fetchAll(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, User::class);
     }
 
     /** @return array{0: string, 1: array} */
@@ -242,4 +237,5 @@ class UserRepository extends BaseRepository implements IUserRepository
             default     => 'created_at DESC',
         };
     }
+
 }

@@ -41,10 +41,10 @@ $section = $pageSection;
                         <div class="row-actions">
                             <?php if ($pub): ?><span class="pill">Published</span><?php endif; ?>
                             <a class="btn-secondary" href="/admin/pageSection/<?= $id ?>/editSectionForm">Edit</a>
-                            <form method="post" action="/admin/pageSection/<?= $id ?>/delete" class="inline-form" onsubmit="return confirmDelete(this);" style="display:inline-block;margin:0;">
-                                <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf ?? '') ?>">
-                                <button type="submit" class="btn-danger btn">Delete</button>
-                            </form>
+                            <a href="/admin/pageSection/<?= $id ?>/deleteSection" class="inline-form btn-danger btn" 
+                            style="display:inline-block;margin:0;">
+                            Delete
+                            </a>
                         </div>
                     </div>
                 <?php endforeach; ?>

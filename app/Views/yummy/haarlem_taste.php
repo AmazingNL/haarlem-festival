@@ -1,6 +1,57 @@
+<?php
+$sectionImage = $s['section_image'] ?? '';
+$images = [];
+
+if (is_array($sectionImage)) {
+    foreach ($sectionImage as $image) {
+        if (is_array($image)) {
+            $src = trim((string) ($image['src'] ?? ''));
+            if ($src === '') {
+                continue;
+            }
+
+            $images[] = [
+                'src' => $src,
+                'alt' => trim((string) ($image['alt'] ?? '')),
+                'caption' => trim((string) ($image['caption'] ?? '')),
+            ];
+            continue;
+        }
+
+        $imagePath = trim((string) $image);
+        if ($imagePath !== '') {
+            $images[] = [
+                'src' => $imagePath,
+                'alt' => '',
+                'caption' => '',
+            ];
+        }
+    }
+}
+?>
+
     <section class="taste-section">
         <div class="taste-inner">
-            <?= $s['content'] ?? '' ?>
+            <div class="carousel-wrap">
+                <button class="carousel-btn carousel-prev">&#10094;</button>
+                <div class="carousel">
+                    <?php if (!empty($images)): ?>
+                        <?php foreach ($images as $img): ?>
+                            <figure class="taste-card">
+                                <img
+                                    src="<?= htmlspecialchars((string) ($img['src'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+                                    alt="<?= htmlspecialchars((string) (($img['alt'] ?? '') !== '' ? $img['alt'] : 'Gallery image'), ENT_QUOTES, 'UTF-8') ?>"
+                                    loading="lazy"
+                                >
+                                <?php if (($img['caption'] ?? '') !== ''): ?>
+                                    <figcaption><?= htmlspecialchars((string) $img['caption'], ENT_QUOTES, 'UTF-8') ?></figcaption>
+                                <?php endif; ?>
+                            </figure>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+                <button class="carousel-btn carousel-next">&#10095;</button>
+            </div>
         </div>
     </section>
 
@@ -44,41 +95,40 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: 24px;
     }
 
     .carousel {
-        overflow-x: auto;
-        overflow-y: hidden;
+        overflow: hidden;
         display: flex;
-        gap: 18px;
-        padding: 28px;
-        background: #6e6112;
-        border-radius: 20px;
+        gap: 16px;
+        padding: 20px;
+        background: #8b7d3a;
+        border: 3px dotted #c9b558;
+        border-radius: 12px;
         scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
         width: 100%;
         box-sizing: border-box;
+        scroll-behavior: smooth;
     }
 
     .carousel {
         -ms-overflow-style: none;
-        /* IE and Edge */
         scrollbar-width: none;
-        /* Firefox */
     }
 
     .carousel::-webkit-scrollbar {
         display: none;
-        height: 0;
     }
 
     .card {
-        flex: 0 0 320px;
+        flex: 0 0 calc(25% - 12px);
+        min-width: 200px;
         scroll-snap-align: center;
         display: flex;
         flex-direction: column;
         gap: 8px;
-        align-items: flex-start;
+        align-items: center;
         color: #fff;
     }
 
@@ -86,60 +136,129 @@
         width: 100%;
         height: 180px;
         object-fit: cover;
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
     .card-caption {
-        font-size: 12px;
+        font-size: 11px;
         color: #f7eed8;
         font-weight: 600;
-        background: rgba(0, 0, 0, 0.08);
-        padding: 6px 10px;
+        text-align: center;
+        line-height: 1.3;
+        padding: 0 4px;
+    }
+
+    .taste-card {
+        flex: 0 0 calc(25% - 12px);
+        min-width: 200px;
+        scroll-snap-align: center;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+        color: #fff;
+    }
+
+    .taste-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
         border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .taste-card figcaption {
+        font-size: 11px;
+        color: #f7eed8;
+        font-weight: 600;
+        text-align: center;
+        line-height: 1.3;
+        padding: 0 4px;
     }
 
     .carousel-btn {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 44px;
-        height: 44px;
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        border: none;
-        background: #1a0101;
-        color: #fff;
-        font-size: 22px;
+        border: 2px solid #2d1f1f;
+        background: #fff;
+        color: #2d1f1f;
+        font-size: 18px;
+        font-weight: bold;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         z-index: 5;
+        transition: all 0.3s ease;
+    }
+
+    .carousel-btn:hover {
+        background: #2d1f1f;
+        color: #fff;
     }
 
     .carousel-prev {
-        left: -18px;
+        order: -1;
     }
 
-    .carousel-next {
-        right: -18px;
-    }
-
-    @media (max-width: 800px) {
+    @media (max-width: 1000px) {
         .card {
-            flex: 0 0 260px;
+            flex: 0 0 calc(33.33% - 11px);
+        }
+
+        .carousel {
+            gap: 12px;
+            padding: 16px;
         }
 
         .card img {
-            height: 150px;
+            height: 140px;
         }
 
-        .carousel-prev {
-            left: 6px;
+        .carousel-btn {
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
         }
 
-        .carousel-next {
-            right: 6px;
+        .taste-card {
+            flex: 0 0 calc(33.33% - 11px);
+        }
+
+        .taste-card img {
+            height: 140px;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .card {
+            flex: 0 0 calc(50% - 8px);
+        }
+
+        .card img {
+            height: 120px;
+        }
+
+        .carousel-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+        }
+
+        .carousel-wrap {
+            gap: 12px;
+        }
+
+        .taste-card {
+            flex: 0 0 calc(50% - 8px);
+        }
+
+        .taste-card img {
+            height: 120px;
         }
     }
 </style>
@@ -149,9 +268,17 @@
         const carousel = document.querySelector('.carousel');
         const prev = document.querySelector('.carousel-prev');
         const next = document.querySelector('.carousel-next');
-        if (!carousel) return;
-        const step = Math.round(carousel.clientWidth * 0.6);
-        prev && prev.addEventListener('click', () => carousel.scrollBy({ left: -step, behavior: 'smooth' }));
-        next && next.addEventListener('click', () => carousel.scrollBy({ left: step, behavior: 'smooth' }));
+        
+        if (!carousel || !prev || !next) return;
+        
+        const scrollAmount = 280; // ~card width + gap
+        
+        prev.addEventListener('click', () => {
+            carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        });
+        
+        next.addEventListener('click', () => {
+            carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        });
     })();
 </script>

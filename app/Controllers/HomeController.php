@@ -1,11 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Controllers;
 use App\Core\BaseController;
 use App\Services\IPageSectionService;
 use App\Services\IAdminPageService;
+
 final class HomeController extends BaseController
 {
 
@@ -31,7 +30,10 @@ final class HomeController extends BaseController
             ]);
 
         } catch (\Exception $e) {
-            $this->setFlash('error', 'Failed to load home page: ' . $e->getMessage());
+            $this->view(
+                'no_page/index',
+                ['error' => 'Failed to load home page: ' . $e->getMessage()]
+            );
         }
     }
 
@@ -47,25 +49,37 @@ final class HomeController extends BaseController
                 );
                 return;
             }
-
-            $yummy = $this->pageSectionService->getSectionsByPageId($page_id);
-            if (empty($yummy)) {
+            $pageSection = $this->pageSectionService->getSectionsByPageId($page_id);
+            if (empty($pageSection)) {
                 $this->setFlash('error', 'page does not exist');
                 $this->redirect('/');
+                return;
             }
+
+            $section = array_map(
+                function (array $s): array {
+                    $content = json_decode((string) ($s['content'] ?? ''), true);
+                    if (is_array($content)) {
+                        $s = array_merge($s, $content);
+                    }
+                    return $s;
+                },
+                $pageSection
+            );
+
+
             $this->view(
                 'yummy/index',
-                ['section' => $yummy, 'page' => $page, 'title' => 'Yummy']
+                ['section' => $section, 'page' => $page, 'title' => 'Yummy']
             );
 
         } catch (\Throwable $e) {
             $this->view(
                 'no_page/index',
-                ['error' => 'Yummy page not available']
+                ['error' => 'Something went wrong' . $e]
             );
         }
     }
-
 
     public function stories(): void
     {
@@ -83,11 +97,12 @@ final class HomeController extends BaseController
             );
         } catch (\Exception $e) {
             $this->view(
-                template: 'no_page/index',
+                'no_page/index',
                 data: ['error' => 'Stories page not available']
             );
         }
     }
+
     public function ratatouille(): void
     {
         try {
@@ -111,6 +126,19 @@ final class HomeController extends BaseController
 
         }
     }
+
+    private function mergeSectionContent(array $sections): array
+    {
+        return array_map(
+            function (array $section): array {
+                $content = json_decode((string) ($section['content'] ?? ''), true);
+                if (is_array($content)) {
+                    $section = array_merge($section, $content);
+                }
+
+                return $section;
+            },
+            $sections
+        );
+    }
 }
-
-

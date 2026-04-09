@@ -4,30 +4,27 @@
 	function initTinyMce() {
 		if (!window.tinymce) return;
 
-		// Remove any existing editors on the target selector before init
 		tinymce.remove("textarea.js-wysiwyg");
 
 		tinymce.init({
 			selector: "textarea.js-wysiwyg",
-			height: 350,
+			height: 200,
+			automatic_uploads: true,
 			menubar: true,
 			plugins: "lists link image code table",
 			toolbar:
 				"undo redo | styles | bold italic underline | bullist numlist | link image | table | code",
 			branding: true,
 
-			// ADD THIS 👇
-			extended_valid_elements: `
+		extended_valid_elements: `
         svg[class|xmlns|width|height|viewBox|fill|stroke|stroke-width|stroke-linecap|stroke-linejoin],
         path[d|fill|stroke|stroke-width|stroke-linecap|stroke-linejoin],
         g[class|fill|stroke|transform],
         defs,
         linearGradient[id|x1|y1|x2|y2|gradientUnits],
-        stop[offset|stop-color|stop-opacity]
-    `,
+        stop[offset|stop-color|stop-opacity]`,
 
 			valid_children: "+svg[path|g|defs|linearGradient|stop]",
-
 			verify_html: false,
 
 			// Keep these:
@@ -36,13 +33,12 @@
 			image_caption: true,
 			image_advtab: true,
 
-			// Use custom handler so we can read image_id + alt_text
 			images_upload_handler: async (blobInfo, progress) => {
 				const formData = new FormData();
 				formData.append("file", blobInfo.blob(), blobInfo.filename());
 
 				// Optional: take alt from section alt input if you have one
-				const altEl = document.getElementById("section_image_alt");
+				const altEl = document.getElementById("image_alt");
 				const altText = altEl ? (altEl.value || "").trim() : "";
 				if (altText) formData.append("alt_text", altText);
 
@@ -54,32 +50,21 @@
 					},
 					credentials: "include",
 				});
-
-				// If your controller returns non-200, this will throw nicely
 				if (!res.ok) {
 					const txt = await res.text().catch(() => "");
 					throw new Error("Upload failed (" + res.status + "): " + txt);
 				}
-
 				const data = await res.json();
-
-				// 1) TinyMCE needs the URL
 				if (!data.location) throw new Error("Upload response missing location");
 
-				// 2) Save returned image_id into your section form
-				if (data.image_id) {
-					const idEl = document.getElementById("section_image_id");
-					if (idEl) idEl.value = data.image_id;
-				}
-
-				// 3) If API echoes back alt_text, keep it synced (optional)
 				if (data.alt_text && altEl) altEl.value = data.alt_text;
-
-				console.log("upload response:", data);
 				return data.location;
 			},
 		});
 	}
+
+	// Allow other scripts (dynamic partial loaders) to re-init editors.
+	window.initTinyMceEditors = initTinyMce;
 
 	function loadTinyMceScriptAndInit() {
 		if (window.tinymce) {
@@ -119,4 +104,5 @@
 	}
 
 	document.addEventListener("DOMContentLoaded", loadTinyMceScriptAndInit);
+	document.addEventListener("cms:content-updated", loadTinyMceScriptAndInit);
 })();

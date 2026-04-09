@@ -25,6 +25,9 @@ final class UserService implements IUserService
     {
         $user = $this->userRepo->findUserByEmail($emailOrUsername);
         if ($user && password_verify($plainPassword, $user->password_hash)) {
+            if (is_string($user->role)) {
+                $user->role = UserRole::tryFrom(strtolower($user->role)) ?? UserRole::customer;
+            }
             return $user;
         }
         return null;
@@ -35,9 +38,9 @@ final class UserService implements IUserService
         return $this->userRepo->findUserById($id);
     }
 
-    public function updateUser(User $user): User
+    public function updateUser(User $user): void
     {
-        return $this->userRepo->updateUser($user);
+        $this->userRepo->updateUser($user);
     }
 
     public function getAllUsers(): array
@@ -50,9 +53,9 @@ final class UserService implements IUserService
         return $this->userRepo->findUserByEmail($email);
     }
 
-    public function deleteUser(int $id): bool
+    public function deleteUser(int $id): void
     {
-        return $this->userRepo->deleteUser($id);
+        $this->userRepo->deleteUser($id);
     }
 
     public function listUsers(): array
@@ -93,14 +96,18 @@ final class UserService implements IUserService
         $users = $this->userRepo->findAllUsers();
 
         if ($role !== '') {
-            $users = array_filter($users, fn(User $u) =>
+            $users = array_filter(
+                $users,
+                fn(User $u) =>
                 ($u->role instanceof UserRole ? $u->role->value : (string) $u->role) === $role
             );
         }
 
         if ($search !== '') {
             $q = strtolower($search);
-            $users = array_filter($users, fn(User $u) =>
+            $users = array_filter(
+                $users,
+                fn(User $u) =>
                 str_contains(strtolower($u->first_name . ' ' . $u->last_name), $q)
                 || str_contains(strtolower($u->email), $q)
             );
@@ -109,10 +116,10 @@ final class UserService implements IUserService
         $users = array_values($users);
 
         usort($users, match ($sort) {
-            'date_asc'  => fn($a, $b) => strcmp($a->created_at ?? '', $b->created_at ?? ''),
-            'name_asc'  => fn($a, $b) => strcmp(($a->first_name ?? '') . ($a->last_name ?? ''), ($b->first_name ?? '') . ($b->last_name ?? '')),
+            'date_asc' => fn($a, $b) => strcmp($a->created_at ?? '', $b->created_at ?? ''),
+            'name_asc' => fn($a, $b) => strcmp(($a->first_name ?? '') . ($a->last_name ?? ''), ($b->first_name ?? '') . ($b->last_name ?? '')),
             'name_desc' => fn($a, $b) => strcmp(($b->first_name ?? '') . ($b->last_name ?? ''), ($a->first_name ?? '') . ($a->last_name ?? '')),
-            default     => fn($a, $b) => strcmp($b->created_at ?? '', $a->created_at ?? ''),
+            default => fn($a, $b) => strcmp($b->created_at ?? '', $a->created_at ?? ''),
         });
 
         return $users;
