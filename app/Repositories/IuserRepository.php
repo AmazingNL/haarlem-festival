@@ -7,6 +7,7 @@ use App\Models\User;
 
 interface IUserRepository
 {
+    public function findUserByLogin(string $login): ?User;
     public function findUserByEmail(string $email): ?User;
     public function findUserById(int $id): ?User;
     public function createUser(User $user): void;

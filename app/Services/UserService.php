@@ -23,7 +23,7 @@ final class UserService implements IUserService
 
     public function authenticate(string $emailOrUsername, string $plainPassword): ?User
     {
-        $user = $this->userRepo->findUserByEmail($emailOrUsername);
+        $user = $this->userRepo->findUserByLogin($emailOrUsername);
         if ($user && password_verify($plainPassword, $user->password_hash)) {
             if (is_string($user->role)) {
                 $user->role = UserRole::tryFrom(strtolower($user->role)) ?? UserRole::customer;
