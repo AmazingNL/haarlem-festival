@@ -1,0 +1,481 @@
+.shop-page {
+    background: #f6f1e8;
+    padding: 48px 0 72px;
+}
+
+.shop-container {
+    width: min(1100px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+.shop-hero {
+    background: #173d2f;
+    color: #f8f4eb;
+    border-radius: 24px;
+    padding: 32px;
+    margin-bottom: 28px;
+}
+
+.shop-hero--small {
+    padding: 28px;
+}
+
+.shop-eyebrow,
+.shop-card__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 12px;
+    margin: 0 0 10px;
+}
+
+.shop-hero .shop-eyebrow {
+    color: #dfece5;
+}
+
+.shop-hero h1,
+.shop-card h1,
+.shop-card h2 {
+    margin: 0 0 12px;
+    color: #173d2f;
+}
+
+.shop-hero h1 {
+    color: #f8f4eb;
+}
+
+.shop-hero p {
+    margin: 0;
+    max-width: 700px;
+    color: #f4f8f6;
+    line-height: 1.6;
+}
+
+.shop-hero__actions {
+    margin-top: 18px;
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.festival-booking {
+    background: #f6f1e8;
+    padding: 0 0 48px;
+}
+
+.festival-booking__card {
+    display: grid;
+    grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+}
+
+.festival-booking__image {
+    min-height: 100%;
+    background: #d8e0d8;
+}
+
+.festival-booking__image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    object-fit: cover;
+}
+
+.shop-card {
+    background: #fffdf8;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 18px 48px rgba(23, 61, 47, 0.12);
+}
+
+.shop-card__image {
+    min-height: 220px;
+    background: #d8e0d8;
+}
+
+.shop-card__image img {
+    display: block;
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.shop-card__placeholder {
+    min-height: 220px;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    text-align: center;
+    color: #173d2f;
+    font-weight: 700;
+    background: linear-gradient(135deg, #dbe8d9, #f0e2c9);
+}
+
+.shop-card__body {
+    padding: 24px;
+}
+
+.shop-card__meta {
+    margin: 0 0 8px;
+    color: #5f655f;
+}
+
+.shop-ticket-list {
+    margin-top: 18px;
+    display: grid;
+    gap: 12px;
+}
+
+.shop-ticket-form {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: end;
+    padding: 14px;
+    border: 1px solid #e3dccd;
+    border-radius: 16px;
+    background: #faf5ea;
+}
+
+.shop-ticket-form__details {
+    display: grid;
+    gap: 4px;
+}
+
+.shop-ticket-form__details span,
+.shop-ticket-form__details small {
+    color: #5f655f;
+}
+
+.shop-ticket-form__quantity {
+    display: grid;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.shop-ticket-form__quantity input,
+.shop-payment-form select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cfc6b4;
+    border-radius: 12px;
+    font: inherit;
+}
+
+.shop-button,
+.shop-link-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font: inherit;
+}
+
+.shop-button {
+    background: #a63f19;
+    color: #fff;
+    padding: 12px 18px;
+}
+
+.shop-button:hover,
+.shop-link-button:hover {
+    opacity: 0.92;
+}
+
+.shop-button:focus-visible,
+.shop-link-button:focus-visible,
+.shop-payment-form select:focus-visible {
+    outline: 3px solid #ffcf66;
+    outline-offset: 3px;
+}
+
+.shop-button--secondary {
+    background: #fff;
+    color: #173d2f;
+    border: 1px solid #173d2f;
+}
+
+.shop-button--link {
+    width: fit-content;
+}
+
+.shop-link-button {
+    background: transparent;
+    color: #173d2f;
+    padding: 0;
+}
+
+.shop-summary-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(280px, 0.9fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.shop-order-list {
+    display: grid;
+    gap: 18px;
+}
+
+.shop-total-card {
+    position: sticky;
+    top: 24px;
+}
+
+.shop-total-card strong {
+    display: block;
+    margin: 18px 0;
+    font-size: 30px;
+    color: #173d2f;
+}
+
+.shop-summary-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    color: #5f655f;
+}
+
+.shop-summary-line__value {
+    margin: 0;
+    font-size: 22px;
+    color: #173d2f;
+}
+
+.shop-summary-divider {
+    height: 1px;
+    margin: 22px 0;
+    background: #e3dccd;
+}
+
+.shop-total-card__actions,
+.shop-payment-form {
+    display: grid;
+    gap: 12px;
+}
+
+.shop-inline-form {
+    margin: 0;
+}
+
+.shop-detail-list {
+    display: grid;
+    gap: 12px;
+    margin: 18px 0 0;
+}
+
+.shop-detail-list div {
+    display: grid;
+    gap: 4px;
+}
+
+.shop-detail-list dt {
+    color: #5f655f;
+    font-size: 14px;
+}
+
+.shop-detail-list dd {
+    margin: 0;
+    color: #173d2f;
+    font-weight: 600;
+}
+
+.shop-card__note,
+.shop-payment-note,
+.shop-payment-help,
+.shop-status-note {
+    margin: 16px 0 0;
+    color: #173d2f;
+    line-height: 1.6;
+}
+
+.shop-payment-form label {
+    display: grid;
+    gap: 8px;
+}
+
+.shop-payment-form label span {
+    color: #173d2f;
+    font-weight: 600;
+}
+
+.shop-payment-title {
+    margin: 0 0 10px;
+    color: #173d2f;
+}
+
+.shop-payment-options {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.shop-payment-options legend {
+    margin-bottom: 6px;
+    color: #173d2f;
+    font-weight: 600;
+}
+
+.shop-payment-option {
+    position: relative;
+    display: block;
+}
+
+.shop-payment-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.shop-payment-option__card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 18px;
+    border: 2px solid #2a8a56;
+    border-radius: 18px;
+    background: #fffdf8;
+    cursor: pointer;
+}
+
+.shop-payment-option input:checked + .shop-payment-option__card {
+    background: #eef8f1;
+    box-shadow: 0 0 0 2px rgba(42, 138, 86, 0.12);
+}
+
+.shop-payment-option input:focus-visible + .shop-payment-option__card {
+    outline: 3px solid #ffcf66;
+    outline-offset: 3px;
+}
+
+.shop-payment-option__badge {
+    min-width: 52px;
+    min-height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #f6f1e8;
+    color: #5a1717;
+    font-weight: 700;
+}
+
+.shop-payment-option__content {
+    display: grid;
+    gap: 6px;
+}
+
+.shop-payment-option__content strong {
+    color: #5a1717;
+    font-size: 16px;
+}
+
+.shop-payment-option__content small {
+    color: #5f655f;
+}
+
+.shop-payment-option__indicator {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #2a8a56;
+    border-radius: 6px;
+    background: #fffdf8;
+}
+
+.shop-payment-option input:checked + .shop-payment-option__card .shop-payment-option__indicator {
+    background: #2a8a56;
+    box-shadow: inset 0 0 0 4px #eef8f1;
+}
+
+.shop-total-banner {
+    padding: 22px;
+    border: 2px solid #2a8a56;
+    border-radius: 20px;
+    background: #e7f5ea;
+}
+
+.shop-total-banner span {
+    display: block;
+    color: #173d2f;
+    font-size: 15px;
+}
+
+.shop-total-banner strong {
+    margin: 12px 0 0;
+    color: #5a1717;
+}
+
+.shop-invoice-header,
+.shop-invoice-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.shop-invoice-header {
+    margin-bottom: 24px;
+}
+
+.shop-invoice-header__meta p,
+.shop-invoice-columns p {
+    margin: 0 0 8px;
+}
+
+.shop-table-wrap {
+    overflow-x: auto;
+    margin: 24px 0;
+}
+
+.shop-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.shop-table th,
+.shop-table td {
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid #ece4d8;
+}
+
+.shop-table tfoot td {
+    font-weight: 600;
+}
+
+.shop-ticket-card code,
+.shop-ticket-code code {
+    display: block;
+    margin-top: 8px;
+    padding: 12px;
+    background: #f4efe6;
+    border-radius: 14px;
+    word-break: break-all;
+}
+
+.shop-ticket-code span {
+    font-size: 14px;
+    color: #5f655f;
+}
+
+@media (max-width: 900px) {
+    .shop-summary-layout,
+    .shop-invoice-header,
+    .shop-invoice-columns,
+    .shop-ticket-form,
+    .festival-booking__card {
+        grid-template-columns: 1fr;
+    }
+
+    .shop-total-card {
+        position: static;
+    }
+}

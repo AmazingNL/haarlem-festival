@@ -1,4 +1,5 @@
 <?php
+// Small helper functions used by the History partials.
 $historyText = static function (?string $value): string {
     return nl2br(htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'));
 };
@@ -10,6 +11,7 @@ $historyUrl = static function (?string $value, string $default = '#'): string {
 ?>
 
 <div class="history-page">
+    <?php // Loop through the CMS sections and load the matching partial for each section type. ?>
     <?php foreach (($section ?? []) as $s): ?>
         <?php if (empty($s['is_published'])) continue; ?>
 

@@ -1,39 +1,48 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Controllers;
+
 use App\Core\BaseController;
-use App\Services\IPageSectionService;
 use App\Services\IAdminPageService;
+use App\Services\IPageSectionService;
 
 final class HomeController extends BaseController
 {
-
     private IPageSectionService $pageSectionService;
     private IAdminPageService $adminPageService;
+
     public function __construct(IPageSectionService $pageSectionService, IAdminPageService $adminPageService)
     {
         $this->pageSectionService = $pageSectionService;
         $this->adminPageService = $adminPageService;
     }
+
     public function index(): void
     {
         try {
-            $this->ensureSession();
-            $pages = $this->adminPageService->getPageBySlug('home');
-            $page_id = $pages->page_id ?? null;
-            $homePage = $this->pageSectionService->getSectionsByPageId($page_id);
+            $page = $this->adminPageService->getPageBySlug('home');
+            $pageId = $page->page_id ?? null;
 
-            $this->view('/home/home', [
-                'sections' => $homePage,
-                'title' => 'Haarlem Festival',
-                'message' => 'Home page loaded successfully.'
+            if ($pageId === null) {
+                $this->view('no_page/index', ['error' => 'Home page not available']);
+                return;
+            }
+
+            $sections = $this->pageSectionService->getSectionsByPageId($pageId);
+            if ($sections === []) {
+                $this->view('no_page/index', ['error' => 'Home page not available']);
+                return;
+            }
+
+            $this->view('home/home', [
+                'section' => $this->mergeSectionContent($sections),
+                'page' => $page,
+                'title' => 'Home',
             ]);
-
-        } catch (\Exception $e) {
-            $this->view(
-                'no_page/index',
-                ['error' => 'Failed to load home page: ' . $e->getMessage()]
-            );
+        } catch (\Throwable $e) {
+            $this->view('no_page/index', ['error' => 'Home page not available']);
         }
     }
 
@@ -41,65 +50,46 @@ final class HomeController extends BaseController
     {
         try {
             $page = $this->adminPageService->getPageBySlug('yummy');
-            $page_id = $page->page_id ?? null;
-            if ($page_id === null) {
-                $this->view(
-                    'no_page/index',
-                    ['error' => 'Yummy page not available']
-                );
-                return;
-            }
-            $pageSection = $this->pageSectionService->getSectionsByPageId($page_id);
-            if (empty($pageSection)) {
-                $this->setFlash('error', 'page does not exist');
-                $this->redirect('/');
+            $pageId = $page->page_id ?? null;
+
+            if ($pageId === null) {
+                $this->view('no_page/index', ['error' => 'Restaurants page not available']);
                 return;
             }
 
-            $section = array_map(
-                function (array $s): array {
-                    $content = json_decode((string) ($s['content'] ?? ''), true);
-                    if (is_array($content)) {
-                        $s = array_merge($s, $content);
-                    }
-                    return $s;
-                },
-                $pageSection
-            );
+            $pageSections = $this->pageSectionService->getSectionsByPageId($pageId);
 
-
-            $this->view(
-                'yummy/index',
-                ['section' => $section, 'page' => $page, 'title' => 'Yummy']
-            );
-
+            $this->view('yummy/index', [
+                'section' => $pageSections === [] ? [] : $this->mergeSectionContent($pageSections),
+                'page' => $page,
+                'title' => 'Restaurants',
+                'showFallbackHero' => $pageSections === [],
+            ]);
         } catch (\Throwable $e) {
-            $this->view(
-                'no_page/index',
-                ['error' => 'Something went wrong' . $e]
-            );
+            $this->view('no_page/index', ['error' => 'Restaurants page not available']);
         }
     }
 
     public function stories(): void
     {
         try {
-            $page = $this->adminPageService->getPageBySlug(slug: 'stories');
-            $page_id = $page->page_id ?? null;
-            $stories = $this->pageSectionService->getSectionsByPageId(pageId: $page_id);
-            if (empty($stories)) {
-                $this->setFlash(key: 'error', value: 'page does not exist');
-                $this->redirect(to: '/');
+            $page = $this->adminPageService->getPageBySlug('stories');
+            $pageId = $page->page_id ?? null;
+            $stories = $pageId === null ? [] : $this->pageSectionService->getSectionsByPageId($pageId);
+
+            if ($stories === []) {
+                $this->setErrorMessage('Stories page not available');
+                $this->redirect('/');
+                return;
             }
-            $this->view(
-                template: '/stories/index',
-                data: ['section' => $stories, 'page' => $page, 'title' => 'Stories']
-            );
-        } catch (\Exception $e) {
-            $this->view(
-                'no_page/index',
-                data: ['error' => 'Stories page not available']
-            );
+
+            $this->view('/stories/index', [
+                'section' => $stories,
+                'page' => $page,
+                'title' => 'Stories',
+            ]);
+        } catch (\Throwable $e) {
+            $this->view('no_page/index', ['error' => 'Stories page not available']);
         }
     }
 
@@ -107,23 +97,22 @@ final class HomeController extends BaseController
     {
         try {
             $page = $this->adminPageService->getPageBySlug('ratatouille');
-            $page_id = $page->page_id ?? null;
-            $ratatouille = $this->pageSectionService->getSectionsByPageId($page_id);
-            if (empty($ratatouille)) {
-                $this->setFlash('error', 'page does not exist');
+            $pageId = $page->page_id ?? null;
+            $ratatouilleSections = $pageId === null ? [] : $this->pageSectionService->getSectionsByPageId($pageId);
+
+            if ($ratatouilleSections === []) {
+                $this->setErrorMessage('Ratatouille page not available');
                 $this->redirect('/');
+                return;
             }
-            $this->view(
-                '/ratatouille/index',
-                ['section' => $ratatouille, 'page' => $page, 'title' => 'ratatouille']
-            );
 
-        } catch (\Exception $e) {
-            $this->view(
-                template: 'no_page/index',
-                data: ['error' => 'ratatouille page not available']
-            );
-
+            $this->view('/ratatouille/index', [
+                'section' => $ratatouilleSections,
+                'page' => $page,
+                'title' => 'Ratatouille',
+            ]);
+        } catch (\Throwable $e) {
+            $this->view('no_page/index', ['error' => 'Ratatouille page not available']);
         }
     }
 
@@ -132,6 +121,7 @@ final class HomeController extends BaseController
         return array_map(
             function (array $section): array {
                 $content = json_decode((string) ($section['content'] ?? ''), true);
+
                 if (is_array($content)) {
                     $section = array_merge($section, $content);
                 }

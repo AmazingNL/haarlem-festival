@@ -11,11 +11,9 @@
     width: 100%;
 }
 
-/* LEFT PANEL STYLES */
 .left-panel {
     flex: 1;
     position: relative;
-
     background: url('/assets/images/shared/loginImage.avif') no-repeat center center;
     background-size: cover;
     color: white;
@@ -26,7 +24,10 @@
 
 .left-panel .overlay {
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: linear-gradient(135deg, rgba(179, 44, 25, 0.85) 0%, rgba(60, 10, 5, 0.7) 100%);
     z-index: 1;
 }
@@ -165,17 +166,37 @@
     font-weight: 600;
 }
 
-.error-msg{
-  color: #d32f2f;
-  background: #ffebee;
-  border: 1px solid #ffcdd2;
-  padding: 12px 14px;
-  border-radius: 8px;
-  margin-bottom: 1.25rem;
-  font-size: 0.95rem;
-  font-weight: 600;
+.error-msg {
+    color: #d32f2f;
+    background: #ffebee;
+    border: 1px solid #ffcdd2;
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.helper-text {
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: #777;
 }
 
 @media (max-width: 900px) {
-    .left-panel { display: none; }
+    .left-panel {
+        display: none;
+    }
+}
+
+@media (max-width: 520px) {
+    .two-col {
+        grid-template-columns: 1fr;
+    }
 }

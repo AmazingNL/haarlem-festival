@@ -20,10 +20,23 @@ final class HistoryBookTourSchedule extends BaseSection
             'day_two' => ['type' => 'text', 'label' => 'Day Two'],
             'day_three' => ['type' => 'text', 'label' => 'Day Three'],
             'day_four' => ['type' => 'text', 'label' => 'Day Four'],
+            'default_day' => ['type' => 'text', 'label' => 'Default Schedule Day'],
             'guide_label' => ['type' => 'text', 'label' => 'Guide Label'],
             'time_one' => ['type' => 'text', 'label' => 'Time One'],
             'time_two' => ['type' => 'text', 'label' => 'Time Two'],
             'time_three' => ['type' => 'text', 'label' => 'Time Three'],
+            'day_one_time_one_guides' => ['type' => 'text', 'label' => 'Day One Guides at Time One'],
+            'day_one_time_two_guides' => ['type' => 'text', 'label' => 'Day One Guides at Time Two'],
+            'day_one_time_three_guides' => ['type' => 'text', 'label' => 'Day One Guides at Time Three'],
+            'day_two_time_one_guides' => ['type' => 'text', 'label' => 'Day Two Guides at Time One'],
+            'day_two_time_two_guides' => ['type' => 'text', 'label' => 'Day Two Guides at Time Two'],
+            'day_two_time_three_guides' => ['type' => 'text', 'label' => 'Day Two Guides at Time Three'],
+            'day_three_time_one_guides' => ['type' => 'text', 'label' => 'Day Three Guides at Time One'],
+            'day_three_time_two_guides' => ['type' => 'text', 'label' => 'Day Three Guides at Time Two'],
+            'day_three_time_three_guides' => ['type' => 'text', 'label' => 'Day Three Guides at Time Three'],
+            'day_four_time_one_guides' => ['type' => 'text', 'label' => 'Day Four Guides at Time One'],
+            'day_four_time_two_guides' => ['type' => 'text', 'label' => 'Day Four Guides at Time Two'],
+            'day_four_time_three_guides' => ['type' => 'text', 'label' => 'Day Four Guides at Time Three'],
         ];
     }
 }

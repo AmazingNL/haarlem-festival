@@ -8,6 +8,7 @@
 # Logs & runtime
 /storage/logs/
 /storage/cache/
+/storage/orders/
 
 # OS / IDE
 .DS_Store

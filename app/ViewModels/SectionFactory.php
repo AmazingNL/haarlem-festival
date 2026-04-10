@@ -2,6 +2,13 @@
 
 namespace App\ViewModels;
 
+use App\ViewModels\home\HomeCardsGrid;
+use App\ViewModels\home\HomeFeature;
+use App\ViewModels\home\HomeGallery;
+use App\ViewModels\home\HomeHero;
+use App\ViewModels\home\HomeImageLeft;
+use App\ViewModels\home\HomeImageRight;
+use App\ViewModels\home\HomeTransport;
 use App\ViewModels\history\HistoryCta;
 use App\ViewModels\history\HistoryBookTourAlert;
 use App\ViewModels\history\HistoryBookTourBooking;
@@ -36,11 +43,18 @@ use App\ViewModels\yummy\WelcomeBanner;
 use App\ViewModels\yummy\HaarlemUnique;
 
 
-class SectionFactory 
+class SectionFactory
 {
-    public static function returnSectionClass(string $type, ): ?string
+    public static function returnSectionClass(string $type): ?string
     {
         $map = [
+            'hero' => HomeHero::class,
+            'feature' => HomeFeature::class,
+            'gallery' => HomeGallery::class,
+            'image_left' => HomeImageLeft::class,
+            'image_right' => HomeImageRight::class,
+            'cards_grid' => HomeCardsGrid::class,
+            'transport' => HomeTransport::class,
             'text_block' => TextBlock::class,
             'welcome_banner' => WelcomeBanner::class,
             'history_hero' => HistoryHero::class,
@@ -76,6 +90,4 @@ class SectionFactory
 
         return $map[$type] ?? null;
     }
-
-
 }

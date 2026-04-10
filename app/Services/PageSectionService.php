@@ -90,7 +90,8 @@ final class PageSectionService implements IPageSectionService
             $fieldType = (string) ($config['type'] ?? 'text');
 
             if ($fieldType === 'image') {
-                $content[$fieldName] = (string) ($post[$fieldName] ?? '');
+                $currentImage = (string) ($post[$fieldName . '_current'] ?? '');
+                $content[$fieldName] = $currentImage;
 
                 if (!empty($files[$fieldName]) && (($files[$fieldName]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK)) {
                     $filePath = $this->imageService->storeUploadedImage($files[$fieldName], [
@@ -98,7 +99,10 @@ final class PageSectionService implements IPageSectionService
                         'prefix' => (string) ($config['prefix'] ?? $fieldName),
                     ]);
                     $content[$fieldName] = $filePath;
-                    $sectionImages[] = $filePath;
+                }
+
+                if ($content[$fieldName] !== '') {
+                    $sectionImages[] = $content[$fieldName];
                 }
                 continue;
             }

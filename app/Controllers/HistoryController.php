@@ -11,10 +11,14 @@ use App\Services\ProgramService;
 
 final class HistoryController extends BaseController
 {
+    // Service for loading section records from the CMS.
     private IPageSectionService $pageSectionService;
+    // Service for loading page records like "history" or "history-book-tour".
     private IAdminPageService $adminPageService;
+    // Service for saving bookings into My Program.
     private ProgramService $programService;
 
+    // Store the services that this controller needs.
     public function __construct(
         IPageSectionService $pageSectionService,
         IAdminPageService $adminPageService,
@@ -26,6 +30,7 @@ final class HistoryController extends BaseController
         $this->programService = $programService;
     }
 
+    // Show the main History overview page.
     public function index(): void
     {
         $this->showHistoryPage('history', 'history/index', 'History', [
@@ -33,6 +38,7 @@ final class HistoryController extends BaseController
         ]);
     }
 
+    // Show the Book Tour page.
     public function bookTour(): void
     {
         $this->ensureSession();
@@ -41,6 +47,7 @@ final class HistoryController extends BaseController
         ]);
     }
 
+    // Show the History route map page.
     public function routeMap(): void
     {
         $this->showHistoryPage('history-route-map', 'history/route_map', 'Route Map', [
@@ -48,6 +55,7 @@ final class HistoryController extends BaseController
         ]);
     }
 
+    // Show the St. Bavo page.
     public function stBavosChurch(): void
     {
         $this->showHistoryPage('history-st-bavos-church', 'history/st_bavos_church', "St. Bavo's Church", [
@@ -55,6 +63,7 @@ final class HistoryController extends BaseController
         ]);
     }
 
+    // Show the Molen de Adriaan page.
     public function molenDeAdriaan(): void
     {
         $this->showHistoryPage('history-molen-de-adriaan', 'history/molen_de_adriaan', 'Molen de Adriaan', [
@@ -62,6 +71,7 @@ final class HistoryController extends BaseController
         ]);
     }
 
+    // Read the Book Tour form and save the selected booking in My Program.
     public function addTourToProgram(): void
     {
         $this->ensureSession();
@@ -83,11 +93,12 @@ final class HistoryController extends BaseController
             $language = trim($this->str('selected_language'));
             $ticketKey = trim($this->str('ticket_key'));
 
-            // Only allow values that really exist on the page.
+            // Build clean option lists from the CMS data.
             $dayOptions = $this->getFilledOptions($bookingData, ['day_one', 'day_two', 'day_three', 'day_four']);
             $timeOptions = $this->getFilledOptions($bookingData, ['time_one', 'time_two', 'time_three']);
             $languageOptions = $this->getFilledOptions($bookingData, ['language_one', 'language_two', 'language_three']);
 
+            // Reject the booking if the user sends values that are missing or not allowed.
             if (
                 $day === ''
                 || $time === ''
@@ -102,21 +113,25 @@ final class HistoryController extends BaseController
                 return;
             }
 
+            // Read labels and prices from the booking section so the CMS controls the content.
             $individualTitle = trim((string) ($bookingData['individual_title'] ?? 'Individual'));
             $familyTitle = trim((string) ($bookingData['family_title'] ?? 'Family'));
             $familySize = $this->parseCount((string) ($bookingData['family_price'] ?? ''), 4);
             $quantity = max(1, min(10, $this->int('quantity', 1)));
 
+            // Pick the correct price depending on the selected ticket type.
             $unitPrice = $this->parseMoney((string) ($bookingData['individual_price'] ?? '0'));
             if ($ticketKey === 'family') {
                 $unitPrice = $this->parseMoney((string) ($bookingData['family_price'] ?? '0'));
             }
 
+            // Pick the label that matches the selected ticket type.
             $ticketTitle = $individualTitle;
             if ($ticketKey === 'family') {
                 $ticketTitle = $familyTitle;
             }
 
+            // Build the text that will be shown later in My Program and checkout.
             $bookingTitle = trim((string) ($bookingData['heading'] ?? 'History Book Tour'));
             $selectionText = sprintf('%s, %s | %s', $day, $time, $language);
             $ticketSummaryText = '';
@@ -163,20 +178,25 @@ final class HistoryController extends BaseController
         }
     }
 
+    // Reusable page loader for all History pages.
     private function showHistoryPage(string $slug, string $view, string $title, array $extraData = []): void
     {
         try {
+            // Remember this page so the Back/Continue link can return here later.
             $this->rememberProgramReturnUrl($this->currentUrl());
 
+            // Load one page and all of its sections from the CMS.
             $pageData = $this->getHistoryPageData($slug);
             $page = $pageData['page'];
             $pageSections = $pageData['sections'];
 
+            // Show a fallback page if the page or its sections do not exist.
             if ($page === null || empty($pageSections)) {
                 $this->view('no_page/index', ['error' => 'History page not available']);
                 return;
             }
 
+            // Decode the section JSON and pass the final data to the view.
             $this->view($view, array_merge([
                 'section' => $this->mergeSectionData($pageSections),
                 'page' => $page,
@@ -187,6 +207,7 @@ final class HistoryController extends BaseController
         }
     }
 
+    // Load one page by slug, then load all sections that belong to that page.
     private function getHistoryPageData(string $slug): array
     {
         $page = $this->adminPageService->getPageBySlug($slug);
@@ -212,12 +233,14 @@ final class HistoryController extends BaseController
         ];
     }
 
+    // Find one specific section type on a page, for example the booking section.
     private function getSectionByType(string $slug, string $sectionType): array
     {
         try {
             $pageData = $this->getHistoryPageData($slug);
             $pageSections = $pageData['sections'];
 
+            // Decode section content first, then return the first published match.
             foreach ($this->mergeSectionData($pageSections) as $section) {
                 if (($section['section_type'] ?? '') === $sectionType && !empty($section['is_published'])) {
                     return $section;
@@ -230,6 +253,7 @@ final class HistoryController extends BaseController
         return [];
     }
 
+    // Return only the non-empty CMS options from a list of field names.
     private function getFilledOptions(array $section, array $keys): array
     {
         $options = [];
@@ -243,6 +267,7 @@ final class HistoryController extends BaseController
         return $options;
     }
 
+    // Turn a price string like "€17.50/person" into a float we can calculate with.
     private function parseMoney(string $value): float
     {
         $raw = str_replace(',', '.', $value);
@@ -253,6 +278,7 @@ final class HistoryController extends BaseController
         return (float) $match[0];
     }
 
+    // Extract a number like 4 from text such as "for up to 4".
     private function parseCount(string $value, int $default = 4): int
     {
         if (!preg_match_all('/\d+/', $value, $matches) || empty($matches[0])) {
@@ -262,6 +288,7 @@ final class HistoryController extends BaseController
         return (int) end($matches[0]);
     }
 
+    // Decode the JSON content field so the views can use normal array keys.
     private function mergeSectionData(array $sections): array
     {
         return array_map(

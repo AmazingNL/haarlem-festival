@@ -8,6 +8,8 @@
     <meta name="description" content="Haarlem Festival - events, programs and city guides">
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/home.css" />
+    <link rel="stylesheet" href="/assets/css/shop.css" />
+    <link rel="stylesheet" href="/assets/css/program.css" />
     <link rel="stylesheet" href="/assets/css/history/index.css" />
     <link rel="stylesheet" href="/assets/css/stories/index.css" />
     <link rel="stylesheet" href="/assets/css/yummy/index.css" />
@@ -28,46 +30,7 @@
 
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <header class="header">
-        <nav class="navbar">
-            <a href="/home" class="logo-link">
-                <span class="logo-text">HA</span>
-                <img class="logo-icon" alt="logo" src="/assets/svg/main/Star 3.svg">
-                <span class="logo-text">RLEM</span>
-            </a>
-
-            <button class="menu-toggle" aria-label="Toggle menu">
-                <span class="hamburger"></span>
-                <span class="hamburger"></span>
-                <span class="hamburger"></span>
-            </button>
-
-            <ul class="nav-links">
-                <li><a href="/home" class="nav-link <?= $isActive('/home') !== '' || $currentPath === '/' ? 'active' : '' ?>">Home</a></li>
-                <li><a href="/stories" class="nav-link <?= $isSectionActive('/stories') ?>">Stories</a></li>
-                <li><a href="/history" class="nav-link <?= $isSectionActive('/history') ?>">History</a></li>
-                <li><a href="/yummy" class="nav-link <?= $isSectionActive('/yummy') ?>">Restaurants</a></li>
-                <li><a href="#" class="nav-link disabled">Dance</a></li>
-                <li><a href="#" class="nav-link disabled">Jazz</a></li>
-            </ul>
-
-            <div class="navbar-actions">
-                <a href="/program" class="program-link <?= $isActive('/program') ?>">My Program</a>
-
-                <div class="icon-actions">
-                    <button class="icon-btn" aria-label="Favorites">
-                        <img class="icon-svg" alt="favorites icon" src="/assets/svg/main/heart.svg">
-                    </button>
-                    <button class="icon-btn" aria-label="Search">
-                        <img class="icon-svg" alt="search icon" src="/assets/svg/main/search.svg">
-                    </button>
-                    <button class="icon-btn" aria-label="Location">
-                        <img class="icon-svg" alt="location icon" src="/assets/svg/main/location.svg">
-                    </button>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <?php require __DIR__ . '/partials/site_header.php'; ?>
 
     <main id="main" class="main-content" role="main">
         <?php if (!empty($flash['success'])): ?>
@@ -85,53 +48,10 @@
         <?php endif; ?>
     </main>
 
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-columns">
-                <div class="footer-column">
-                    <h3 class="footer-title">Culture</h3>
-                    <ul class="footer-links">
-                        <li><a href="/history" class="footer-link">History of Haarlem</a></li>
-                        <li><a href="/stories" class="footer-link">Stories in Haarlem</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column">
-                    <h3 class="footer-title">What to do</h3>
-                    <ul class="footer-links">
-                        <li><a href="#" class="footer-link">Events</a></li>
-                        <li><a href="/yummy" class="footer-link">Food and drinks</a></li>
-                        <li><a href="#" class="footer-link">Haarlem Tickets</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column">
-                    <h3 class="footer-title">Follow Us</h3>
-                    <div class="social-links">
-                        <a href="#" class="social-link" aria-label="Facebook">
-                            <img class="social-icon" alt="Facebook" src="/assets/svg/main/facebook.svg">
-                        </a>
-                        <a href="#" class="social-link" aria-label="Instagram">
-                            <img class="social-icon" alt="Instagram" src="/assets/svg/main/Instagram.svg">
-                        </a>
-                        <a href="#" class="social-link" aria-label="Youtube">
-                            <img class="social-icon" alt="Youtube" src="/assets/svg/main/youtube.svg">
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p class="footer-copyright">&copy; 2025 Haarlem Marketing. All rights reserved.</p>
-                <nav class="footer-nav">
-                    <a href="#" class="footer-bottom-link">Privacy Policy</a>
-                    <a href="#" class="footer-bottom-link">Terms of Service</a>
-                </nav>
-            </div>
-        </div>
-    </footer>
+    <?php require __DIR__ . '/partials/site_footer.php'; ?>
 
     <script src="/assets/js/navbar.js"></script>
+    <script src="/assets/js/home.js"></script>
     <script src="/assets/js/history-book-tour.js"></script>
     <script src="/assets/js/stories.js"></script>
 </body>

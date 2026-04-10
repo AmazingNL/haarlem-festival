@@ -9,8 +9,14 @@ abstract class BaseController
     protected function view(string $template, array $data = [], ?string $layout = 'main', int $status = 200): void
     {
         $data['csrf'] ??= $this->csrfToken();
-        // inject any flash messages stored in session 
+        // Read one-time session messages and also expose simple view variables.
         $data['flash'] = $data['flash'] ?? $this->getAllFlash();
+        $data['errorMessage'] ??= is_string($data['flash']['error'] ?? null)
+            ? (string) $data['flash']['error']
+            : '';
+        $data['successMessage'] ??= is_string($data['flash']['success'] ?? null)
+            ? (string) $data['flash']['success']
+            : '';
         extract($data, EXTR_SKIP);
 
             $content = __DIR__ . '/../Views/' . $template. '.php';

@@ -15,8 +15,8 @@
             <h2>Welcome Back</h2>
             <p class="subtitle">Sign in to access all of Haarlem's features.</p>
 
-            <?php if (!empty(($flash ?? [])['error'])): ?>
-                <div class="error-msg"><?= htmlspecialchars((string) ($flash ?? [])['error'], ENT_QUOTES, 'UTF-8') ?></div>
+            <?php if (!empty($errorMessage)): ?>
+                <div class="error-msg"><?= htmlspecialchars((string) $errorMessage, ENT_QUOTES, 'UTF-8') ?></div>
             <?php endif; ?>
 
             <form action="<?= !empty($isAdminLogin) ? '/admin/login' : '/login' ?>" method="POST">

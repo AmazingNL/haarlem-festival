@@ -1,4 +1,5 @@
 <?php
+// Read the selectable options from the CMS section data.
 $dayOptions = array_values(array_filter([
     $s['day_one'] ?? '',
     $s['day_two'] ?? '',
@@ -35,10 +36,9 @@ $parseCount = static function (?string $value, int $default = 4): int {
     return (int) end($matches[0]);
 };
 
-$selectedDay = trim((string) ($s['selected_day'] ?? ($dayOptions[0] ?? '')));
-$selectedTime = trim((string) ($s['selected_time'] ?? ($timeOptions[0] ?? '')));
-$selectedLanguage = trim((string) ($s['selected_language'] ?? ($languageOptions[0] ?? '')));
-$selectedTicket = trim((string) ($s['selected_ticket'] ?? ($s['individual_title'] ?? '')));
+$selectedDay = '';
+$selectedTime = '';
+$selectedLanguage = '';
 
 $individualPriceValue = $parseMoney($s['individual_price'] ?? '');
 $familyPriceValue = $parseMoney($s['family_price'] ?? '');
@@ -47,24 +47,16 @@ $familyGroupSize = $parseCount($s['family_price'] ?? '', 4);
 $individualTitle = trim((string) ($s['individual_title'] ?? 'Individual'));
 $familyTitle = trim((string) ($s['family_title'] ?? 'Family'));
 
-$defaultTicketKey = $selectedTicket === $familyTitle ? 'family' : 'individual';
+$defaultTicketKey = '';
 $defaultQuantity = max(1, (int) ($s['quantity_value'] ?? 1));
-$defaultUnitPrice = $defaultTicketKey === 'family' ? $familyPriceValue : $individualPriceValue;
-$defaultTotalPrice = $defaultUnitPrice * $defaultQuantity;
-$defaultSelectionText = trim($selectedDay . ', ' . $selectedTime . ' | ' . $selectedLanguage, ' ,|');
-$defaultTicketSummary = $defaultTicketKey === 'family'
-    ? ($defaultQuantity === 1
-        ? sprintf('%s (up to %d)', $familyTitle, $familyGroupSize)
-        : sprintf('%d %s tickets (up to %d people)', $defaultQuantity, strtolower($familyTitle), $defaultQuantity * $familyGroupSize))
-    : ($defaultQuantity === 1 ? '1 person' : sprintf('%d people', $defaultQuantity));
+$defaultUnitPrice = 0.0;
+$defaultTotalPrice = 0.0;
+$defaultSelectionText = '';
+$defaultTicketSummary = '';
+$selectionPlaceholder = 'Choose day, time, and language';
+$ticketPlaceholder = 'Choose a ticket type';
 
 $defaultSavingNote = '';
-if ($defaultTicketKey === 'family') {
-    $defaultSavings = ($individualPriceValue * $familyGroupSize * $defaultQuantity) - $defaultTotalPrice;
-    if ($defaultSavings > 0) {
-        $defaultSavingNote = 'Save €' . number_format($defaultSavings, 2, '.', '') . ' vs individual tickets!';
-    }
-}
 
 $submitUrl = trim((string) ($s['button_link'] ?? '')) !== '' && trim((string) ($s['button_link'] ?? '')) !== '#'
     ? trim((string) $s['button_link'])
@@ -94,13 +86,14 @@ $submitUrl = trim((string) ($s['button_link'] ?? '')) !== '' && trim((string) ($
     </div>
 
     <form class="history-tour-booking-form" method="post" action="<?= htmlspecialchars($submitUrl, ENT_QUOTES, 'UTF-8') ?>">
+        <?php // Hidden inputs are updated by JavaScript and posted to the controller on submit. ?>
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars((string) ($csrf ?? ''), ENT_QUOTES, 'UTF-8') ?>">
         <input type="hidden" name="booking_title" value="<?= htmlspecialchars((string) ($s['heading'] ?? 'Book Your Adventure'), ENT_QUOTES, 'UTF-8') ?>">
         <input type="hidden" name="selected_day" value="<?= htmlspecialchars($selectedDay, ENT_QUOTES, 'UTF-8') ?>" data-booking-input="day">
         <input type="hidden" name="selected_time" value="<?= htmlspecialchars($selectedTime, ENT_QUOTES, 'UTF-8') ?>" data-booking-input="time">
         <input type="hidden" name="selected_language" value="<?= htmlspecialchars($selectedLanguage, ENT_QUOTES, 'UTF-8') ?>" data-booking-input="language">
         <input type="hidden" name="ticket_key" value="<?= htmlspecialchars($defaultTicketKey, ENT_QUOTES, 'UTF-8') ?>" data-booking-input="ticket_key">
-        <input type="hidden" name="ticket_title" value="<?= htmlspecialchars($defaultTicketKey === 'family' ? $familyTitle : $individualTitle, ENT_QUOTES, 'UTF-8') ?>" data-booking-input="ticket_title">
+        <input type="hidden" name="ticket_title" value="" data-booking-input="ticket_title">
         <input type="hidden" name="quantity" value="<?= htmlspecialchars((string) $defaultQuantity, ENT_QUOTES, 'UTF-8') ?>" data-booking-input="quantity">
         <input type="hidden" name="unit_price" value="<?= htmlspecialchars(number_format($defaultUnitPrice, 2, '.', ''), ENT_QUOTES, 'UTF-8') ?>" data-booking-input="unit_price">
         <input type="hidden" name="total_price" value="<?= htmlspecialchars(number_format($defaultTotalPrice, 2, '.', ''), ENT_QUOTES, 'UTF-8') ?>" data-booking-input="total_price">
@@ -113,7 +106,7 @@ $submitUrl = trim((string) ($s['button_link'] ?? '')) !== '' && trim((string) ($
                 <?php foreach ($dayOptions as $option): ?>
                     <button
                         type="button"
-                        class="history-tour-pill <?= $option === $selectedDay ? 'is-selected' : '' ?>"
+                        class="history-tour-pill"
                         data-booking-choice="day"
                         data-value="<?= htmlspecialchars($option, ENT_QUOTES, 'UTF-8') ?>">
                         <?= htmlspecialchars($option, ENT_QUOTES, 'UTF-8') ?>
@@ -128,7 +121,7 @@ $submitUrl = trim((string) ($s['button_link'] ?? '')) !== '' && trim((string) ($
                 <?php foreach ($timeOptions as $option): ?>
                     <button
                         type="button"
-                        class="history-tour-pill <?= $option === $selectedTime ? 'is-selected' : '' ?>"
+                        class="history-tour-pill"
                         data-booking-choice="time"
                         data-value="<?= htmlspecialchars($option, ENT_QUOTES, 'UTF-8') ?>">
                         <?= htmlspecialchars($option, ENT_QUOTES, 'UTF-8') ?>
@@ -143,7 +136,7 @@ $submitUrl = trim((string) ($s['button_link'] ?? '')) !== '' && trim((string) ($
                 <?php foreach ($languageOptions as $option): ?>
                     <button
                         type="button"
-                        class="history-tour-pill <?= $option === $selectedLanguage ? 'is-selected' : '' ?>"
+                        class="history-tour-pill"
                         data-booking-choice="language"
                         data-value="<?= htmlspecialchars($option, ENT_QUOTES, 'UTF-8') ?>">
                         <?= htmlspecialchars($option, ENT_QUOTES, 'UTF-8') ?>
@@ -157,7 +150,7 @@ $submitUrl = trim((string) ($s['button_link'] ?? '')) !== '' && trim((string) ($
             <div class="history-tour-ticket-grid">
                 <button
                     type="button"
-                    class="history-tour-ticket <?= $defaultTicketKey === 'individual' ? 'is-selected' : '' ?>"
+                    class="history-tour-ticket"
                     data-booking-ticket="individual"
                     data-label="<?= htmlspecialchars($individualTitle, ENT_QUOTES, 'UTF-8') ?>"
                     data-price="<?= htmlspecialchars(number_format($individualPriceValue, 2, '.', ''), ENT_QUOTES, 'UTF-8') ?>">
@@ -168,7 +161,7 @@ $submitUrl = trim((string) ($s['button_link'] ?? '')) !== '' && trim((string) ($
 
                 <button
                     type="button"
-                    class="history-tour-ticket <?= $defaultTicketKey === 'family' ? 'is-selected' : '' ?>"
+                    class="history-tour-ticket"
                     data-booking-ticket="family"
                     data-label="<?= htmlspecialchars($familyTitle, ENT_QUOTES, 'UTF-8') ?>"
                     data-price="<?= htmlspecialchars(number_format($familyPriceValue, 2, '.', ''), ENT_QUOTES, 'UTF-8') ?>"
@@ -192,11 +185,11 @@ $submitUrl = trim((string) ($s['button_link'] ?? '')) !== '' && trim((string) ($
         <div class="history-tour-summary">
             <div class="history-tour-summary__row">
                 <span><?= htmlspecialchars((string) ($s['selection_label'] ?? 'Selection'), ENT_QUOTES, 'UTF-8') ?></span>
-                <strong data-booking-summary="selection"><?= htmlspecialchars($defaultSelectionText, ENT_QUOTES, 'UTF-8') ?></strong>
+                <strong data-booking-summary="selection"><?= htmlspecialchars($selectionPlaceholder, ENT_QUOTES, 'UTF-8') ?></strong>
             </div>
             <div class="history-tour-summary__row">
                 <span><?= htmlspecialchars((string) ($s['ticket_summary_label'] ?? 'Ticket'), ENT_QUOTES, 'UTF-8') ?></span>
-                <strong data-booking-summary="ticket"><?= htmlspecialchars($defaultTicketSummary, ENT_QUOTES, 'UTF-8') ?></strong>
+                <strong data-booking-summary="ticket"><?= htmlspecialchars($ticketPlaceholder, ENT_QUOTES, 'UTF-8') ?></strong>
             </div>
             <div class="history-tour-summary__row history-tour-summary__row--total">
                 <span><?= htmlspecialchars((string) ($s['total_label'] ?? 'Total'), ENT_QUOTES, 'UTF-8') ?></span>
@@ -205,7 +198,7 @@ $submitUrl = trim((string) ($s['button_link'] ?? '')) !== '' && trim((string) ($
             <p class="history-tour-summary__note" data-booking-summary="note"><?= htmlspecialchars($defaultSavingNote, ENT_QUOTES, 'UTF-8') ?></p>
         </div>
 
-        <button type="submit" class="history-btn history-btn--dark history-tour-card__button history-tour-card__submit">
+        <button type="submit" class="history-btn history-btn--dark history-tour-card__button history-tour-card__submit" data-booking-submit disabled>
             <span class="history-tour-card__submit-icon" aria-hidden="true">+</span>
             <span><?= htmlspecialchars((string) ($s['button_text'] ?? 'Add to My Program'), ENT_QUOTES, 'UTF-8') ?></span>
         </button>

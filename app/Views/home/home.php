@@ -1,30 +1,60 @@
-<?php 
-$sections = $sections ?? [];
+<?php
+$homeUrl = static function (?string $value, string $default = '#'): string {
+    $url = trim((string) $value);
+
+    return htmlspecialchars($url !== '' ? $url : $default, ENT_QUOTES, 'UTF-8');
+};
+
+$homeText = static function (?string $value): string {
+    return nl2br(htmlspecialchars(trim((string) $value), ENT_QUOTES, 'UTF-8'));
+};
+
+$homeParagraphs = static function (?string $value): array {
+    $text = str_replace(["\r\n", "\r"], "\n", trim((string) $value));
+    if ($text === '') {
+        return [];
+    }
+
+    $paragraphs = preg_split('/\n\s*\n/', $text) ?: [];
+    return array_values(array_filter($paragraphs, static fn(string $paragraph): bool => trim($paragraph) !== ''));
+};
 ?>
 
-<?php foreach ($sections as $section): ?>
+<div class="home-page">
+    <?php foreach (($section ?? []) as $s): ?>
+        <?php if (empty($s['is_published'])) continue; ?>
 
-    <?php if ($section->getTitle() === 'hero'): ?>
-        <section class="hero">
-            <h1><?= htmlspecialchars($section->getTitle()) ?></h1>
-            <?= $section->getContent() ?>
-        </section>
+        <?php switch ((string) ($s['section_type'] ?? '')):
+            case 'hero':
+                require __DIR__ . '/partials/hero.php';
+                break;
+            case 'feature':
+                require __DIR__ . '/partials/feature.php';
+                break;
+            case 'gallery':
+                require __DIR__ . '/partials/gallery.php';
+                break;
+            case 'image_left':
+                require __DIR__ . '/partials/image_left.php';
+                break;
+            case 'image_right':
+                require __DIR__ . '/partials/image_right.php';
+                break;
+            case 'cards_grid':
+                require __DIR__ . '/partials/cards_grid.php';
+                break;
+            case 'transport':
+                require __DIR__ . '/partials/transport.php';
+                break;
+        endswitch; ?>
+    <?php endforeach; ?>
 
-    <?php elseif ($section->getSectionType() === 'text_block'): ?>
-        <section class="text-block">
-            <h2><?= htmlspecialchars($section->getTitle()) ?></h2>
-            <?= $section->getContent() ?>
-        </section>
-
-    <?php elseif ($section->getSectionType() === 'image_left'): ?>
-        <section class="image-left">
-            <img src="/uploads/<?= htmlspecialchars($section->getImagePath()) ?>" alt="">
-            <div>
-                <h2><?= htmlspecialchars($section->getTitle()) ?></h2>
-                <?= $section->getContent() ?>
-            </div>
-        </section>
-
-    <?php endif; ?>
-
-<?php endforeach; ?>
+    <section class="home-back-top">
+        <div class="home-container">
+            <a class="home-back-top__link" href="#home-top">
+                <span>Go to top</span>
+                <span class="home-back-top__icon" aria-hidden="true">&uarr;</span>
+            </a>
+        </div>
+    </section>
+</div>

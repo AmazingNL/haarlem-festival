@@ -32,13 +32,28 @@ MODIFY section_type ENUM(
   'history_route',
   'history_info',
   'history_cta',
+  'history_page_nav',
   'history_book_tour_hero',
   'history_book_tour_booking',
   'history_book_tour_route',
   'history_book_tour_schedule',
   'history_book_tour_pricing',
   'history_book_tour_notice',
-  'history_book_tour_alert'
+  'history_book_tour_alert',
+  'history_route_map_hero',
+  'history_route_map_stops',
+  'history_route_map_directions',
+  'history_route_map_cta',
+  'history_st_bavo_hero',
+  'history_st_bavo_facts',
+  'history_st_bavo_article',
+  'history_st_bavo_sidebar',
+  'history_st_bavo_route_cta',
+  'history_molen_hero',
+  'history_molen_facts',
+  'history_molen_article',
+  'history_molen_sidebar',
+  'history_molen_route_cta'
 ) NOT NULL;
 
 DELETE ps FROM page_section ps
