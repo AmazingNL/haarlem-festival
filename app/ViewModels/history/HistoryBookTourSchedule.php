@@ -4,13 +4,16 @@ namespace App\ViewModels\history;
 
 use App\ViewModels\BaseSection;
 
+// Defines the CMS form fields for the History book tour schedule section.
 final class HistoryBookTourSchedule extends BaseSection
 {
+    // Register this ViewModel as the history_book_tour_schedule section type.
     public function __construct(int $pageId = 0, int $sectionId = 0, string $customClass = '', int $sortOrder = 0)
     {
         parent::__construct($pageId, $sectionId, 'history_book_tour_schedule', $customClass, $sortOrder);
     }
 
+    // Return the inputs that the admin should see when editing the schedule section.
     public function getAdminFormFields(): array
     {
         return [

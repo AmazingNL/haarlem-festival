@@ -13,12 +13,14 @@ final class EventController extends BaseController
     private EventCatalogService $eventCatalogService;
     private ProgramService $programService;
 
+    // Inject the event catalogue and program services used by the event shop flow.
     public function __construct(EventCatalogService $eventCatalogService, ProgramService $programService)
     {
         $this->eventCatalogService = $eventCatalogService;
         $this->programService = $programService;
     }
 
+    // Show the published festival events and remember this page for the return link.
     public function index(): void
     {
         $tag = trim($this->str('tag'));
@@ -31,6 +33,7 @@ final class EventController extends BaseController
         ]);
     }
 
+    // Validate the selected ticket type and add the chosen event ticket to My Program.
     public function addToProgram(): void
     {
         $this->ensureSession();
@@ -95,6 +98,7 @@ final class EventController extends BaseController
         }
     }
 
+    // Format the event start date for display in My Program.
     private function formatDate(string $dateTime): string
     {
         $timestamp = strtotime($dateTime);
@@ -102,6 +106,7 @@ final class EventController extends BaseController
         return $timestamp ? date('D d M Y', $timestamp) : '';
     }
 
+    // Format the event start and end time as a readable time range.
     private function formatTimeRange(string $startDateTime, string $endDateTime): string
     {
         $start = strtotime($startDateTime);
@@ -118,6 +123,7 @@ final class EventController extends BaseController
         return date('H:i', $start) . ' - ' . date('H:i', $end);
     }
 
+    // Build the summary text shown under the selected event in My Program and checkout.
     private function formatSelectionText(string $startDateTime, string $endDateTime): string
     {
         $date = $this->formatDate($startDateTime);

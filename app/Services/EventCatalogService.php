@@ -10,11 +10,13 @@ final class EventCatalogService
 {
     private EventCatalogRepository $eventCatalogRepository;
 
+    // Inject the repository that loads event and ticket data from the database.
     public function __construct(EventCatalogRepository $eventCatalogRepository)
     {
         $this->eventCatalogRepository = $eventCatalogRepository;
     }
 
+    // Group published event rows into event cards with their available ticket types.
     public function getPublishedEvents(string $tag = ''): array
     {
         $events = [];
@@ -58,6 +60,7 @@ final class EventCatalogService
         return array_values($events);
     }
 
+    // Return one ticket type only if it is still bookable for the selected event.
     public function getBookableTicketType(int $eventId, int $ticketTypeId): ?array
     {
         $row = $this->eventCatalogRepository->findBookableTicketType($eventId, $ticketTypeId);
@@ -83,6 +86,7 @@ final class EventCatalogService
         ];
     }
 
+    // Infer a simple category label from the event content for display in the UI.
     private function categoryLabel(array $row): string
     {
         $haystack = strtolower(implode(' ', [

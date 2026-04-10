@@ -11,22 +11,26 @@ final class PageSectionService implements IPageSectionService
     private IPageSectionRepository $pageSectionRepository;
     private IImageService $imageService;
 
+    // Inject the section repository and image helper used by the CMS.
     public function __construct(IPageSectionRepository $pageSectionRepository, IImageService $imageService)
     {
         $this->pageSectionRepository = $pageSectionRepository;
         $this->imageService = $imageService;
     }
 
+    // Return all sections that belong to one page.
     public function getSectionsByPageId(int $pageId): array
     {
         return $this->pageSectionRepository->getSectionsByPageId($pageId);
     }
 
+    // Return one page section by its id.
     public function getSectionById(int $sectionId): PageSection
     {
         return $this->pageSectionRepository->getSectionById($sectionId);
     }
 
+    // Build the admin form field list for a given section type by using its ViewModel.
     public function resolveSectionFormFields(string $sectionType): array
     {
         if ($sectionType === '') {
@@ -47,6 +51,7 @@ final class PageSectionService implements IPageSectionService
         return $sectionVm->getAdminFormFields();
     }
 
+    // Turn posted CMS form data into a PageSection model ready to save.
     public function buildSectionFromInput(int $fallbackPageId, array $post, array $files): PageSection
     {
         $postedPageId = (int) ($post['page_id'] ?? 0);
@@ -81,6 +86,7 @@ final class PageSectionService implements IPageSectionService
         );
     }
 
+    // Build the JSON content for a section, including uploaded or embedded images.
     private function buildSectionContent(array $sectionField, array $post, array $files): array
     {
         $content = [];
@@ -126,6 +132,7 @@ final class PageSectionService implements IPageSectionService
         return $content;
     }
 
+    // Save a new section in the database.
     public function createSection(PageSection $section): bool
     {
 
@@ -135,11 +142,14 @@ final class PageSectionService implements IPageSectionService
         }
         return false;
     }
+
+    // Update an existing section in the database.
     public function updateSection(PageSection $section): bool
     {
         return $this->pageSectionRepository->updateSection($section);
     }
 
+    // Delete a section by id.
     public function deleteSection(int $sectionId): bool
     {
         try {

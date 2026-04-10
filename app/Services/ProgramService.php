@@ -12,6 +12,7 @@ final class ProgramService
     private const ORDER_SEQUENCE_KEY = 'program_order_sequence';
     private const LAST_ORDER_KEY = 'last_order_id';
 
+    // Return the current My Program items from the session.
     public function getItems(): array
     {
         $this->ensureSession();
@@ -27,6 +28,7 @@ final class ProgramService
         return $items;
     }
 
+    // Add a program item or replace the matching one with the newest selection.
     public function addItem(array $item): void
     {
         $this->ensureSession();
@@ -45,6 +47,7 @@ final class ProgramService
         $_SESSION[self::ITEMS_KEY] = $items;
     }
 
+    // Remove one program item by its generated id.
     public function removeItem(string $itemId): void
     {
         $this->ensureSession();
@@ -55,6 +58,7 @@ final class ProgramService
         ));
     }
 
+    // Remove multiple items after they have been turned into a paid order.
     public function removeItemsByIds(array $itemIds): void
     {
         $this->ensureSession();
@@ -74,17 +78,20 @@ final class ProgramService
         ));
     }
 
+    // Empty the current My Program cart.
     public function clearItems(): void
     {
         $this->ensureSession();
         unset($_SESSION[self::ITEMS_KEY]);
     }
 
+    // Check whether My Program currently has any saved items.
     public function hasItems(): bool
     {
         return $this->getItems() !== [];
     }
 
+    // Count the total quantity across all saved items.
     public function getItemCount(): int
     {
         $count = 0;
@@ -95,11 +102,13 @@ final class ProgramService
         return $count;
     }
 
+    // Calculate the full total for the current My Program cart.
     public function getTotal(): float
     {
         return $this->calculateTotal($this->getItems());
     }
 
+    // Save a Stripe checkout snapshot so success can rebuild the order after redirecting back.
     public function storePendingStripeCheckout(
         string $sessionId,
         int $userId,
@@ -127,6 +136,7 @@ final class ProgramService
         $_SESSION[self::PENDING_CHECKOUTS_KEY] = $pendingCheckouts;
     }
 
+    // Read one pending Stripe checkout by session id.
     public function getPendingStripeCheckout(string $sessionId): ?array
     {
         $this->ensureSession();
@@ -137,6 +147,7 @@ final class ProgramService
         return is_array($checkout) ? $checkout : null;
     }
 
+    // Remove a pending Stripe checkout after the order is completed.
     public function clearPendingStripeCheckout(string $sessionId): void
     {
         $this->ensureSession();
@@ -150,6 +161,7 @@ final class ProgramService
         $_SESSION[self::PENDING_CHECKOUTS_KEY] = $pendingCheckouts;
     }
 
+    // Turn paid program items into an order record with invoice data and generated tickets.
     public function createPaidOrder(
         int $userId,
         array $customer,
@@ -254,6 +266,7 @@ final class ProgramService
         return $orderId;
     }
 
+    // Return all paid orders that belong to the current user.
     public function getPaidOrdersForUser(int $userId): array
     {
         $this->ensureSession();
@@ -276,6 +289,7 @@ final class ProgramService
         return $userOrders;
     }
 
+    // Return one order only if it belongs to the logged-in user.
     public function getOrderForUser(int $orderId, int $userId): ?array
     {
         $this->ensureSession();
@@ -293,6 +307,7 @@ final class ProgramService
         return $order;
     }
 
+    // Prevent duplicate success handling by checking whether this Stripe session already created an order.
     public function findOrderByStripeSessionId(int $userId, string $stripeSessionId): ?array
     {
         $this->ensureSession();
@@ -306,6 +321,7 @@ final class ProgramService
         return null;
     }
 
+    // Return the last successful order id for the confirmation shortcut on My Program.
     public function getLastOrderId(): int
     {
         $this->ensureSession();
@@ -323,6 +339,7 @@ final class ProgramService
         return $orderId;
     }
 
+    // Sum all normalized item totals into one final amount.
     private function calculateTotal(array $items): float
     {
         $total = 0.0;
@@ -334,6 +351,7 @@ final class ProgramService
         return round($total, 2);
     }
 
+    // Normalize one program item so event tickets and history bookings share one consistent structure.
     private function normalizeItem(array $item): array
     {
         $quantity = max(1, min(10, (int) ($item['quantity'] ?? 1)));
@@ -368,6 +386,7 @@ final class ProgramService
         ];
     }
 
+    // Remove duplicates so the same selection is stored only once.
     private function deduplicateItems(array $items): array
     {
         $uniqueItems = [];
@@ -388,6 +407,7 @@ final class ProgramService
         return $uniqueItems;
     }
 
+    // Find the matching line in My Program for a newly added item.
     private function findMatchingProgramItemIndex(array $items, array $candidate): ?int
     {
         foreach ($items as $index => $item) {
@@ -399,6 +419,7 @@ final class ProgramService
         return null;
     }
 
+    // Decide whether two program items represent the same booking or ticket choice.
     private function isSameProgramItem(array $left, array $right): bool
     {
         $leftEventId = (int) ($left['event_id'] ?? 0);
@@ -423,6 +444,7 @@ final class ProgramService
         return true;
     }
 
+    // Generate the next simple order number in this session-based checkout flow.
     private function getNextOrderId(): int
     {
         $currentValue = (int) ($_SESSION[self::ORDER_SEQUENCE_KEY] ?? 0) + 1;
@@ -431,6 +453,7 @@ final class ProgramService
         return $currentValue;
     }
 
+    // Start the PHP session if it has not been started yet.
     private function ensureSession(): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {

@@ -11,11 +11,13 @@ final class ProgramController extends BaseController
 {
     private ProgramService $programService;
 
+    // Inject the service that manages the session-based My Program cart.
     public function __construct(ProgramService $programService)
     {
         $this->programService = $programService;
     }
 
+    // Show the My Program page with current items, totals, and recent paid orders.
     public function index(): void
     {
         $this->ensureSession();
@@ -34,6 +36,7 @@ final class ProgramController extends BaseController
         ]);
     }
 
+    // Remove one saved item from My Program and return to the list.
     public function removeItem(): void
     {
         $this->ensureSession();

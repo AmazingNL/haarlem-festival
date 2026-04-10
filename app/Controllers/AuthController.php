@@ -12,11 +12,13 @@ final class AuthController extends BaseController
 {
     private IUserService $userService;
 
+    // Inject the user service for registration and login logic.
     public function __construct(IUserService $userService)
     {
         $this->userService = $userService;
     }
 
+    // Show the registration page and keep any redirect target for after signup.
     public function showRegisterForm(): void
     {
         $this->ensureSession();
@@ -32,6 +34,7 @@ final class AuthController extends BaseController
         ], 'auth');
     }
 
+    // Validate the registration form, create the user, then log them in immediately.
     public function register(): void
     {
         try {
@@ -59,6 +62,7 @@ final class AuthController extends BaseController
         }
     }
 
+    // Check the basic registration rules before creating the account.
     private function validateRegistrationInput(string $email, string $password): void
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -70,6 +74,7 @@ final class AuthController extends BaseController
         }
     }
 
+    // Stop duplicate accounts by checking both email and username first.
     private function ensureUserIsUnique(User $user): void
     {
         if ($this->userService->userExists($user->email, $user->username)) {
@@ -77,6 +82,7 @@ final class AuthController extends BaseController
         }
     }
 
+    // Show the login page and detect whether it is the admin or normal login route.
     public function showLoginForm(): void
     {
         $this->ensureSession();
@@ -94,6 +100,7 @@ final class AuthController extends BaseController
         ], 'auth');
     }
 
+    // Process the submitted login form and start a session if the credentials are correct.
     public function login(): void
     {
         $loginForm = str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin')
@@ -123,6 +130,7 @@ final class AuthController extends BaseController
         }
     }
 
+    // Clear the current session and return the user to the correct login page.
     public function logout(): void
     {
         $this->ensureSession();
@@ -136,6 +144,7 @@ final class AuthController extends BaseController
         $this->redirect($wasAdmin ? '/admin/loginForm' : '/loginForm');
     }
 
+    // Store the logged-in user in the session and send them to the right next page.
     private function startUserSession(User $user, string $requestedRedirect = ''): void
     {
         $this->ensureSession();
@@ -185,6 +194,7 @@ final class AuthController extends BaseController
         }
     }
 
+    // Read the requested redirect target from the form or session.
     private function getAuthRedirect(): string
     {
         $this->ensureSession();
@@ -197,6 +207,7 @@ final class AuthController extends BaseController
         return $this->cleanRedirectPath((string) ($_SESSION['auth_redirect'] ?? ''));
     }
 
+    // Only allow safe internal redirect paths and block admin URLs for normal auth redirects.
     private function cleanRedirectPath(string $path): string
     {
         $path = trim($path);
@@ -207,6 +218,7 @@ final class AuthController extends BaseController
         return str_starts_with($path, '/admin') ? '' : $path;
     }
 
+    // Read the optional phone number and convert an empty input to null.
     private function readPhoneNumber(): ?string
     {
         $phone = trim((string) ($_POST['phone'] ?? ''));

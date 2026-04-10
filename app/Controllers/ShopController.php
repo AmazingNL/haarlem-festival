@@ -14,11 +14,13 @@ final class ShopController extends BaseController
 {
     private ProgramService $programService;
 
+    // Inject the program service used during checkout and order creation.
     public function __construct(ProgramService $programService)
     {
         $this->programService = $programService;
     }
 
+    // Show the checkout page after confirming the user is logged in and has items to pay for.
     public function checkout(): void
     {
         $this->ensureSession();
@@ -46,6 +48,7 @@ final class ShopController extends BaseController
         ]);
     }
 
+    // Create a Stripe Checkout session for the selected My Program items.
     public function pay(): void
     {
         $this->ensureSession();
@@ -95,6 +98,7 @@ final class ShopController extends BaseController
         }
     }
 
+    // Verify the Stripe session after the redirect back and create the final paid order.
     public function checkoutSuccess(): void
     {
         $this->ensureSession();
@@ -165,6 +169,7 @@ final class ShopController extends BaseController
         }
     }
 
+    // Return the visitor to My Program if the Stripe payment flow was cancelled.
     public function checkoutCancel(): void
     {
         $this->ensureSession();
@@ -172,6 +177,7 @@ final class ShopController extends BaseController
         $this->redirect('/program');
     }
 
+    // Show the success page for one paid order.
     public function success(int $orderId): void
     {
         $order = $this->getOrderForSuccessPage($orderId, '/orders/' . $orderId . '/success');
@@ -186,6 +192,7 @@ final class ShopController extends BaseController
         ]);
     }
 
+    // Load one order and make sure the current user is allowed to open it.
     private function getOrderForSuccessPage(int $orderId, string $redirectPath): ?array
     {
         $this->ensureSession();
@@ -204,6 +211,7 @@ final class ShopController extends BaseController
         return $order;
     }
 
+    // Build the payload that Stripe needs to open the hosted checkout page.
     private function buildCheckoutSessionPayload(string $provider, array $programItems, array $customer): array
     {
         $payload = [
@@ -227,6 +235,7 @@ final class ShopController extends BaseController
         return $payload;
     }
 
+    // Convert My Program items into Stripe line items with labels and amounts.
     private function buildCheckoutLineItems(array $programItems): array
     {
         $lineItems = [];
@@ -253,6 +262,7 @@ final class ShopController extends BaseController
         return $lineItems;
     }
 
+    // Map the selected payment option to the Stripe payment methods that should be enabled.
     private function getPaymentMethodTypes(string $provider): array
     {
         return match ($provider) {
@@ -264,6 +274,7 @@ final class ShopController extends BaseController
         };
     }
 
+    // Read the logged-in customer details from the session for checkout and order storage.
     private function getCustomerData(): array
     {
         return [
@@ -274,6 +285,7 @@ final class ShopController extends BaseController
         ];
     }
 
+    // Normalize different provider aliases to the internal payment values used by this controller.
     private function normalizePaymentProvider(string $provider): string
     {
         $provider = trim($provider);
@@ -291,6 +303,7 @@ final class ShopController extends BaseController
         };
     }
 
+    // Read the Stripe secret key from the environment configuration.
     private function stripeSecretKey(): string
     {
         $key = trim((string) ($_ENV['STRIPE_SECRET_KEY'] ?? ''));
@@ -301,6 +314,7 @@ final class ShopController extends BaseController
         return $key;
     }
 
+    // Build the application base URL used in Stripe success and cancel redirects.
     private function appUrl(): string
     {
         $configuredUrl = trim((string) ($_ENV['APP_URL'] ?? ''));
