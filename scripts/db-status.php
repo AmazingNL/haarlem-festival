@@ -17,8 +17,7 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
 
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?");
-    $stmt->execute([$db]);
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?");    
     $dbExists = (int) $stmt->fetchColumn() > 0;
 
     if (!$dbExists) {
