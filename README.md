@@ -1,8 +1,43 @@
 # Haarlem Festival
 
-## Quick Start
+## Quick Start for Team Members
 
-When you first clone the project:
+### First Time Setup
+
+```bash
+# Clone and navigate
+git clone <repo-url>
+cd Haarlem_Festival
+
+# One-command sync (handles everything)
+./team-sync.sh              # macOS/Linux
+# OR
+.\team-sync.ps1             # Windows PowerShell
+```
+
+That's it! Your database is now fully set up.
+
+### Daily Workflow
+
+After pulling code:
+
+```bash
+./team-sync.sh              # macOS/Linux
+# OR  
+.\team-sync.ps1             # Windows
+```
+
+---
+
+## Documentation
+
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** — Fast answers for common tasks
+- **[TEAM_SYNC.md](TEAM_SYNC.md)** — How to keep your database in sync with the team
+- **[docs/DATABASE_SETUP.md](docs/DATABASE_SETUP.md)** — Complete database guide for new developers
+
+---
+
+## Manual Setup (if sync scripts don't work)
 
 ```bash
 # 1. Start services

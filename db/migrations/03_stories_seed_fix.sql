@@ -47,16 +47,13 @@ VALUES ('Stories', 'stories', 'published');
 
 SET @stories_id = LAST_INSERT_ID();
 
-INSERT INTO page_section (page_id, section_type, title, content, image_id, button_text, button_link, sort_order, is_published)
+INSERT INTO page_section (page_id, section_type, title, content, sort_order, is_published)
 VALUES
 (
   @stories_id,
   'stories_hero',
   'Stories matter',
   '<p>Immerse yourself in captivating tales from the heart of Haarlem. Live performances, legends, and voices that stay with you long after the curtain falls.</p>',
-  @img_hero,
-  'Explore the programme',
-  '#schedule',
   1, 1
 ),
 (
@@ -71,8 +68,6 @@ VALUES
     'Stories offers an unforgettable evening under the Haarlem sky.</p>',
     '<img class="wis-image" src="/assets/images/stories/antonio-molinari-22FwbFrPvpU-unsplash.jpg" alt="Audience at a storytelling event">'
   ),
-  NULL,
-  NULL, NULL,
   2, 1
 ),
 (
@@ -88,8 +83,6 @@ VALUES
       '<img src="/assets/images/stories/MisterAnansiLeendertJansen-1.jpg" alt="Anansi portrait">',
     '</div>'
   ),
-  NULL,
-  NULL, NULL,
   3, 1
 ),
 (
@@ -149,7 +142,5 @@ VALUES
       '</div>',
     '</div>'
   ),
-  NULL,
-  NULL, NULL,
   4, 1
 );

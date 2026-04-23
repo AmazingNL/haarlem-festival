@@ -66,6 +66,22 @@
     }
 
     @media (max-width: 480px) {
+        .sp-section {
+            padding: 48px 16px;
+        }
+
+        .sp-title {
+            font-size: 1.8rem;
+        }
+
+        .sp-inner {
+            gap: 26px;
+        }
+
         .sp-body .sp-mosaic { grid-template-columns: 1fr; }
+        .sp-body .sp-mosaic img:first-child,
+        .sp-body .sp-mosaic img:not(:first-child) {
+            height: 160px;
+        }
     }
 </style>

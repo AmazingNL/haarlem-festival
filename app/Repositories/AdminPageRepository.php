@@ -51,9 +51,9 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
         try {
             $page = $this->hydratePage($pageData);
             $sql = "INSERT INTO " . self::TABLE . "
-                (title, slug, content, created_at, updated_at, status)
+                (title, slug, created_at, updated_at, status)
                 VALUES
-                (:title, :slug, :content, NOW(), NOW(), :status)";
+                (:title, :slug, NOW(), NOW(), :status)";
 
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute($this->pageToDbArray($page));
@@ -76,7 +76,7 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
             $page = $this->hydratePage($pageData);
             $page->page_id = $id;
             $sql = "UPDATE " . self::TABLE . "
-                    SET title = :title, slug = :slug, content = :content, updated_at = NOW(), status = :status
+                    SET title = :title, slug = :slug, updated_at = NOW(), status = :status
                     WHERE " . self::PK . " = :id";
             $stmt = $this->getConnection()->prepare($sql);
             $params = $this->pageToDbArray($page);
@@ -113,7 +113,6 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
         $result = [
             'title' => $page->title,
             'slug' => $page->slug,
-            'content' => $page->content,
             'status' => $statusVal,
         ];
 

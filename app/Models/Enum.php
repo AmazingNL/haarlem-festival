@@ -47,11 +47,10 @@ enum PageStatus: string
 
 enum SectionType: string
 {
-    case CTA = 'cta';
     case TEXT_BLOCK = 'text_block';
-    case IMAGE_TEXT = 'image_text';
-    case RESTAURANTS_CARD = 'restaurants_card';
+    case RESTAURANT_CARD = 'restaurant_card';
     case WELCOME_BANNER = "welcome_banner";
+    case WELCOME_BANNER_CARD = 'welcome_banner_card';
     case GALLERY = "gallery";
     case HAARLEM_UNIQUE = "haarlem_unique";
 }

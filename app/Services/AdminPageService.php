@@ -33,7 +33,7 @@ final class AdminPageService implements IAdminPageService
         return $this->repository->getPageById($id);
     }
 
-    public function preparePageData(string $title, string $slug, string $content, string $status = 'draft'): array
+    public function preparePageData(string $title, string $slug, string $content = '', string $status = 'draft'): array
     {
         return [
             'title' => $title,

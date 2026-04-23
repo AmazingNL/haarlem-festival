@@ -55,4 +55,21 @@
         .stories-breadcrumb__inner { padding: 12px 16px; }
         .crumb, .crumb--current { font-size: 16px; }
     }
+
+    @media (max-width: 420px) {
+        .stories-breadcrumb__inner {
+            gap: 10px;
+            padding: 10px 12px;
+        }
+
+        .crumb,
+        .crumb--current,
+        .crumb-sep {
+            font-size: 14px;
+        }
+
+        .crumb {
+            gap: 6px;
+        }
+    }
 </style>

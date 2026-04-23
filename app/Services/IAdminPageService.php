@@ -8,7 +8,7 @@ interface IAdminPageService
     public function getAllPages(): array;
     public function getPublishedPages(): array;
     public function getPageById(int $id): ?Page;
-    public function preparePageData(string $title, string $slug, string $content, string $status = 'draft'): array;
+    public function preparePageData(string $title, string $slug, string $content = '', string $status = 'draft'): array;
     public function createPage(array $pageData): int;
     public function updatePage(int $id, array $pageData): bool;
     public function deletePage(int $id): bool;

@@ -12,7 +12,7 @@ for ($i = 0; $i < $total; $i++) {
 
     $type = trim((string) ($s['section_type'] ?? ''));
 
-    if ($type === 'restaurants_card') {
+    if ($type === 'restaurant_card') {
         $resCard[] = $s;
         continue;
     }
@@ -32,6 +32,7 @@ for ($i = 0; $i < $total; $i++) {
 
     switch ($type) {
         case 'welcome_banner':
+        case 'welcome_banner_card':
             require __DIR__ . '/welcome_banner.php';
             require __DIR__ . '/breadcrumb.php';
             break;
@@ -57,7 +58,5 @@ for ($i = 0; $i < $total; $i++) {
     }
 }
 
-if (!empty($resCard)) {
-    require __DIR__ . '/restaurants_card.php';
-}
+require __DIR__ . '/restaurants_card.php';
 ?>

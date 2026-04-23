@@ -22,6 +22,19 @@
         border-color: var(--color-accent-pink);
         background-color: transparent;
     }
+
+    @media (max-width: 520px) {
+        .card-back a {
+            padding: 8px 12px 8px 8px;
+            top: 6px;
+            font-size: 14px;
+        }
+
+        .icon-arrow-back {
+            width: 12px;
+            height: 12px;
+        }
+    }
 </style>
 
 

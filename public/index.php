@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 
+use App\Controllers\YummyController;
 use FastRoute\RouteCollector;
 use FastRoute\Dispatcher;
 use function FastRoute\simpleDispatcher;
@@ -89,8 +90,8 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/', [HomeController::class, 'index']);
     $r->get('/home', [HomeController::class, 'index']);
 
-    $r->get('/yummy', [HomeController::class, 'yummy']);
-    $r->get('/yummy/ratatouille', [HomeController::class, 'ratatouille']);
+    $r->get('/yummy', [YummyController::class, 'yummy']);
+    $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
 
     $r->get('/stories', [HomeController::class, 'stories']);
     $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
@@ -144,20 +145,29 @@ switch ($routeInfo[0]) {
 
 function createController(string $controllerClass)
 {
+
+    $pageRepo = new App\Repositories\AdminPageRepository();
+    $pageService = new App\Services\AdminPageService($pageRepo);
+
+    $imageRepo = new App\Repositories\ImageRepository();
+    $imageService = new App\Services\ImageService($imageRepo);
+
+    $sectionRepo = new App\Repositories\PageSectionRepository();
+    $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
+
+
     switch ($controllerClass) {
 
         case App\Controllers\HomeController::class:
 
-            $pageRepo = new App\Repositories\AdminPageRepository();
-            $pageService = new App\Services\AdminPageService($pageRepo);
-
-            $imageRepo = new App\Repositories\ImageRepository();
-            $imageService = new App\Services\ImageService($imageRepo);
-
-            $sectionRepo = new App\Repositories\PageSectionRepository();
-            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
-
             return new App\Controllers\HomeController($sectionService, $pageService);
+
+        case App\Controllers\YummyController::class:
+
+            $resRepo = new App\Repositories\RestaurantRepository();
+            $restaurantService = new App\Services\RestaurantService($resRepo);
+
+            return new App\Controllers\YummyController($restaurantService, $pageService, $sectionService);
 
 
         case App\Controllers\AuthController::class:

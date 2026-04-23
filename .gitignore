@@ -28,3 +28,6 @@ db/02_sample_data.sql
 # Ignore runtime php.ini if generated or copied locally
 docker/php.ini
 
+# Database backups (created by team-sync reset)
+backup-*.sql
+backup.sql

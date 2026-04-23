@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS image (
   image_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   file_path VARCHAR(500) NOT NULL,
   alt_text VARCHAR(255) NULL,
+  caption VARCHAR(255) NULL,
   uploaded_by_user_id BIGINT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -96,11 +97,11 @@ CREATE TABLE IF NOT EXISTS page_section (
   'text_block',
   'image_text',
   'restaurants_card',
-  'welcome_banner'
+  'welcome_banner',
+  'welcome_banner_card'
 ) NOT NULL,
   title VARCHAR(255) NULL,
   content LONGTEXT NULL,
-  image_id BIGINT UNSIGNED NULL,
 
   button_text VARCHAR(100) NULL,
   button_link VARCHAR(255) NULL,
@@ -117,12 +118,7 @@ CREATE TABLE IF NOT EXISTS page_section (
   CONSTRAINT fk_section_page
     FOREIGN KEY (page_id)
     REFERENCES page(page_id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-
-  CONSTRAINT fk_section_image
-    FOREIGN KEY (image_id)
-    REFERENCES image(image_id)
-    ON DELETE SET NULL ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 
 COLLATE=utf8mb4_unicode_ci;
 

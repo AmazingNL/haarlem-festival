@@ -25,25 +25,31 @@
 	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 	gap: 50px;
 	justify-content: center;
-	align-items: center;
+	justify-items: stretch;
+	align-items: stretch;
+	margin-bottom: 30px;
 }
 
 .restaurant-card {
 	background: transparent;
 	width: 100%;
+	height: 100%;
 	overflow: visible;
-	max-width: 380px;
+	max-width: none;
+	display: flex;
+	flex-direction: column;
 }
 
 .card-media {
 	position: relative;
 	overflow: visible;
-	display: block;
+	flex: 0 0 auto;
 }
 
 .card-media img {
 	display: block;
 	width: 100%;
+	aspect-ratio: 4 / 3;
 	object-fit: cover;
 	border-radius: 12px 12px 0 0;
 }
@@ -112,25 +118,30 @@
 	background: #fcddca;
 	padding: 16px;
 	border-radius: 0 0 12px 12px;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
 }
 
 .card-title {
 	margin: 0 0 8px;
 	font-size: 16px;
+	font-weight: 700;
 	color: #231815;
 }
 
-.card-excerpt {
-	margin: 0 0 12px;
+.card-excerpt p{
 	font-size: 13px;
 	color: #2f1f1f;
-	line-height: 1.45;
+	margin-bottom: 5px;
+
 }
 
 .card-tags {
 	display: flex;
 	gap: 8px;
 	flex-wrap: wrap;
+	margin-top: 2px;
 	margin-bottom: 12px;
 }
 
@@ -148,6 +159,7 @@
 	justify-content: space-between;
 	gap: 12px;
 	margin-bottom: 20px;
+	margin-top: 0;
 }
 
 .card-footer .strong {
@@ -165,8 +177,7 @@
 .footer-button a {
 	padding: 0;
 	display: flex;
-	align-items: center;
-	justify-content: center;
+
 }
 
 .btn[disabled] {
@@ -184,12 +195,46 @@
 @media (max-width: 1000px) {
 	.restaurants-grid {
 		grid-template-columns: repeat(2, 1fr);
+		gap: 24px;
 	}
 }
 
-@media (max-width: 640px) {
+@media (max-width: 860px) {
+	.page-container {
+		padding: 0 16px;
+	}
+
 	.restaurants-grid {
 		grid-template-columns: 1fr;
+	}
+
+	.restaurant-card {
+		max-width: none;
+		min-height: 620px;
+	}
+}
+
+@media (max-width: 420px) {
+	.page-container {
+		padding: 0 12px;
+	}
+
+	.restaurants-heading {
+		font-size: 28px;
+		margin-bottom: 12px;
+	}
+
+	.restaurant-card {
+		min-height: auto;
+	}
+
+	.card-body {
+		padding: 12px;
+	}
+
+	.icon-favorite {
+		width: 32px;
+		height: 32px;
 	}
 }
 

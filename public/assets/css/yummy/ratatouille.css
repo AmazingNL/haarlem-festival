@@ -2,14 +2,24 @@
 
 .welcome-card {
 	position: relative;
+	width: 100%;
+	overflow: hidden;
+}
+
+.restaurant-image {
+	display: block;
+	width: 100%;
+	height: clamp(460px, 62vw, 820px);
+	object-fit: cover;
 }
 
 .title {
 	position: absolute;
 	top: 0;
 	left: 60px;
-	font-size: 96px;
-	line-height: 136px;
+	z-index: 2;
+	font-size: clamp(120px, 10vw, 160px);
+	line-height: 0.9;
 	font-family: "Rammetto One";
 	background:
 		linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)),

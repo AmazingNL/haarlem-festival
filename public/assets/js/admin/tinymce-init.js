@@ -27,7 +27,6 @@
 			valid_children: "+svg[path|g|defs|linearGradient|stop]",
 			verify_html: false,
 
-			// Keep these:
 			images_upload_credentials: true,
 			image_title: true,
 			image_caption: true,
@@ -37,10 +36,18 @@
 				const formData = new FormData();
 				formData.append("file", blobInfo.blob(), blobInfo.filename());
 
-				// Optional: take alt from section alt input if you have one
-				const altEl = document.getElementById("image_alt");
+				// Use shared metadata fields when available in admin section forms.
+				const altEl =
+					document.getElementById("image_alt") ||
+					document.querySelector("[data-image-alt]");
 				const altText = altEl ? (altEl.value || "").trim() : "";
 				if (altText) formData.append("alt_text", altText);
+
+				const captionEl =
+					document.getElementById("image_caption") ||
+					document.querySelector("[data-image-caption]");
+				const captionText = captionEl ? (captionEl.value || "").trim() : "";
+				if (captionText) formData.append("caption", captionText);
 
 				const res = await fetch("/admin/media/upload", {
 					method: "POST",
@@ -58,6 +65,7 @@
 				if (!data.location) throw new Error("Upload response missing location");
 
 				if (data.alt_text && altEl) altEl.value = data.alt_text;
+				if (data.caption && captionEl) captionEl.value = data.caption;
 				return data.location;
 			},
 		});

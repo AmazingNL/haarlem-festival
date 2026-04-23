@@ -84,14 +84,16 @@ if (!empty($s['image_path'])) {
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
-        white-space: nowrap;
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
 
     .sh-title--main {
         font-size: 3.8rem;
         font-weight: 900;
         color: #fff;
-        white-space: nowrap;
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
 
     .sh-banner-content {
@@ -132,5 +134,14 @@ if (!empty($s['image_path'])) {
         .sh-banner-inner { padding: 40px 20px; max-width: 100%; }
         .sh-title--accent { font-size: 2.8rem; }
         .sh-title--main  { font-size: 2rem; }
+    }
+
+    @media (max-width: 420px) {
+        .sh-banner { min-height: 320px; }
+        .sh-banner-inner { padding: 28px 14px; gap: 14px; }
+        .sh-title--accent { font-size: 2.1rem; }
+        .sh-title--main { font-size: 1.45rem; }
+        .sh-banner-content { font-size: 0.95rem; line-height: 1.55; }
+        .sh-banner-btn { width: 100%; justify-content: center; padding: 12px 16px; }
     }
 </style>

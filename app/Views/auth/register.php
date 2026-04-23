@@ -8,6 +8,17 @@
     }
     @media (max-width: 520px) {
       .two-col { grid-template-columns: 1fr; }
+
+      .helper-text {
+        font-size: 0.8rem;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .error-msg {
+        padding: 10px 12px;
+        font-size: 0.88rem;
+      }
     }
 
     .error-msg {

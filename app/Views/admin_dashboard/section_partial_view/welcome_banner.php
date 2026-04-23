@@ -36,6 +36,31 @@ $toFieldString = static function (mixed $data): string {
             <input id="field_<?= htmlspecialchars($name) ?>" name="<?= htmlspecialchars($name) ?>" type="file" class="input"
                 accept="image/*" <?= $required ?>>
 
+            <?php
+            $altName = $name . '_alt_text';
+            $captionName = $name . '_caption';
+            $altValue = isset($values[$altName]) ? $toFieldString($values[$altName]) : '';
+            $captionValue = isset($values[$captionName]) ? $toFieldString($values[$captionName]) : '';
+            ?>
+
+            <label for="field_<?= htmlspecialchars($altName) ?>">Image Alt Text</label>
+            <input
+                id="field_<?= htmlspecialchars($altName) ?>"
+                name="<?= htmlspecialchars($altName) ?>"
+                type="text"
+                class="input"
+                value="<?= htmlspecialchars($altValue) ?>"
+                data-image-alt>
+
+            <label for="field_<?= htmlspecialchars($captionName) ?>">Image Caption</label>
+            <input
+                id="field_<?= htmlspecialchars($captionName) ?>"
+                name="<?= htmlspecialchars($captionName) ?>"
+                type="text"
+                class="input"
+                value="<?= htmlspecialchars($captionValue) ?>"
+                data-image-caption>
+
             <?php if ($value !== ''): ?>
                 <p class="field-note">Current image: <a href="<?= htmlspecialchars($value) ?>" target="_blank" rel="noopener">view</a></p>
             <?php endif; ?>

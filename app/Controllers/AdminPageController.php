@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
+use App\DTO\SectionInput;
 use App\Models\Page;
 use App\Models\User;
 use App\Models\Enum\SectionType;
@@ -81,7 +82,7 @@ final class AdminPageController extends BaseController
         $pageData = [];
         try {
             $this->verifyCsrf();
-            $this->requireFields(['title', 'slug', 'content']);
+            $this->requireFields(['title', 'slug']);
 
             $pageData = $this->adminPageService->preparePageData(
                 $this->str('title'),
@@ -141,7 +142,7 @@ final class AdminPageController extends BaseController
         $pageData = [];
         try {
             $this->verifyCsrf();
-            $this->requireFields(['title', 'content', 'slug']);
+            $this->requireFields(['title', 'slug']);
 
             $pageData = $this->adminPageService->preparePageData(
                 $this->str('title'),
@@ -223,7 +224,11 @@ final class AdminPageController extends BaseController
         }
         try {
             $this->verifyCsrf();
-            $section = $this->pageSectionService->buildSectionFromInput($pageId, $_POST, $_FILES);
+            $sectionType = $this->str('section_type');
+            $sectionField = $this->pageSectionService->resolveSectionFormFields($sectionType);
+            $sectionInput = $this->mapSectionInput($pageId, $sectionField);
+
+            $section = $this->pageSectionService->buildSectionFromDto($sectionInput);
             $this->pageSectionService->createSection($section);
 
             $this->setFlash('success', 'Section created successful');
@@ -283,7 +288,6 @@ final class AdminPageController extends BaseController
                 $this->redirect('/admin/pageSection/' . $section_id . '/editSectionForm');
                 return;
             }
-            $sectionData = json_decode((string) $pageSection->content, true);
             $sectionTypeValue = $pageSection->section_type instanceof SectionType
                 ? $pageSection->section_type->value : (string) $pageSection->section_type;
             if ($sectionTypeValue === '') {
@@ -293,7 +297,7 @@ final class AdminPageController extends BaseController
             }
             $sectionClass = SectionFactory::returnSectionClass($sectionTypeValue);
             if ($sectionClass === null) {
-                $this->setFlash('error', 'No Section type not supported');
+                $this->setFlash('error', ' Section type not supported');
                 $this->redirect('/admin/dashboard');
                 return;
             }
@@ -316,7 +320,13 @@ final class AdminPageController extends BaseController
         $sectionId = (int) $sectionId;
         try {
             $this->verifyCsrf();
-            $pageSection = $this->pageSectionService->buildSectionFromInput($sectionId, $_POST, $_FILES);
+            $existingSection = $this->pageSectionService->getSectionById($sectionId);
+            $pageId = (int) $existingSection->page_id;
+            $sectionType = $this->str('section_type');
+            $sectionField = $this->pageSectionService->resolveSectionFormFields($sectionType);
+            $sectionInput = $this->mapSectionInput($pageId, $sectionField);
+
+            $pageSection = $this->pageSectionService->buildSectionFromDto($sectionInput);
             $updated = $this->pageSectionService->updateSection($pageSection);
             if ($updated === false) {
                 $this->setFlash('error', 'Section not saving');
@@ -332,10 +342,10 @@ final class AdminPageController extends BaseController
     }
 
     /**
-     * *
+     * 
      * @param PageSection $section
      * 
-     */
+     **/
     private function sectionFormData(PageSection $section, string $sectionType, array $sectionField): array
     {
         $sectionData = json_decode((string) $section->content, true);
@@ -351,6 +361,57 @@ final class AdminPageController extends BaseController
             'sectionData' => $sectionData,
             'sectionField' => $sectionField,
         ];
+    }
+
+    /**
+     * Map section form input through BaseController helpers so services don't read raw $_POST.
+     */
+    private function mapSectionInput(int $pageId, array $sectionField): SectionInput
+    {
+        $fields = [];
+
+        foreach ($sectionField as $fieldName => $config) {
+            $fieldType = (string) ($config['type'] ?? 'text');
+
+            if ($fieldType === 'image') {
+                $fields[$fieldName] = $this->str($fieldName);
+                $fields[$fieldName . '_alt_text'] = $this->str($fieldName . '_alt_text');
+                $fields[$fieldName . '_caption'] = $this->str($fieldName . '_caption');
+                continue;
+            }
+
+            $value = $this->input($fieldName, '');
+            if (is_array($value)) {
+                $fields[$fieldName] = implode("\n", array_map(static fn ($item): string => trim((string) $item), $value));
+                continue;
+            }
+
+            $fields[$fieldName] = trim((string) $value);
+        }
+
+        $files = [];
+
+        foreach ($sectionField as $fieldName => $config) {
+            $fieldType = (string) ($config['type'] ?? 'text');
+            if ($fieldType !== 'image') {
+                continue;
+            }
+
+            $file = $_FILES[$fieldName] ?? null;
+            if (is_array($file)) {
+                $files[$fieldName] = $file;
+            }
+        }
+
+        return new SectionInput(
+            $pageId,
+            $this->int('section_id'),
+            $this->str('section_type'),
+            $this->int('sort_order'),
+            $this->int('is_published') === 1,
+            $fields,
+            $files
+        );
     }
     //------- Delete Section --------------//
 
@@ -384,6 +445,7 @@ final class AdminPageController extends BaseController
             $publicUrl = $this->imageService->storeUploadedImage($_FILES['file']);
 
             $altText = $this->str('alt_text', '');
+            $caption = $this->str('caption', '');
             $userId = $_SESSION['user_id'];
             if ($userId === 0) {
                 $this->json(['error' => 'Unauthorized'], 401);
@@ -396,7 +458,8 @@ final class AdminPageController extends BaseController
                 file_path: $publicUrl,
                 alt_text: $altText !== '' ? $altText : null,
                 uploaded_by_user_id: $userId,
-                created_at: null
+                created_at: null,
+                caption: $caption !== '' ? $caption : null,
             );
 
             $imageId = $this->imageService->saveImage($image);
@@ -405,6 +468,7 @@ final class AdminPageController extends BaseController
                 'location' => $publicUrl,
                 'image_id' => $imageId,
                 'alt_text' => $altText !== '' ? $altText : null,
+                'caption' => $caption !== '' ? $caption : null,
             ]);
         } catch (\Exception $e) {
             $this->json(['error' => $e->getMessage()], (int) $e->getCode() ?: 400);

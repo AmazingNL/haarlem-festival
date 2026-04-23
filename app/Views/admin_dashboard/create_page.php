@@ -27,12 +27,6 @@
                     <option value="archived">Archived</option>
                 </select>
             </div>
-
-            <div class="field field-full">
-                <label for="page_content">Content</label>
-                <textarea enctype="multipart/form-data" id="page_content" name="content" class="js-wysiwyg" rows="10"
-                    placeholder="Write the main page content..."></textarea>
-            </div>
         </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Create Page</button>

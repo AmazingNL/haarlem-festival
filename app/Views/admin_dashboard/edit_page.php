@@ -3,7 +3,6 @@ $pageId = (int) ($page->page_id ?? 0);
 
 $valTitle = (string) ($page->title ?? '');
 $valSlug = (string) ($page->slug ?? '');
-$valBody = (string) ($page->content ?? '');
 
 $valStatus = is_object($page->status) && property_exists($page->status, 'value')
     ? (string) $page->status->value
@@ -40,12 +39,6 @@ $valStatus = is_object($page->status) && property_exists($page->status, 'value')
                     <input id="slug" class="input" name="slug" type="text" required
                         value="<?= htmlspecialchars($valSlug, ENT_QUOTES, 'UTF-8') ?>">
                     <small class="hint">Example: jazz-night or history-of-haarlem</small>
-                </div>
-
-                <div class="field field-full">
-                    <label for="content">Content</label>
-                    <textarea enctype="multipart/form-data" id="content" class="textarea tinymce js-wysiwyg" name="content"
-                        rows="12"><?= htmlspecialchars($valBody, ENT_QUOTES, 'UTF-8') ?></textarea>
                 </div>
 
                 <div class="field">

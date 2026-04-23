@@ -178,4 +178,34 @@
 
 @media (max-width: 900px) {
     .left-panel { display: none; }
+
+    .right-panel {
+        padding: 28px 20px;
+    }
+
+    .form-container {
+        max-width: 520px;
+    }
+}
+
+@media (max-width: 520px) {
+    .right-panel {
+        padding: 18px 12px;
+    }
+
+    .form-container h2 {
+        font-size: 1.7rem;
+    }
+
+    .subtitle {
+        margin-bottom: 1.5rem;
+    }
+
+    .input-wrapper input {
+        padding: 12px 12px 12px 40px;
+    }
+
+    .btn-signin {
+        padding: 14px;
+    }
 }
