@@ -3,6 +3,21 @@ $resCard = [];
 $sectionData = isset($section) && is_array($section) ? $section : [];
 $sections = array_values($sectionData);
 $total = count($sections);
+$showFallbackHero = !empty($showFallbackHero);
+
+if ($showFallbackHero) {
+    ?>
+    <section class="shop-page">
+        <div class="shop-container">
+            <header class="shop-hero shop-hero--small">
+                <p class="shop-eyebrow">Restaurants</p>
+                <h1>Food and drink in Haarlem</h1>
+                <p>The full restaurants page is still being prepared.</p>
+            </header>
+        </div>
+    </section>
+    <?php
+}
 
 for ($i = 0; $i < $total; $i++) {
     $s = $sections[$i];
@@ -58,5 +73,7 @@ for ($i = 0; $i < $total; $i++) {
     }
 }
 
-require __DIR__ . '/restaurants_card.php';
+if (!empty($resCard)) {
+    require __DIR__ . '/restaurants_card.php';
+}
 ?>

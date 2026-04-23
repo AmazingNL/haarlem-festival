@@ -9,8 +9,14 @@ abstract class BaseController
     protected function view(string $template, array $data = [], ?string $layout = 'main', int $status = 200): void
     {
         $data['csrf'] ??= $this->csrfToken();
-        // inject any flash messages stored in session 
+        // Read one-time session messages and also expose simple view variables.
         $data['flash'] = $data['flash'] ?? $this->getAllFlash();
+        $data['errorMessage'] ??= is_string($data['flash']['error'] ?? null)
+            ? (string) $data['flash']['error']
+            : '';
+        $data['successMessage'] ??= is_string($data['flash']['success'] ?? null)
+            ? (string) $data['flash']['success']
+            : '';
         extract($data, EXTR_SKIP);
 
             $content = __DIR__ . '/../Views/' . $template. '.php';
@@ -63,6 +69,23 @@ abstract class BaseController
         return $_POST[$key] ?? $_GET[$key] ?? $default;
     }
 
+    protected function currentUserId(): ?int
+    {
+        $this->ensureSession();
+        return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
+    }
+
+    protected function currentUserRole(): ?string
+    {
+        $this->ensureSession();
+        return isset($_SESSION['user_role']) ? (string) $_SESSION['user_role'] : null;
+    }
+
+    protected function isLoggedIn(): bool
+    {
+        return $this->currentUserId() !== null;
+    }
+
     protected function requireFields(array $keys): void
     {
         foreach ($keys as $k) {
@@ -83,6 +106,70 @@ abstract class BaseController
     {
         $v = $this->input($key, null);
         return ($v === null) ? $default : trim((string) $v);
+    }
+
+    protected function rememberProgramReturnUrl(string $url): void
+    {
+        $this->ensureSession();
+
+        $cleanUrl = $this->cleanInternalUrl($url);
+        if ($cleanUrl === '') {
+            return;
+        }
+
+        $pathOnly = (string) (parse_url($cleanUrl, PHP_URL_PATH) ?? '');
+        $blockedPaths = ['/program', '/checkout', '/orders', '/loginForm', '/registerForm', '/logout'];
+
+        foreach ($blockedPaths as $blockedPath) {
+            if (str_starts_with($pathOnly, $blockedPath)) {
+                return;
+            }
+        }
+
+        $_SESSION['program_return_url'] = $cleanUrl;
+    }
+
+    protected function getProgramReturnUrl(string $default = '/home'): string
+    {
+        $this->ensureSession();
+
+        $savedUrl = $this->cleanInternalUrl((string) ($_SESSION['program_return_url'] ?? ''));
+        if ($savedUrl !== '') {
+            return $savedUrl;
+        }
+
+        $defaultUrl = $this->cleanInternalUrl($default);
+        return $defaultUrl !== '' ? $defaultUrl : '/home';
+    }
+
+    protected function currentUrl(): string
+    {
+        return $this->cleanInternalUrl((string) ($_SERVER['REQUEST_URI'] ?? ''));
+    }
+
+    protected function cleanInternalUrl(string $url): string
+    {
+        $url = trim($url);
+        if ($url === '' || !str_starts_with($url, '/')) {
+            return '';
+        }
+
+        $parts = parse_url($url);
+        if ($parts === false) {
+            return '';
+        }
+
+        $path = (string) ($parts['path'] ?? '');
+        if ($path === '' || !str_starts_with($path, '/')) {
+            return '';
+        }
+
+        $cleanUrl = $path;
+        if (!empty($parts['query'])) {
+            $cleanUrl .= '?' . $parts['query'];
+        }
+
+        return $cleanUrl;
     }
 
     // ---------- Auth helpers ----------
@@ -142,6 +229,18 @@ abstract class BaseController
     {
         $this->ensureSession();
         $_SESSION['_flash'][$key] = $value;
+    }
+
+    protected function setErrorMessage(string $message): void
+    {
+        // Save one error message in the session so it can be shown after redirect.
+        $this->setFlash('error', $message);
+    }
+
+    protected function setSuccessMessage(string $message): void
+    {
+        // Save one success message in the session so it can be shown after redirect.
+        $this->setFlash('success', $message);
     }
 
     protected function getFlash(string $key): mixed

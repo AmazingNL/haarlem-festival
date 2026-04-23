@@ -4,54 +4,65 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\IUserService;
-use App\Models\User;
 use App\Models\Enum\UserRole;
-use Exception;
+use App\Models\User;
+use App\Services\IUserService;
 
 final class AuthController extends BaseController
 {
     private IUserService $userService;
+
+    // Inject the user service for registration and login logic.
     public function __construct(IUserService $userService)
     {
         $this->userService = $userService;
     }
 
-    //registration part from here
+    // Show the registration page and keep any redirect target for after signup.
     public function showRegisterForm(): void
     {
-        $this->verifyCsrf();
         $this->ensureSession();
-        $this->view(
-            'auth/register',
-            $data = ['title' => 'Registration'],
-            $layout = 'auth'
-        );
+
+        $next = $this->getAuthRedirect();
+        if ($next !== '') {
+            $_SESSION['auth_redirect'] = $next;
+        }
+
+        $this->view('auth/register', [
+            'title' => 'Registration',
+            'next' => $next,
+        ], 'auth');
     }
 
+    // Validate the registration form, create the user, then log them in immediately.
     public function register(): void
     {
-        $this->verifyCsrf();
+        try {
+            $this->verifyCsrf();
+            $this->requireFields(['first_name', 'last_name', 'username', 'email', 'password']);
 
-        $this->requireFields(['first_name', 'last_name', 'username', 'email', 'password']);
+            $email = $this->str('email');
+            $password = $this->str('password');
+            $this->validateRegistrationInput($email, $password);
 
-        $email = $this->str('email');
-        $password = $this->str('password');
-        $this->validateRegistrationInput($email, $password);
+            $firstName = $this->str('first_name');
+            $lastName = $this->str('last_name');
+            $username = $this->str('username');
+            $phone = $this->readPhoneNumber();
+            $next = trim((string) $this->input('next', ''));
 
-        $first_name = $this->str('first_name');
-        $last_name = $this->str('last_name');
-        $username = $this->str('username');
-        $phone = isset($_POST['phone']) ? trim((string) $_POST['phone']) : null;
-        $role = UserRole::customer;
+            $user = new User($username, $email, $password, $firstName, $lastName, $phone, UserRole::customer);
 
-        $user = new User($username, $email, $password, $first_name, $last_name, $phone, $role);
-
-        $this->ensureRegistrationIsUnique($user);
-        $this->userService->registerUser($user, $password);
-        $this->loginAndRedirect($user);
+            $this->ensureUserIsUnique($user);
+            $this->userService->registerUser($user, $password);
+            $this->startUserSession($user, $next);
+        } catch (\Throwable $e) {
+            $this->setErrorMessage('Could not create your account right now.');
+            $this->redirect('/registerForm');
+        }
     }
 
+    // Check the basic registration rules before creating the account.
     private function validateRegistrationInput(string $email, string $password): void
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -63,72 +74,78 @@ final class AuthController extends BaseController
         }
     }
 
-    private function ensureRegistrationIsUnique(User $user): void
+    // Stop duplicate accounts by checking both email and username first.
+    private function ensureUserIsUnique(User $user): void
     {
         if ($this->userService->userExists($user->email, $user->username)) {
             $this->abort(409, 'Email or username already exists');
         }
     }
 
-    //login part from here
-    public function showLogin(): void
+    // Show the login page and detect whether it is the admin or normal login route.
+    public function showLoginForm(): void
     {
         $this->ensureSession();
 
         $isAdminLogin = str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin');
-
-        $flash = $_SESSION['flash'] ?? [];
-        unset($_SESSION['flash']);
+        $next = $this->getAuthRedirect();
+        if ($next !== '') {
+            $_SESSION['auth_redirect'] = $next;
+        }
 
         $this->view('auth/login', [
             'title' => 'Login',
-            'flash' => $flash,
             'isAdminLogin' => $isAdminLogin,
-        ], layout: 'auth');
+            'next' => $next,
+        ], 'auth');
     }
 
-
+    // Process the submitted login form and start a session if the credentials are correct.
     public function login(): void
     {
+        $loginForm = str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin')
+            ? '/admin/loginForm'
+            : '/loginForm';
+
         try {
             $this->ensureSession();
             $this->verifyCsrf();
+            $this->requireFields(['login', 'password']);
 
-            $this->requireFields(['email_or_Username', 'password']);
-
-            $emailOrUsername = trim($this->str('email_or_Username'));
+            $login = trim($this->str('login'));
             $password = $this->str('password');
+            $next = trim((string) $this->input('next', ''));
 
-            $user = $this->userService->authenticate($emailOrUsername, $password);
-            $loginForm = str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin')
-                ? '/admin/loginForm'
-                : '/loginForm';
+            $user = $this->userService->authenticate($login, $password);
             if ($user === null) {
-                $_SESSION['flash']['error'] = 'Invalid email/username or password.';
+                $this->setErrorMessage('Invalid email/username or password.');
                 $this->redirect($loginForm);
                 return;
             }
-            $this->loginAndRedirect($user);
-        } catch (Exception $e) {
-            $this->setFlash('error', 'Something went wrong');
-            $this->redirect('/loginForm');
-        }
 
+            $this->startUserSession($user, $next);
+        } catch (\Throwable $e) {
+            $this->setErrorMessage('Something went wrong.');
+            $this->redirect($loginForm);
+        }
     }
 
-
+    // Clear the current session and return the user to the correct login page.
     public function logout(): void
     {
-        // Destroys whichever session is currently active (HF_APP or HF_ADMIN)
+        $this->ensureSession();
+        $wasAdmin = !empty($_SESSION['admin']);
+
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_unset();
             session_destroy();
         }
 
-        $this->redirect('/login');
+        $this->redirect($wasAdmin ? '/admin/loginForm' : '/loginForm');
     }
 
-    private function loginAndRedirect(User $user): void
+    // Store the logged-in user in the session and send them to the right next page.
+    private function startUserSession(User $user, string $requestedRedirect = ''): void
     {
         $this->ensureSession();
         session_regenerate_id(true);
@@ -138,36 +155,73 @@ final class AuthController extends BaseController
             : strtolower((string) $user->role);
 
         $_SESSION['user_id'] = $user->user_id;
+        $_SESSION['user_role'] = $roleValue;
         $_SESSION['role'] = $roleValue;
-        $_SESSION['admin'] = ($roleValue === UserRole::admin->value);
+        $_SESSION['user_first_name'] = $user->first_name;
+        $_SESSION['user_last_name'] = $user->last_name;
+        $_SESSION['user_name'] = trim($user->first_name . ' ' . $user->last_name);
+        $_SESSION['user_email'] = $user->email;
+        $_SESSION['user_phone'] = $user->phone;
 
-        if ($_SESSION['admin']) {
+        $isAdmin = ($roleValue === UserRole::admin->value);
+        if ($isAdmin) {
+            $_SESSION['admin'] = true;
+            unset($_SESSION['auth_redirect']);
             $this->redirect('/admin/dashboard');
-        } else {
-            switch ($roleValue) {
-                case UserRole::customer->value:
-                    $this->redirect('/');
-                    break;
-                case UserRole::employee->value:
-                    $this->redirect('/employee/dashboard');
-                    break;
-                default:
-                    $this->redirect('/');
-            }
+            return;
+        }
+
+        unset($_SESSION['admin']);
+
+        $redirectTarget = $this->cleanRedirectPath(
+            $requestedRedirect !== '' ? $requestedRedirect : $this->getAuthRedirect()
+        );
+
+        if ($redirectTarget !== '') {
+            unset($_SESSION['auth_redirect']);
+            $this->redirect($redirectTarget);
+            return;
+        }
+
+        switch ($roleValue) {
+            case UserRole::employee->value:
+                $this->redirect('/employee/dashboard');
+                break;
+            case UserRole::customer->value:
+            default:
+                $this->redirect('/');
+                break;
         }
     }
 
-
-    private function switchSession(string $sessionName): void
+    // Read the requested redirect target from the form or session.
+    private function getAuthRedirect(): string
     {
-        // Close any session that might already be open
         $this->ensureSession();
-        session_write_close();
 
-        session_name($sessionName);
-        session_start();
+        $requested = trim((string) $this->input('next', ''));
+        if ($requested !== '') {
+            return $this->cleanRedirectPath($requested);
+        }
 
-        // Prevent session fixation after login
-        session_regenerate_id(true);
+        return $this->cleanRedirectPath((string) ($_SESSION['auth_redirect'] ?? ''));
+    }
+
+    // Only allow safe internal redirect paths and block admin URLs for normal auth redirects.
+    private function cleanRedirectPath(string $path): string
+    {
+        $path = trim($path);
+        if ($path === '' || !str_starts_with($path, '/')) {
+            return '';
+        }
+
+        return str_starts_with($path, '/admin') ? '' : $path;
+    }
+
+    // Read the optional phone number and convert an empty input to null.
+    private function readPhoneNumber(): ?string
+    {
+        $phone = trim((string) ($_POST['phone'] ?? ''));
+        return $phone === '' ? null : $phone;
     }
 }

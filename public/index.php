@@ -9,7 +9,11 @@ use function FastRoute\simpleDispatcher;
 
 use App\Controllers\AuthController;
 use App\Controllers\AdminPageController;
+use App\Controllers\EventController;
 use App\Controllers\HomeController;
+use App\Controllers\HistoryController;
+use App\Controllers\ProgramController;
+use App\Controllers\ShopController;
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
@@ -35,7 +39,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/admin/register', [AuthController::class, 'showRegisterForm']);
     $r->post('/admin/register', [AuthController::class, 'register']);
 
-    $r->get('/admin/loginForm', [AuthController::class, 'showLogin']);
+    $r->get('/admin/loginForm', [AuthController::class, 'showLoginForm']);
     $r->post('/admin/login', [AuthController::class, 'login']);
 
     $r->get('/admin/logout', [AuthController::class, 'logout']);
@@ -81,7 +85,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/registerForm', [AuthController::class, 'showRegisterForm']);
     $r->post('/register', [AuthController::class, 'register']);
 
-    $r->get('/loginForm', [AuthController::class, 'showLogin']);
+    $r->get('/loginForm', [AuthController::class, 'showLoginForm']);
     $r->post('/login', [AuthController::class, 'login']);
 
     $r->get('/logout', [AuthController::class, 'logout']);
@@ -89,12 +93,26 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/', [HomeController::class, 'index']);
     $r->get('/home', [HomeController::class, 'index']);
-
-    $r->get('/yummy', [YummyController::class, 'yummy']);
-    $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
+    $r->get('/events', [EventController::class, 'index']);
+    $r->post('/events/add-to-program', [EventController::class, 'addToProgram']);
+    $r->get('/checkout', [ShopController::class, 'checkout']);
+    $r->post('/checkout/pay', [ShopController::class, 'pay']);
+    $r->get('/checkout/success', [ShopController::class, 'checkoutSuccess']);
+    $r->get('/checkout/cancel', [ShopController::class, 'checkoutCancel']);
+    $r->get('/orders/{orderId:\d+}/success', [ShopController::class, 'success']);
+    $r->get('/yummy', [HomeController::class, 'yummy']);
+    $r->get('/yummy/ratatouille', [HomeController::class, 'ratatouille']);
 
     $r->get('/stories', [HomeController::class, 'stories']);
     $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
+    $r->get('/history', [HistoryController::class, 'index']);
+    $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
+    $r->post('/history/book-tour/add-to-program', [HistoryController::class, 'addTourToProgram']);
+    $r->get('/history/route-map', [HistoryController::class, 'routeMap']);
+    $r->get('/history/st-bavos-church', [HistoryController::class, 'stBavosChurch']);
+    $r->get('/history/molen-de-adriaan', [HistoryController::class, 'molenDeAdriaan']);
+    $r->get('/program', [ProgramController::class, 'index']);
+    $r->post('/program/remove', [ProgramController::class, 'removeItem']);
 });
 
 
@@ -137,8 +155,18 @@ switch ($routeInfo[0]) {
         }
 
         $controller = createController($controllerClass);
-        // FastRoute provides associative params; pass positionally to avoid PHP named-arg binding.
-        call_user_func_array([$controller, $method], array_values($vars));
+        $routeArguments = array_map(
+            static function ($value) {
+                if (is_string($value) && ctype_digit($value)) {
+                    return (int) $value;
+                }
+
+                return $value;
+            },
+            array_values($vars)
+        );
+
+        call_user_func_array([$controller, $method], $routeArguments);
 
         break;
 }
@@ -170,12 +198,50 @@ function createController(string $controllerClass)
             return new App\Controllers\YummyController($restaurantService, $pageService, $sectionService);
 
 
+        case App\Controllers\HistoryController::class:
+
+            $pageRepo = new App\Repositories\AdminPageRepository();
+            $pageService = new App\Services\AdminPageService($pageRepo);
+
+            $imageRepo = new App\Repositories\ImageRepository();
+            $imageService = new App\Services\ImageService($imageRepo);
+
+            $sectionRepo = new App\Repositories\PageSectionRepository();
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
+            $programService = new App\Services\ProgramService();
+
+            return new App\Controllers\HistoryController($sectionService, $pageService, $programService);
+
+
         case App\Controllers\AuthController::class:
 
             $repo = new App\Repositories\UserRepository();
             $service = new App\Services\UserService($repo);
 
             return new App\Controllers\AuthController($service);
+
+
+        case App\Controllers\ShopController::class:
+
+            $programService = new App\Services\ProgramService();
+
+            return new App\Controllers\ShopController($programService);
+
+
+        case App\Controllers\EventController::class:
+
+            $eventCatalogRepository = new App\Repositories\EventCatalogRepository();
+            $eventCatalogService = new App\Services\EventCatalogService($eventCatalogRepository);
+            $programService = new App\Services\ProgramService();
+
+            return new App\Controllers\EventController($eventCatalogService, $programService);
+
+
+        case App\Controllers\ProgramController::class:
+
+            $programService = new App\Services\ProgramService();
+
+            return new App\Controllers\ProgramController($programService);
 
 
         case App\Controllers\AdminPageController::class:

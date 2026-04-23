@@ -11,7 +11,7 @@ interface IImageService
     public function saveImage(Image $image): int;
     public function getImageById($image_id): Image;
     public function getAllImage(): array;
-    public function storeUploadedImage(array $file): string;
+    public function storeUploadedImage(array $file, array $options = []): string;
     public function validateUpload(array $file): array;
     public function extractUrls(string $html): array;
 

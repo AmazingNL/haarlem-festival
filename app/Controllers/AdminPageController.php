@@ -57,7 +57,7 @@ final class AdminPageController extends BaseController
         );
     }
 
-    public function viewPages()
+    public function viewPages(): void
     {
         $pages = $this->adminPageService->getAllPages();
         $this->view(

@@ -33,6 +33,7 @@ $toFieldString = static function (mixed $data): string {
                 class="input <?= htmlspecialchars($config['class'] ?? '') ?>" <?= $required ?>><?= htmlspecialchars($value) ?></textarea>
 
         <?php elseif ($type === 'image'): ?>
+            <input type="hidden" name="<?= htmlspecialchars($name) ?>_current" value="<?= htmlspecialchars($value) ?>">
             <input id="field_<?= htmlspecialchars($name) ?>" name="<?= htmlspecialchars($name) ?>" type="file" class="input"
                 accept="image/*" <?= $required ?>>
 

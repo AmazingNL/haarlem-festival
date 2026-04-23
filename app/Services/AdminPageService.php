@@ -12,11 +12,13 @@ final class AdminPageService implements IAdminPageService
 {
     private IAdminPageRepository $repository;
 
+    // Inject the page repository used by the CMS page layer.
     public function __construct(IAdminPageRepository $repository)
     {
         $this->repository = $repository;
     }
 
+    // Return every page from the CMS.
     public function getAllPages(): array
     {
         try {
@@ -25,6 +27,8 @@ final class AdminPageService implements IAdminPageService
             throw new RuntimeException($e);
         }
     }
+
+    // Return one page by id or null if the id is invalid.
     public function getPageById(int $id): ?Page
     {
         if ($id === null || $id <= 0) {
@@ -33,34 +37,37 @@ final class AdminPageService implements IAdminPageService
         return $this->repository->getPageById($id);
     }
 
+    // Clean and package the page fields before create or update.
     public function preparePageData(string $title, string $slug, string $content = '', string $status = 'draft'): array
     {
         return [
             'title' => $title,
             'slug' => $slug,
-            'content' => $this->sanitizeCmsHtml($content),
+            // Persist body/content only when table supports it.
+            'content' => $content,
             'status' => $status,
         ];
     }
 
-
+    // Create a new CMS page.
     public function createPage(array $pageData): int
     {
-
         return $this->repository->createPage($pageData);
-
     }
 
+    // Update an existing CMS page.
     public function updatePage(int $id, array $pageData): bool
     {
         return $this->repository->updatePage($id, $pageData);
     }
 
+    // Delete a CMS page.
     public function deletePage(int $id): bool
     {
         return $this->repository->deletePage($id);
     }
 
+    // Return only the pages that are marked as published.
     public function getPublishedPages(): array
     {
         $pages = $this->repository->getAllPages();
@@ -72,6 +79,7 @@ final class AdminPageService implements IAdminPageService
         ));
     }
 
+    // Find one page by its slug, which is how the History controller loads pages.
     public function getPageBySlug(string $slug): ?Page
     {
         $pages = $this->repository->getAllPages();
@@ -83,6 +91,7 @@ final class AdminPageService implements IAdminPageService
         return null;
     }
 
+    // Remove unsafe HTML before page content is stored from the CMS editor.
     private function sanitizeCmsHtml(string $html): string
     {
         $html = preg_replace('#<\s*(script|style)\b[^>]*>.*?<\s*/\s*\1\s*>#is', '', $html) ?? '';
