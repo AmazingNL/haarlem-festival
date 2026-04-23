@@ -28,7 +28,7 @@ $groupedCards = array_chunk($cards, (int) ceil(max(1, count($cards)) / 2));
     <?php if ($img !== ''): ?>
         <img src="<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?>" class="restaurant-image">
     <?php endif; ?>
-
+<section class="absolute top-0 left-0 w-full">
     <header class="title">
         <h2><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h2>
     </header>
@@ -54,6 +54,8 @@ $groupedCards = array_chunk($cards, (int) ceil(max(1, count($cards)) / 2));
             <?php endforeach; ?>
         </section>
     <?php endif; ?>
+</section>
+
 
     <?php if ($buttonText !== '' && $buttonLink !== ''): ?>
         <footer class="ft">

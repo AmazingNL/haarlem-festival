@@ -21,6 +21,12 @@
 
         // Accept cuisine as array, comma-separated text, or newline-separated text.
         $normalizeCuisines = static function (mixed $value): array {
+            if (is_array($value)) {
+                return array_values(array_filter(array_map(
+                    static fn (mixed $item): string => trim((string) $item),
+                    $value
+                )));
+            }
 
             $text = trim((string) $value);
             if ($text === '') {

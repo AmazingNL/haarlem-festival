@@ -15,10 +15,10 @@
 
 .title {
 	position: absolute;
-	top: 0;
+	top: -70px;
 	left: 60px;
 	z-index: 2;
-	font-size: clamp(120px, 10vw, 160px);
+	font-size: clamp(200px, 10vw, 160px);
 	line-height: 0.9;
 	font-family: "Rammetto One";
 	background:

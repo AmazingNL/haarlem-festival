@@ -106,7 +106,7 @@ final class HomeController extends BaseController
                 return;
             }
 
-            $this->view('/ratatouille/index', [
+            $this->view('yummy/ratatouille/index', [
                 'section' => $ratatouilleSections,
                 'page' => $page,
                 'title' => 'Ratatouille',

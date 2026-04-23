@@ -6,6 +6,7 @@
     <meta name="viewport" content="initial-scale=1, width=device-width">
     <title><?= htmlspecialchars((string) ($title ?? 'Haarlem Festival'), ENT_QUOTES, 'UTF-8') ?></title>
     <meta name="description" content="Haarlem Festival - events, programs and city guides">
+    <link rel="stylesheet" href="/assets/css/output.css" />
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/home.css" />
     <link rel="stylesheet" href="/assets/css/shop.css" />
