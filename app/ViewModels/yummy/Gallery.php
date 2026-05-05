@@ -24,11 +24,7 @@ final class Gallery extends BaseSection
         $customClass,
         $sortOrder
     );
-        $this->page_id = $pageId;
-        $this->section_id = $sectionId;
-        $this->type = 'gallery';
-        $this->customClass = $customClass;
-        $this->sortOrder = $sortOrder;
+
         $this->title = $title;
         $this->images = $images;
 

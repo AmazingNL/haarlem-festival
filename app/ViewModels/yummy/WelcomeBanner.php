@@ -23,11 +23,7 @@ final class WelcomeBanner extends BaseSection
         string $buttonLink = '',
         ?string $backgroundImg = null
     ) {
-        $this->page_id = $pageId;
-        $this->section_id = $sectionId;
-        $this->type = 'welcome_banner';
-        $this->sortOrder = $sortOrder;
-        $this->customClass = $customClass;
+        parent::__construct($pageId, $sectionId, 'welcome_banner', $customClass, $sortOrder);
 
         $this->title = $title;
         $this->introduction = $introduction;

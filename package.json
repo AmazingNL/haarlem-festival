@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build:css": "tailwindcss -i ./Public/assets/css/input.css -o ./Public/assets/css/output.css",
+    "watch:css": "tailwindcss -i ./Public/assets/css/input.css -o ./Public/assets/css/output.css --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

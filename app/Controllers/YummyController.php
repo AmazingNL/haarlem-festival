@@ -6,8 +6,10 @@ use App\Core\BaseController;
 use App\Services\IAdminPageService;
 use App\Services\IPageSectionService;
 use App\Services\IRestaurantService;
+use App\Services\IUserService;
+use App\Services\ProgramService;
+use App\Services\ReservationEmailService;
 use App\Models\Restaurant;
-use App\ViewModels\yummy\BookReservation;
 
 final class YummyController extends BaseController
 {
@@ -15,17 +17,26 @@ final class YummyController extends BaseController
     private IRestaurantService $restaurantService;
     private IAdminPageService $adminPageService;
     private IPageSectionService $pageSectionService;
+    private ProgramService $programService;
+    private ReservationEmailService $reservationEmailService;
+    private IUserService $userService;
 
     public function __construct(
         IRestaurantService $restaurantService,
         IAdminPageService $adminPageService,
-        IPageSectionService $pageSectionService
+        IPageSectionService $pageSectionService,
+        ProgramService $programService,
+        ReservationEmailService $reservationEmailService,
+        IUserService $userService
     )
     {
 
         $this->restaurantService = $restaurantService;
         $this->adminPageService = $adminPageService;
         $this->pageSectionService = $pageSectionService;
+        $this->programService = $programService;
+        $this->reservationEmailService = $reservationEmailService;
+        $this->userService = $userService;
     }
 
     public function yummy(): void
@@ -48,7 +59,7 @@ final class YummyController extends BaseController
             }
             $this->view(
                 'yummy/index',
-                ['section' => $pageSection, 'page' => $page, 'title' => 'Yummy']
+                ['section' => $pageSection, 'title' => 'Yummy']
             );
 
         } catch (\Throwable $e) {
@@ -71,7 +82,7 @@ final class YummyController extends BaseController
             }
             $this->view(
                 'yummy/ratatouille/index',
-                ['section' => $ratatouille, 'page' => $page]
+                ['section' => $ratatouille, 'page' => $page, 'title' => 'Ratatouille']
             );
 
         } catch (\Exception $e) {
@@ -84,6 +95,13 @@ final class YummyController extends BaseController
     }
     public function bookReservation()
     {
+        $this->ensureSession();
+
+        if ($this->isPost()) {
+            $this->addReservationToProgram();
+            return;
+        }
+
         try {
             $this->requireFields(['childCount', 'adultCount', 'adultPrice', 'childPrice', 'totalPrice']);
 
@@ -108,6 +126,159 @@ final class YummyController extends BaseController
         } catch (\Exception $e) {
             $this->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
+    }
+
+    private function addReservationToProgram(): void
+    {
+        try {
+            $this->verifyCsrf();
+
+            if (!$this->isLoggedIn()) {
+                $_SESSION['auth_redirect'] = '/yummy/ratatouille';
+                $this->setErrorMessage('Log in before booking your reservation.');
+                $this->redirect('/loginForm');
+                return;
+            }
+
+            $reservation = $this->getRatatouilleReservationSection();
+            if ($reservation === []) {
+                $this->setErrorMessage('The reservation form is not available right now.');
+                $this->redirect('/yummy/ratatouille');
+                return;
+            }
+
+            $date = trim($this->str('date'));
+            $session = trim($this->str('session'));
+            $adultCount = max(0, min(10, $this->int('adultCount')));
+            $childCount = max(0, min(10, $this->int('childCount')));
+            $specialRequests = trim($this->str('special_requests'));
+
+            $dates = $this->normalizeOptions($reservation['date'] ?? []);
+            $sessions = $this->normalizeOptions($reservation['session'] ?? []);
+
+            if ($date === '' || $session === '' || !in_array($date, $dates, true) || !in_array($session, $sessions, true)) {
+                $this->setErrorMessage('Please choose a valid date and session.');
+                $this->redirect('/yummy/ratatouille');
+                return;
+            }
+
+            if (($adultCount + $childCount) < 1) {
+                $this->setErrorMessage('Please choose at least one adult or child.');
+                $this->redirect('/yummy/ratatouille');
+                return;
+            }
+
+            $adultPrice = round((float) ($reservation['adultPrice'] ?? 0), 2);
+            $childPrice = round((float) ($reservation['kidsPrice'] ?? 0), 2);
+            $totalPrice = round(($adultCount * $adultPrice) + ($childCount * $childPrice), 2);
+
+            $guestParts = [];
+            if ($adultCount > 0) {
+                $guestParts[] = $adultCount . ' adult' . ($adultCount === 1 ? '' : 's');
+            }
+            if ($childCount > 0) {
+                $guestParts[] = $childCount . ' child' . ($childCount === 1 ? '' : 'ren');
+            }
+
+            $customer = $this->getCurrentCustomerData();
+            $customerName = trim((string) ($customer['first_name'] ?? '') . ' ' . (string) ($customer['last_name'] ?? ''));
+
+            $item = [
+                'type' => 'yummy-reservation',
+                'title' => trim((string) ($reservation['title'] ?? 'Ratatouille Reservation')),
+                'day' => $date,
+                'time' => $session,
+                'ticket_key' => 'restaurant-reservation',
+                'ticket_title' => 'Restaurant reservation',
+                'quantity' => 1,
+                'unit_price' => $totalPrice,
+                'selection_text' => $date . ', ' . $session,
+                'ticket_summary_text' => implode(', ', $guestParts),
+                'location_name' => 'Ratatouille Food & Wine',
+                'category_label' => 'Yummy',
+                'special_requests' => $specialRequests,
+                'customer_name' => $customerName,
+                'customer_email' => (string) ($customer['email'] ?? ''),
+                'customer_phone' => (string) ($customer['phone'] ?? ''),
+            ];
+
+            $this->programService->addItem($item);
+
+            $this->reservationEmailService->sendReservationAdded($customer, array_merge($item, [
+                'adult_count' => $adultCount,
+                'child_count' => $childCount,
+                'adult_price' => $adultPrice,
+                'child_price' => $childPrice,
+                'total_price' => $totalPrice,
+                'special_requests' => $specialRequests,
+            ]));
+
+            $this->setSuccessMessage('Your Ratatouille reservation was added to My Program. A confirmation email has been sent.');
+            $this->redirect('/program');
+        } catch (\Throwable $e) {
+            $this->setErrorMessage('Your reservation could not be booked right now.');
+            $this->redirect('/yummy/ratatouille');
+        }
+    }
+
+    private function getRatatouilleReservationSection(): array
+    {
+        $page = $this->adminPageService->getPageBySlug('ratatouille');
+        $pageId = $page->page_id ?? null;
+        if ($pageId === null) {
+            return [];
+        }
+
+        foreach ($this->pageSectionService->getSectionsByPageId((int) $pageId) as $section) {
+            if (($section['section_type'] ?? '') === 'reservation' && !empty($section['is_published'])) {
+                return $section;
+            }
+        }
+
+        return [];
+    }
+
+    private function normalizeOptions(mixed $value): array
+    {
+        if (!is_array($value)) {
+            $value = preg_split('/[,\r\n]+/', (string) $value) ?: [];
+        }
+
+        return array_values(array_filter(array_map(
+            static fn(mixed $item): string => trim(strip_tags((string) $item)),
+            $value
+        )));
+    }
+
+    private function getCurrentCustomerData(): array
+    {
+        $customer = [
+            'first_name' => (string) ($_SESSION['user_first_name'] ?? ''),
+            'last_name' => (string) ($_SESSION['user_last_name'] ?? ''),
+            'email' => (string) ($_SESSION['user_email'] ?? ''),
+            'phone' => (string) ($_SESSION['user_phone'] ?? ''),
+        ];
+
+        if ($customer['email'] !== '') {
+            return $customer;
+        }
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return $customer;
+        }
+
+        $user = $this->userService->getUserById($userId);
+        if ($user === null) {
+            return $customer;
+        }
+
+        return [
+            'first_name' => (string) $user->first_name,
+            'last_name' => (string) $user->last_name,
+            'email' => (string) $user->email,
+            'phone' => (string) $user->phone,
+        ];
     }
 
 }

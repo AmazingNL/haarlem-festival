@@ -65,6 +65,7 @@ enum SectionType: string
     case WELCOME_BANNER = "welcome_banner";
     case WELCOME_BANNER_CARD = 'welcome_banner_card';
     case GALLERY = "gallery";
+    case HOME_GALLERY = "home_gallery";
     case STORIES_HERO = 'stories_hero';
     case WHAT_IS_STORIES = 'what_is_stories';
     case STORIES_PREVIEW = 'stories_preview';
@@ -100,5 +101,6 @@ enum SectionType: string
     case HISTORY_MOLEN_ARTICLE = 'history_molen_article';
     case HISTORY_MOLEN_SIDEBAR = 'history_molen_sidebar';
     case HISTORY_MOLEN_ROUTE_CTA = 'history_molen_route_cta';
+    case RESERVATION = 'reservation';
 }
 

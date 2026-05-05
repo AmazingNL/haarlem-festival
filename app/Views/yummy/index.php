@@ -5,6 +5,10 @@ $sections = array_values($sectionData);
 $total = count($sections);
 $showFallbackHero = !empty($showFallbackHero);
 
+?>
+<div class="yummy-page">
+<?php
+
 if ($showFallbackHero) {
     ?>
     <section class="shop-page">
@@ -36,7 +40,7 @@ for ($i = 0; $i < $total; $i++) {
     if ($type === 'text_block' && isset($sections[$i + 1])) {
         $next = $sections[$i + 1];
         $nextType = trim((string) ($next['section_type'] ?? ''));
-        if (!empty($next['is_published']) && $nextType === 'gallery') {
+        if ($nextType === 'gallery') {
             $textSection = $s;
             $gallerySection = $next;
             require __DIR__ . '/text_block_gallery.php';
@@ -52,19 +56,12 @@ for ($i = 0; $i < $total; $i++) {
             require __DIR__ . '/breadcrumb.php';
             break;
 
-        case 'text_block':
-        case 'gallery':
-            $title = trim((string) ($s['title'] ?? ''));
-            if($title === "haarlem taste"){
-            require __DIR__ . '/haarlem_taste.php';
-            }
-            else{
-            require __DIR__ . '/text_block_gallery.php';
-            }
-            break;
-
         case 'haarlem_unique':
             require __DIR__ . '/haarlem_unique.php';
+            break;
+
+        case 'gallery':
+            require __DIR__ . '/haarlem_taste.php';
             break;
 
         default:
@@ -77,3 +74,4 @@ if (!empty($resCard)) {
     require __DIR__ . '/restaurants_card.php';
 }
 ?>
+</div>

@@ -1,49 +1,53 @@
-<section class="page-container">
+<section id="restaurants" class="page-container">
     <h2 class="restaurants-heading">All Restaurants</h2>
+
+    <form class="restaurants-filter" role="search" aria-label="Filter restaurants">
+        <button type="button" class="restaurants-filter-button" aria-label="Open restaurant filters">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16M7 12h10M10 18h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <span>Filter</span>
+        </button>
+        <label class="restaurants-filter-search">
+            <span class="sr-only">Search restaurants</span>
+            <input type="search" name="restaurant_filter" placeholder="filter by cuisine, restaurant name or location" autocomplete="off">
+        </label>
+        <button type="reset" class="restaurants-filter-submit">Enter</button>
+    </form>
 
     <section class="restaurants-grid">
         <?php
         // Keep only valid card arrays from the incoming data.
         $restaurantCards = array_values(array_filter(
             $resCard ?? [],
-            static fn ($card): bool => is_array($card)
+            static fn($card): bool => is_array($card)
         ));
 
-        // Normalize scalar-or-array values into a trimmed string.
+        // Normalize array values into a trimmed string.
         $normalizeText = static function (mixed $value, string $default = ''): string {
-            if (is_array($value)) {
-                $value = $value[0] ?? $default;
-            }
-
             $text = trim((string) $value);
             return $text;
         };
 
         // Accept cuisine as array, comma-separated text, or newline-separated text.
         $normalizeCuisines = static function (mixed $value): array {
-            if (is_array($value)) {
-                return array_values(array_filter(array_map(
-                    static fn (mixed $item): string => trim((string) $item),
-                    $value
-                )));
-            }
+            if (!is_array($value)) {
+                $text = trim((string) $value);
+                $value = ($text === '') ? [] : preg_split('/[\r\n,]+/', $text);
 
-            $text = trim((string) $value);
-            if ($text === '') {
-                return [];
             }
 
             return array_values(array_filter(array_map(
-                static fn (string $item): string => trim($item),
-                preg_split('/[\r\n,]+/', $text) ?: []
+                static fn($item) => trim((string)$item),
+                $value ?: []
             )));
         };
 
         // Resolve card image with fallback when data is missing.
         $getImage = static function (array $card): string {
-            $image = $card['section_image'] ?? $card['image'] ?? '';
+            $image = $card['section_image'] ?? '';
             if (is_array($image)) {
-                $image = $image[0] ?? '';
+                $image = $image[0];
             }
 
             $image = trim((string) $image);
@@ -63,16 +67,17 @@
             <?php
             // Shape each card field into safe, display-ready values.
             $title = $normalizeText($card['title'] ?? '', 'Restaurant');
-            $introduction = preg_replace('/\s+/', ' ', trim(strip_tags($normalizeText($card['introduction'] ?? '', ''))));
+            $introduction = $card['introduction'] ?? '';
             $rating = number_format((float) $normalizeText($card['rating'] ?? '0.0', '0.0'), 1, '.', '');
-            $buttonText = $normalizeText($card['button_text'] ?? 'View', 'View');
-            $buttonLink = $normalizeText($card['button_link'] ?? '#', '#');
+            $buttonText = $normalizeText($card['button_text'] ?? 'View');
+            $buttonLink = $normalizeText($card['button_link'] ?? '#');
             $capacity = $normalizeText($card['capacity'] ?? '', '0');
             $cuisines = $normalizeCuisines($card['cuisine'] ?? []);
             $image = $getImage($card);
+            $searchData = trim(strip_tags($title . ' ' . $introduction . ' ' . implode(' ', $cuisines) . ' ' . $capacity));
             ?>
 
-            <article class="restaurant-card">
+            <article class="restaurant-card" data-restaurant-card data-search="<?= htmlspecialchars(strtolower($searchData), ENT_QUOTES, 'UTF-8') ?>">
                 <section class="card-media">
                     <img src="<?= htmlspecialchars($image, ENT_QUOTES, 'UTF-8') ?>"
                         alt="<?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?>">
@@ -104,7 +109,7 @@
                 <section class="card-body">
                     <h3 class="card-title"><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h3>
                     <?php if ($introduction !== ''): ?>
-                        <p class="card-excerpt"><?= htmlspecialchars($introduction, ENT_QUOTES, 'UTF-8') ?></p>
+                        <p class="card-excerpt"><?= $introduction ?></p>
                     <?php endif; ?>
 
                     <?php if ($cuisines !== []): ?>
@@ -147,3 +152,30 @@
         <?php endforeach; ?>
     </section>
 </section>
+
+<script>
+    (function () {
+        const filter = document.querySelector('.restaurants-filter');
+        if (!filter) return;
+
+        const input = filter.querySelector('input[type="search"]');
+        const cards = Array.from(document.querySelectorAll('[data-restaurant-card]'));
+
+        const applyFilter = function () {
+            const query = (input.value || '').trim().toLowerCase();
+            cards.forEach(function (card) {
+                const haystack = card.getAttribute('data-search') || '';
+                card.hidden = query !== '' && !haystack.includes(query);
+            });
+        };
+
+        input.addEventListener('input', applyFilter);
+        filter.addEventListener('reset', function () {
+            window.setTimeout(applyFilter, 0);
+        });
+        filter.addEventListener('submit', function (event) {
+            event.preventDefault();
+            applyFilter();
+        });
+    })();
+</script>

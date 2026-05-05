@@ -2,6 +2,7 @@
 
 namespace App\ViewModels;
 
+use App\Controllers\YummyController;
 use App\ViewModels\home\HomeCardsGrid;
 use App\ViewModels\home\HomeFeature;
 use App\ViewModels\home\HomeGallery;
@@ -38,7 +39,9 @@ use App\ViewModels\history\HistoryStBavoHero;
 use App\ViewModels\history\HistoryStBavoRouteCta;
 use App\ViewModels\history\HistoryStBavoSidebar;
 use App\ViewModels\history\HistoryTimeline;
+use App\ViewModels\yummy\Gallery;
 use App\ViewModels\yummy\HaarlemUnique;
+use App\ViewModels\yummy\Reservation;
 use App\ViewModels\yummy\RestaurantCard;
 use App\ViewModels\yummy\TextBlock;
 use App\ViewModels\yummy\WelcomeBanner;
@@ -53,14 +56,14 @@ class SectionFactory
         $map = [
             'hero' => HomeHero::class,
             'feature' => HomeFeature::class,
-            'gallery' => HomeGallery::class,
+            'home_gallery' => HomeGallery::class,
+            'gallery' => Gallery::class,
             'image_left' => HomeImageLeft::class,
             'image_right' => HomeImageRight::class,
             'cards_grid' => HomeCardsGrid::class,
             'transport' => HomeTransport::class,
             'text_block' => TextBlock::class,
             'restaurant_card' => RestaurantCard::class,
-            'restaurants_card' => RestaurantCard::class,
             'welcome_banner' => WelcomeBanner::class,
             'welcome_banner_card' => WelcomeBannerCard::class,
             'haarlem_unique' => HaarlemUnique::class,
@@ -93,6 +96,7 @@ class SectionFactory
             'history_molen_article' => HistoryMolenArticle::class,
             'history_molen_sidebar' => HistoryMolenSidebar::class,
             'history_molen_route_cta' => HistoryMolenRouteCta::class,
+            'reservation' => Reservation::class
         ];
 
         return $map[$type] ?? null;

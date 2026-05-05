@@ -46,29 +46,7 @@ final class HomeController extends BaseController
         }
     }
 
-    public function yummy(): void
-    {
-        try {
-            $page = $this->adminPageService->getPageBySlug('yummy');
-            $pageId = $page->page_id ?? null;
 
-            if ($pageId === null) {
-                $this->view('no_page/index', ['error' => 'Restaurants page not available']);
-                return;
-            }
-
-            $pageSections = $this->pageSectionService->getSectionsByPageId($pageId);
-
-            $this->view('yummy/index', [
-                'section' => $pageSections === [] ? [] : $this->mergeSectionContent($pageSections),
-                'page' => $page,
-                'title' => 'Restaurants',
-                'showFallbackHero' => $pageSections === [],
-            ]);
-        } catch (\Throwable $e) {
-            $this->view('no_page/index', ['error' => 'Restaurants page not available']);
-        }
-    }
 
     public function stories(): void
     {
@@ -93,28 +71,6 @@ final class HomeController extends BaseController
         }
     }
 
-    public function ratatouille(): void
-    {
-        try {
-            $page = $this->adminPageService->getPageBySlug('ratatouille');
-            $pageId = $page->page_id ?? null;
-            $ratatouilleSections = $pageId === null ? [] : $this->pageSectionService->getSectionsByPageId($pageId);
-
-            if ($ratatouilleSections === []) {
-                $this->setErrorMessage('Ratatouille page not available');
-                $this->redirect('/');
-                return;
-            }
-
-            $this->view('yummy/ratatouille/index', [
-                'section' => $ratatouilleSections,
-                'page' => $page,
-                'title' => 'Ratatouille',
-            ]);
-        } catch (\Throwable $e) {
-            $this->view('no_page/index', ['error' => 'Ratatouille page not available']);
-        }
-    }
 
     private function mergeSectionContent(array $sections): array
     {

@@ -12,11 +12,14 @@ if (is_array($sectionImage)) {
 $title = trim((string) ($s['title'] ?? 'Ratatouille'));
 $buttonText = trim((string) ($s['button_text'] ?? ''));
 $buttonLink = trim((string) ($s['button_link'] ?? ''));
+if ($buttonLink === '/reservation' || $buttonLink === 'reservation') {
+    $buttonLink = '#reservation';
+}
 
 // Keep only valid welcome banner card rows and ignore empty titles.
 $cards = array_values(array_filter(
     $welcomeBannerCard ?? [],
-    static fn ($card): bool => is_array($card) && trim((string) ($card['title'] ?? '')) !== ''
+    static fn ($card): bool => is_array($card) && trim((string) ($card['title'] !== 'Signature Highlights')) !== ''
 ));
 
 // Split the cards into two columns so the layout stays balanced.

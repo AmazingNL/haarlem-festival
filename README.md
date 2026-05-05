@@ -37,6 +37,16 @@ After pulling code:
 
 ---
 
+## Local Email
+
+When running the project with Docker, outgoing emails are captured by Mailpit instead of being sent to a real inbox.
+
+- Mailpit inbox: http://127.0.0.1:8025
+- SMTP host inside Docker: `mailpit`
+- SMTP port: `1025`
+
+---
+
 ## Manual Setup (if sync scripts don't work)
 
 ```bash
@@ -54,10 +64,10 @@ docker compose exec php php /app/migrate.php up
 
 
 ```bash
-# exports
+# Export the current Docker database data to backup.sql
 docker compose exec mysql sh -c 'mariadb-dump -uroot -psecret123 haarlem_festival' > backup.sql
 
-# restore:
+# Restore backup.sql into the Docker database
 cat backup.sql | docker compose exec -T mysql sh -c 'mariadb -uroot -psecret123 haarlem_festival'
 ```
 

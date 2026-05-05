@@ -90,3 +90,560 @@ address {
     text-align: center;
     padding: 20px 125px ;
 }
+
+.ratatouille-detail-shell {
+	background: #f8edeb;
+	padding: 34px 24px 72px;
+}
+
+.ratatouille-detail-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(320px, 390px);
+	gap: 120px;
+	max-width: 1220px;
+	margin: 0 auto;
+	align-items: start;
+}
+
+.ratatouille-detail-content {
+	min-width: 0;
+}
+
+.ratatouille-reservation-column {
+	position: sticky;
+	top: 112px;
+}
+
+.ratatouille-copy-section {
+	padding: 0 0 34px;
+}
+
+.ratatouille-section-title {
+	margin: 0 0 24px;
+	color: #5a1a11;
+	font-size: clamp(2rem, 3vw, 2.65rem);
+	font-weight: 900;
+	letter-spacing: 0.16em;
+	line-height: 1.15;
+	text-transform: uppercase;
+}
+
+.ratatouille-body-copy {
+	margin: 0 0 22px;
+	color: #2c211f;
+	font-size: 1rem;
+	line-height: 2;
+}
+
+.ratatouille-body-copy p {
+	margin: 0 0 18px;
+}
+
+.ratatouille-highlights-card {
+	max-width: 540px;
+	border: 2px solid #b02a26;
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.42);
+	padding: 16px;
+}
+
+.ratatouille-highlights-card h3 {
+	margin: 0 0 14px;
+	color: #5a1a11;
+	font-size: 1.1rem;
+	font-weight: 900;
+	line-height: 1.2;
+	text-transform: none;
+}
+
+.ratatouille-highlights-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+}
+
+.ratatouille-highlight-item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 64px;
+	border-radius: 6px;
+	background: #e4dbad;
+	padding: 8px;
+	color: #2d2a26;
+	font-size: 0.74rem;
+	font-weight: 800;
+	line-height: 1.35;
+	text-align: center;
+}
+
+.ratatouille-highlight-item svg {
+	width: 18px;
+	height: 18px;
+	flex: 0 0 auto;
+}
+
+.ratatouille-chef-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 250px));
+	gap: 42px;
+	margin-top: 26px;
+}
+
+.ratatouille-chef-card p {
+	margin: 8px 0 0;
+	color: #2c211f;
+	font-size: 0.74rem;
+	font-weight: 800;
+	line-height: 1.3;
+}
+
+.ratatouille-chef-image {
+	aspect-ratio: 4 / 3;
+	overflow: hidden;
+	border-radius: 8px;
+}
+
+.ratatouille-chef-image img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.ratatouille-section-rule {
+	margin: 34px 0 0;
+	border: 0;
+	border-top: 1px solid #d4c6c5;
+}
+
+.ratatouille-booking-card {
+	position: relative;
+	width: 100%;
+	border-radius: 8px;
+	background: #551415;
+	padding: 22px 16px 18px;
+	color: #fff4f4;
+	box-shadow: 0 18px 36px rgba(40, 0, 0, 0.14);
+}
+
+.ratatouille-booking-card * {
+	line-height: 1.35;
+}
+
+.ratatouille-booking-close {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	border: 0;
+	border-radius: 4px;
+	background: #180203;
+	color: #fff;
+	font-size: 0.75rem;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.ratatouille-booking-card h2 {
+	margin: 12px 20px 16px 0;
+	color: #fff4f4;
+	font-size: clamp(1.35rem, 2.4vw, 1.95rem);
+	font-weight: 900;
+	letter-spacing: 0.18em;
+	line-height: 1.15;
+	text-transform: uppercase;
+}
+
+.ratatouille-booking-info {
+	margin-bottom: 10px;
+	border: 2px solid #76c4e8;
+	border-radius: 8px;
+	background: #c7e7fb;
+	padding: 8px 10px;
+	color: #1b2530;
+	font-size: 0.72rem;
+}
+
+.ratatouille-booking-info p {
+	margin: 0 0 7px;
+	line-height: 1.55;
+}
+
+.ratatouille-booking-info p:last-child {
+	margin-bottom: 0;
+}
+
+.ratatouille-booking-fieldset {
+	margin: 10px 0 0;
+	border: 1px solid #1e8f53;
+	border-radius: 4px;
+	padding: 8px;
+}
+
+.ratatouille-booking-fieldset legend {
+	padding: 0 4px;
+	color: #fff;
+	font-size: 0.74rem;
+	font-weight: 800;
+}
+
+.ratatouille-date-options,
+.ratatouille-session-options {
+	display: grid;
+	gap: 8px;
+}
+
+.ratatouille-date-options {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ratatouille-session-options {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ratatouille-date-options label,
+.ratatouille-session-options label {
+	display: block;
+	cursor: pointer;
+}
+
+.ratatouille-date-options input,
+.ratatouille-session-options input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ratatouille-date-options span,
+.ratatouille-session-options span {
+	display: flex;
+	align-items: center;
+	min-height: 36px;
+	border: 2px solid #bf2726;
+	border-radius: 8px;
+	background: #fff;
+	padding: 7px 8px 7px 30px;
+	color: #551415;
+	font-size: 0.63rem;
+	font-weight: 700;
+	line-height: 1.15;
+	position: relative;
+	transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.ratatouille-date-options span::before,
+.ratatouille-session-options span::before {
+	content: "";
+	position: absolute;
+	left: 8px;
+	top: 50%;
+	width: 14px;
+	height: 14px;
+	border: 2px solid #9d1f1f;
+	border-radius: 999px;
+	background: #fff;
+	transform: translateY(-50%);
+}
+
+.ratatouille-date-options input:checked + span::before,
+.ratatouille-session-options input:checked + span::before {
+	background: #f7d117;
+	border-color: #ffffff;
+	box-shadow: inset 0 0 0 3px #9d1f1f;
+}
+
+.ratatouille-date-options input:checked + span,
+.ratatouille-session-options input:checked + span {
+	background: #f7d117;
+	border-color: #ffffff;
+	color: #3b0b0b;
+	box-shadow: 0 0 0 3px rgba(247, 209, 23, 0.38);
+}
+
+.ratatouille-date-options input:focus-visible + span,
+.ratatouille-session-options input:focus-visible + span {
+	outline: 3px solid #ffffff;
+	outline-offset: 3px;
+}
+
+.ratatouille-booking-row-label {
+	display: grid;
+	grid-template-columns: max-content 1fr max-content max-content;
+	gap: 8px;
+	align-items: center;
+	margin-top: 14px;
+	color: #fff;
+	font-size: 0.72rem;
+	font-weight: 800;
+}
+
+.ratatouille-booking-row-label strong {
+	font-weight: 900;
+	text-align: right;
+}
+
+.ratatouille-select-wrap select {
+	display: block;
+	width: 100%;
+	margin-top: 6px;
+	border: 0;
+	border-radius: 8px;
+	background: #188c51;
+	padding: 13px 14px;
+	color: #fff;
+	font-size: 1rem;
+	font-weight: 500;
+}
+
+.ratatouille-ticket-picker {
+	position: relative;
+	margin-top: 6px;
+	z-index: 1;
+}
+
+.ratatouille-ticket-picker.is-open {
+	z-index: 20;
+}
+
+.ratatouille-picker-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	min-height: 48px;
+	border: 0;
+	border-radius: 9px;
+	background: #188c51;
+	padding: 0 18px;
+	color: #ffffff;
+	font-size: 1rem;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.ratatouille-picker-toggle svg {
+	width: 18px;
+	height: 18px;
+	transition: transform 0.18s ease;
+}
+
+.ratatouille-ticket-picker.is-open .ratatouille-picker-toggle {
+	border-radius: 9px 9px 0 0;
+}
+
+.ratatouille-ticket-picker.is-open .ratatouille-picker-toggle svg {
+	transform: rotate(180deg);
+}
+
+.ratatouille-picker-toggle:focus-visible {
+	outline: 3px solid #ffffff;
+	outline-offset: 3px;
+}
+
+.ratatouille-picker-panel {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	width: 100%;
+	border-radius: 0 0 9px 9px;
+	background: #f6e8e8;
+	padding: 10px 12px 14px;
+	color: #3b0b0b;
+	box-shadow: 0 18px 38px rgba(25, 0, 0, 0.28);
+}
+
+.ratatouille-picker-panel[hidden] {
+	display: none;
+}
+
+.ratatouille-picker-panel-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 10px;
+	min-height: 54px;
+	border: 1px solid #aa0000;
+	padding: 8px 10px;
+	font-size: 1rem;
+	font-weight: 500;
+}
+
+.ratatouille-picker-panel-row + .ratatouille-picker-panel-row {
+	margin-top: 8px;
+}
+
+.ratatouille-picker-panel-row strong {
+	font-size: 1.08rem;
+	font-weight: 700;
+}
+
+.ratatouille-picker-panel-row--counter {
+	grid-template-columns: minmax(0, 1fr) auto;
+	grid-template-areas:
+		"label stepper"
+		"people stepper";
+}
+
+.ratatouille-picker-panel-row--counter > span {
+	grid-area: label;
+}
+
+.ratatouille-picker-people {
+	grid-area: people;
+	width: 46px;
+	height: 30px;
+	color: #aa0000;
+}
+
+.ratatouille-picker-stepper {
+	grid-area: stepper;
+	display: grid;
+	grid-template-columns: 28px 46px 28px;
+	align-items: center;
+	justify-content: end;
+	border-radius: 999px;
+	background: #188c51;
+	color: #130303;
+}
+
+.ratatouille-picker-stepper button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	border: 0;
+	border-radius: 999px;
+	background: #a7e4c4;
+	color: #1a0101;
+	font-size: 1.1rem;
+	font-weight: 900;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.ratatouille-picker-stepper button:hover,
+.ratatouille-picker-stepper button:focus-visible {
+	background: #f7d117;
+	outline: none;
+}
+
+.ratatouille-picker-stepper span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 28px;
+	border: 1px solid #0d0000;
+	border-radius: 6px;
+	color: #0d0000;
+	font-size: 1rem;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.ratatouille-picker-enter {
+	display: block;
+	margin: 10px auto 0;
+	border: 0;
+	border-radius: 8px;
+	background: #8f1d1d;
+	padding: 10px 18px;
+	color: #ffffff;
+	font-size: 0.86rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.ratatouille-picker-enter:hover,
+.ratatouille-picker-enter:focus-visible {
+	background: #aa0000;
+	outline: 3px solid #f7d117;
+	outline-offset: 2px;
+}
+
+.ratatouille-notes-label {
+	display: block;
+	margin: 14px 0 6px;
+	font-size: 0.74rem;
+	font-weight: 800;
+}
+
+.ratatouille-booking-card textarea {
+	display: block;
+	width: 100%;
+	min-height: 78px;
+	resize: vertical;
+	border: 0;
+	border-radius: 4px;
+	background: #fff;
+	padding: 10px;
+	color: #2c211f;
+}
+
+.ratatouille-total-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 14px;
+	border: 1px solid #1e8f53;
+	border-radius: 4px;
+	padding: 8px 10px;
+	color: #fff;
+	font-size: 0.95rem;
+	font-weight: 900;
+}
+
+.ratatouille-submit-button {
+	display: block;
+	width: min(235px, 78%);
+	margin: 18px auto 0;
+	border: 0;
+	border-radius: 9px;
+	background: #a51f1e;
+	padding: 11px 18px;
+	color: #fff;
+	font-size: 1rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.ratatouille-submit-button:hover {
+	background: #bb2a28;
+}
+
+@media (max-width: 1100px) {
+	.ratatouille-detail-grid {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 34px;
+	}
+
+	.ratatouille-reservation-column {
+		position: static;
+		max-width: 430px;
+		width: 100%;
+	}
+}
+
+@media (max-width: 700px) {
+	.ratatouille-detail-shell {
+		padding: 28px 16px 54px;
+	}
+
+	.ratatouille-highlights-grid,
+	.ratatouille-chef-grid,
+	.ratatouille-date-options,
+	.ratatouille-session-options {
+		grid-template-columns: 1fr;
+	}
+
+	.ratatouille-booking-row-label {
+		grid-template-columns: 1fr auto;
+	}
+}

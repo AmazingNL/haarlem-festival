@@ -31,7 +31,6 @@ final class PageSectionService implements IPageSectionService
                 if (is_array($content)) {
                     $section = array_merge($section, $content);
                 }
-
                 return $section;
             },
             $sections
@@ -129,8 +128,8 @@ final class PageSectionService implements IPageSectionService
 
             $fieldValue = (string) ($post[$fieldName] ?? '');
 
-            if ($fieldName === 'cuisine') {
-                $content[$fieldName] = $this->normalizeCuisineValues($fieldValue);
+            if ($fieldName === 'cuisine' || $fieldName === 'session' || $fieldName === 'date') {
+                $content[$fieldName] = $this->normalizeArrayValues($fieldValue);
                 continue;
             }
 
@@ -165,7 +164,7 @@ final class PageSectionService implements IPageSectionService
         }
     }
 
-    private function normalizeCuisineValues(string $fieldValue): array
+    private function normalizeArrayValues(string $fieldValue): array
     {
         $parts = preg_split('/[\r\n,]+/', $fieldValue) ?: [];
 

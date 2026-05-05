@@ -10,13 +10,12 @@ param(
     [string]$Command = "sync"
 )
 
-$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ErrorActionPreference = "Stop"
 
 Write-Host "`n Haarlem Festival Team Database Sync" -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan
 
-function Run-Command {
+function Run_Command {
     param([string]$Description, [scriptblock]$Script)
     
     Write-Host $Description -ForegroundColor Green
@@ -26,7 +25,7 @@ function Run-Command {
 
 switch ($Command) {
     "up" {
-        Run-Command " Starting Docker containers..." {
+        Run_Command " Starting Docker containers..." {
             docker compose up -d
             docker compose ps
             Write-Host " Containers started" -ForegroundColor Green

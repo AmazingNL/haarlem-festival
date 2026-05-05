@@ -1,156 +1,238 @@
-/**
- * Restaurants grid
- *
- * @format
- */
+/** @format */
+
+.page-container {
+	max-width: 1180px;
+	margin: 0 auto;
+	padding: 42px 24px 120px;
+}
 
 .restaurants-heading {
-	font-family: "Bebas Neue", system-ui, sans-serif;
-	letter-spacing: 0.15em;
-	color: #6b1a1a;
-	font-size: 36px;
-	margin: 0 0 18px;
+	font-family: "Bebas Neue", Impact, sans-serif;
+	letter-spacing: 0.18em;
+	color: #5a1515;
+	font-size: 38px;
+	line-height: 1;
+	margin: 0 0 20px;
 	text-transform: uppercase;
 	text-align: left;
 }
 
-.page-container {
-	max-width: 1200px; /* pick 1100-1400 depending on your taste */
-	margin: 0 auto; /* centers the whole block */
-	padding: 0 24px; /* space on left/right on small screens */
+.restaurants-filter {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	min-height: 46px;
+	margin: 0 0 26px;
+	padding: 5px;
+	background: #ffffff;
+	border: 2px solid #a7a0a0;
+	border-radius: 5px;
+}
+
+.restaurants-filter-button,
+.restaurants-filter-submit {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	height: 34px;
+	border: 0;
+	border-radius: 4px;
+	font-weight: 800;
+	line-height: 1;
+}
+
+.restaurants-filter-button {
+	padding: 0 12px;
+	background: #ffffff;
+	color: #3b0b0b;
+	box-shadow: inset 0 0 0 1px #686161;
+	cursor: pointer;
+}
+
+.restaurants-filter-button svg {
+	width: 20px;
+	height: 20px;
+}
+
+.restaurants-filter-search input {
+	width: 100%;
+	height: 34px;
+	border: 0;
+	outline: none;
+	text-align: center;
+	font-weight: 700;
+	color: #4a3030;
+	background: transparent;
+}
+
+.restaurants-filter-search input::placeholder {
+	color: #4d3d3d;
+	opacity: 1;
+}
+
+.restaurants-filter-submit {
+	min-width: 66px;
+	padding: 0 14px;
+	background: #d8d5d5;
+	color: #ffffff;
+	cursor: pointer;
+}
+
+.restaurants-filter-submit:hover,
+.restaurants-filter-button:hover {
+	background: #9d1f1f;
+	color: #ffffff;
 }
 
 .restaurants-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-	gap: 50px;
-	justify-content: center;
-	justify-items: stretch;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 52px 76px;
 	align-items: stretch;
-	margin-bottom: 30px;
 }
 
 .restaurant-card {
-	background: transparent;
 	width: 100%;
-	height: 100%;
-	overflow: visible;
-	max-width: none;
+	min-width: 0;
 	display: flex;
 	flex-direction: column;
+	background: #fcddca;
+	border: 1px solid #a96f51;
+	border-radius: 7px;
+	overflow: hidden;
+	box-shadow: 0 2px 4px rgba(57, 22, 20, 0.08);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.restaurant-card[hidden] {
+	display: none;
+}
+
+.restaurant-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 12px 24px rgba(57, 22, 20, 0.16);
 }
 
 .card-media {
 	position: relative;
-	overflow: visible;
 	flex: 0 0 auto;
+	background: #2d100d;
 }
 
 .card-media img {
 	display: block;
 	width: 100%;
-	aspect-ratio: 4 / 3;
+	aspect-ratio: 1.35 / 1;
+	height: auto;
 	object-fit: cover;
-	border-radius: 12px 12px 0 0;
 }
 
 .rating-tag {
 	position: absolute;
-	top: 5px;
-	right: 5px;
-	padding: 10px;
-	border-radius: 50px;
+	top: 8px;
+	right: 8px;
 	display: flex;
-	flex-direction: column;
-	gap: 20px;
-	width: 50px;
-	justify-content: center;
+	flex-direction: column-reverse;
 	align-items: center;
-	background-color: wheat;
+	gap: 14px;
+	width: 42px;
+	padding: 6px 5px;
+	border-radius: 999px;
+	background: #f7e7b1;
 }
 
 .rating-tag .rating {
-	background: #801a1a;
-	border-radius: 50px;
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
 	align-items: center;
-	font-weight: 700;
-	font-size: 13px;
-	width: 100%;
-	padding: 10px 20px;
+	justify-content: center;
+	gap: 2px;
+	width: 34px;
+	min-height: 52px;
+	border-radius: 999px;
+	background: #8f1d1d;
+	color: #ffffff;
+	font-size: 11px;
+	font-weight: 900;
+	line-height: 1;
 }
 
+.rating-tag .rating svg {
+	width: 21px;
+	height: 21px;
+}
+
+.rating-tag p,
 .restaurant-card h3,
 .restaurant-card p {
 	margin: 0;
 }
-.rating-tag p {
-	color: #fff;
-}
 
-.icon-favorite:hover {
-	cursor: pointer;
-	transform: scale(2);
-	fill: #6b1a1a;
-}
-
-.rating-tag .icon-favorite {
+.fav {
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
 	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	background: #ffffff;
+	cursor: pointer;
 }
 
 .icon-favorite {
-	width: 40px;
-	height: 40px;
+	width: 26px;
+	height: 26px;
 	fill: none;
 }
 
-.fav svg.is-fav .icon-favorite {
-	fill: #231815;
-	stroke: #d3cece;
+.fav:hover .icon-favorite {
+	transform: scale(1.08);
 }
 
 .card-body {
-	background: #fcddca;
-	padding: 16px;
-	border-radius: 0 0 12px 12px;
+	padding: 16px 18px 15px;
 	flex: 1;
 	display: flex;
 	flex-direction: column;
+	gap: 12px;
 }
 
 .card-title {
-	margin: 0 0 8px;
-	font-size: 16px;
-	font-weight: 700;
-	color: #231815;
+	font-size: 18px;
+	font-weight: 900;
+	line-height: 1.2;
+	color: #2d1111;
 }
 
-.card-excerpt p{
-	font-size: 13px;
-	color: #2f1f1f;
-	margin-bottom: 5px;
+.card-excerpt {
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.65;
+	color: #3e2929;
+}
 
+.card-excerpt p {
+	line-height: inherit;
 }
 
 .card-tags {
 	display: flex;
 	gap: 8px;
 	flex-wrap: wrap;
-	margin-top: 2px;
-	margin-bottom: 12px;
+	margin-top: auto;
 }
 
 .card-tags span {
-	background: #7f6e19;
-	color: #fff;
-	padding: 6px 10px;
-	border-radius: 8px;
-	font-size: 12px;
+	background: #82770f;
+	color: #ffffff;
+	padding: 6px 12px;
+	border-radius: 5px;
+	font-size: 10px;
+	font-weight: 800;
+	line-height: 1;
 }
 
 .card-footer {
@@ -158,87 +240,93 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
-	margin-bottom: 20px;
-	margin-top: 0;
+	font-size: 10px;
+	font-weight: 800;
+	color: #3b0b0b;
 }
 
 .card-footer .strong {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	gap: 12px;
-	color: #6b1a1a;
+	gap: 5px;
+	color: #9d1f1f;
+	font-size: 16px;
+	font-weight: 900;
 }
 
-.strong strong {
-	margin-top: 10px;
+.card-footer .strong svg {
+	width: 24px;
+	height: 24px;
+}
+
+.footer-button {
+	margin-top: 0;
 }
 
 .footer-button a {
-	padding: 0;
 	display: flex;
-
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 38px;
+	padding: 0 12px;
+	border-radius: 6px;
+	background: #9d1f1f;
+	color: #ffffff;
+	font-size: 12px;
+	font-weight: 800;
+	line-height: 1;
+	text-align: center;
 }
 
-.btn[disabled] {
-	background: #d3cece;
-	color: #9f9999;
-	cursor: not-allowed;
+.footer-button a[href="#"] {
+	background: #d2d0d0;
+	color: #9b9393;
+	pointer-events: none;
 }
 
-.restaurant-card:hover {
-	transform: translateY(-4px);
-	transition: all 0.5s ease;
-}
-
-/* Responsive */
-@media (max-width: 1000px) {
+@media (max-width: 1060px) {
 	.restaurants-grid {
-		grid-template-columns: repeat(2, 1fr);
-		gap: 24px;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 34px;
 	}
 }
 
-@media (max-width: 860px) {
+@media (max-width: 720px) {
 	.page-container {
-		padding: 0 16px;
+		padding: 34px 16px 84px;
+	}
+
+	.restaurants-filter {
+		grid-template-columns: 1fr;
+	}
+
+	.restaurants-filter-search input {
+		text-align: left;
+		padding: 0 8px;
 	}
 
 	.restaurants-grid {
 		grid-template-columns: 1fr;
-	}
-
-	.restaurant-card {
-		max-width: none;
-		min-height: 620px;
+		gap: 24px;
 	}
 }
 
 @media (max-width: 420px) {
 	.page-container {
-		padding: 0 12px;
+		padding-left: 12px;
+		padding-right: 12px;
 	}
 
 	.restaurants-heading {
-		font-size: 28px;
-		margin-bottom: 12px;
-	}
-
-	.restaurant-card {
-		min-height: auto;
+		font-size: 30px;
 	}
 
 	.card-body {
-		padding: 12px;
-	}
-
-	.icon-favorite {
-		width: 32px;
-		height: 32px;
+		padding: 14px;
 	}
 }
 
-/* Popup / detail page error (kept from previous design) */
 .detail-page-error {
 	width: 882px;
 	height: 264px;
@@ -259,5 +347,5 @@
 	text-align: left;
 	font-size: 33px;
 	color: #0d0000;
-	font-family: "Bebas Neue";
+	font-family: "Bebas Neue", Impact, sans-serif;
 }
