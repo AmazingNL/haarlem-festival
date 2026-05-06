@@ -137,7 +137,11 @@ final class PageSectionService implements IPageSectionService
 
             if ($fieldValue !== '') {
                 try {
-                    $sectionImages = array_merge($sectionImages, $this->imageService->extractUrls($fieldValue));
+                    if ($fieldName === 'section_image') {
+                        $sectionImages = array_merge($sectionImages, $this->extractImageObjects($fieldValue));
+                    } else {
+                        $sectionImages = array_merge($sectionImages, $this->imageService->extractUrls($fieldValue));
+                    }
                 } catch (\Throwable $e) {
                     // Plain text content does not contain embedded images.
                 }
@@ -145,10 +149,87 @@ final class PageSectionService implements IPageSectionService
         }
 
         if ($sectionImages !== []) {
-            $content['section_image'] = array_values(array_unique($sectionImages));
+            $content['section_image'] = $this->uniqueSectionImages($sectionImages);
         }
 
         return $content;
+    }
+
+    private function extractImageObjects(string $html): array
+    {
+        if ($html === '') {
+            return [];
+        }
+
+        $images = [];
+        $previous = libxml_use_internal_errors(true);
+
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<!DOCTYPE html><html><body>' . $html . '</body></html>', LIBXML_NOERROR | LIBXML_NOWARNING);
+
+        foreach ($dom->getElementsByTagName('img') as $img) {
+            if (!($img instanceof \DOMElement)) {
+                continue;
+            }
+
+            $src = trim($img->getAttribute('src'));
+            if ($src === '' || str_starts_with($src, 'data:')) {
+                continue;
+            }
+
+            $caption = '';
+            $parent = $img->parentNode;
+            if ($parent instanceof \DOMElement && strtolower($parent->tagName) === 'figure') {
+                foreach ($parent->getElementsByTagName('figcaption') as $figcaption) {
+                    $caption = trim($figcaption->textContent);
+                    break;
+                }
+            }
+
+            $images[] = [
+                'src' => $src,
+                'alt' => trim($img->getAttribute('alt')),
+                'caption' => $caption,
+            ];
+        }
+
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        return $images;
+    }
+
+    private function uniqueSectionImages(array $images): array
+    {
+        $unique = [];
+        $seen = [];
+
+        foreach ($images as $image) {
+            if (is_array($image)) {
+                $src = trim((string) ($image['src'] ?? ''));
+                if ($src === '' || isset($seen[$src])) {
+                    continue;
+                }
+
+                $seen[$src] = true;
+                $unique[] = [
+                    'src' => $src,
+                    'alt' => trim((string) ($image['alt'] ?? '')),
+                    'caption' => trim((string) ($image['caption'] ?? '')),
+                ];
+                continue;
+            }
+
+            $src = trim((string) $image);
+            if ($src === '' || isset($seen[$src])) {
+                continue;
+            }
+
+            $seen[$src] = true;
+            $unique[] = $src;
+        }
+
+        return $unique;
     }
 
     private function normalizeImageField(string $fieldName, array $post, array $files, array &$content, array &$sectionImages): void

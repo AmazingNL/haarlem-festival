@@ -103,6 +103,8 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/yummy', [YummyController::class, 'yummy']);
     $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
     $r->post('/yummy/ratatouille/book-reservation', [YummyController::class, 'bookReservation']);
+    $r->get('/yummy/bistro-toujours', [YummyController::class, 'bistroToujours']);
+    $r->post('/yummy/bistro-toujours/book-reservation', [YummyController::class, 'bookBistroToujoursReservation']);
 
     $r->get('/stories', [HomeController::class, 'stories']);
     $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);

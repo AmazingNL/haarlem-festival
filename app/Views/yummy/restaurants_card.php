@@ -10,9 +10,9 @@
         </button>
         <label class="restaurants-filter-search">
             <span class="sr-only">Search restaurants</span>
-            <input type="search" name="restaurant_filter" placeholder="filter by cuisine, restaurant name or location" autocomplete="off">
+            <input type="search" name="restaurant_filter" placeholder="filter by restaurant name or cuisine" autocomplete="off">
         </label>
-        <button type="reset" class="restaurants-filter-submit">Enter</button>
+        <button type="submit" class="restaurants-filter-submit">Enter</button>
     </form>
 
     <section class="restaurants-grid">
@@ -74,7 +74,7 @@
             $capacity = $normalizeText($card['capacity'] ?? '', '0');
             $cuisines = $normalizeCuisines($card['cuisine'] ?? []);
             $image = $getImage($card);
-            $searchData = trim(strip_tags($title . ' ' . $introduction . ' ' . implode(' ', $cuisines) . ' ' . $capacity));
+            $searchData = trim(strip_tags($title . ' ' . implode(' ', $cuisines)));
             ?>
 
             <article class="restaurant-card" data-restaurant-card data-search="<?= htmlspecialchars(strtolower($searchData), ENT_QUOTES, 'UTF-8') ?>">

@@ -72,33 +72,56 @@ final class YummyController extends BaseController
 
     public function ratatouille(): void
     {
+        $this->restaurantDetail('ratatouille', 'Ratatouille', '/yummy', 'yummy/ratatouille/index');
+    }
+
+    public function bistroToujours(): void
+    {
+        $this->restaurantDetail('bistro-toujours', 'Bistro Toujours', '/yummy', 'yummy/bistro_toujours/index');
+    }
+
+    private function restaurantDetail(string $slug, string $title, string $fallbackUrl, string $template): void
+    {
         try {
-            $page = $this->adminPageService->getPageBySlug('ratatouille');
+            $page = $this->adminPageService->getPageBySlug($slug);
             $page_id = $page->page_id ?? null;
-            $ratatouille = $this->pageSectionService->getSectionsByPageId($page_id);
-            if (empty($ratatouille)) {
+            $sections = $page_id === null ? [] : $this->pageSectionService->getSectionsByPageId((int) $page_id);
+            if (empty($sections)) {
                 $this->setFlash('error', 'page does not exist');
-                $this->redirect('/yummy');
+                $this->redirect($fallbackUrl);
             }
             $this->view(
-                'yummy/ratatouille/index',
-                ['section' => $ratatouille, 'page' => $page, 'title' => 'Ratatouille']
+                $template,
+                ['section' => $sections, 'page' => $page, 'title' => $title]
             );
 
         } catch (\Exception $e) {
             $this->view(
                 template: 'no_page/index',
-                data: ['error' => 'ratatouille page not available']
+                data: ['error' => $title . ' page not available']
             );
 
         }
     }
+
+    public function bookBistroToujoursReservation(): void
+    {
+        $this->ensureSession();
+
+        if ($this->isPost()) {
+            $this->addReservationToProgram('bistro-toujours', '/yummy/bistro-toujours', 'Bistro Toujours');
+            return;
+        }
+
+        $this->redirect('/yummy/bistro-toujours');
+    }
+
     public function bookReservation()
     {
         $this->ensureSession();
 
         if ($this->isPost()) {
-            $this->addReservationToProgram();
+            $this->addReservationToProgram('ratatouille', '/yummy/ratatouille', 'Ratatouille Food & Wine');
             return;
         }
 
@@ -128,22 +151,22 @@ final class YummyController extends BaseController
         }
     }
 
-    private function addReservationToProgram(): void
+    private function addReservationToProgram(string $pageSlug, string $fallbackUrl, string $locationName): void
     {
         try {
             $this->verifyCsrf();
 
             if (!$this->isLoggedIn()) {
-                $_SESSION['auth_redirect'] = '/yummy/ratatouille';
+                $_SESSION['auth_redirect'] = $fallbackUrl;
                 $this->setErrorMessage('Log in before booking your reservation.');
                 $this->redirect('/loginForm');
                 return;
             }
 
-            $reservation = $this->getRatatouilleReservationSection();
+            $reservation = $this->getReservationSection($pageSlug);
             if ($reservation === []) {
                 $this->setErrorMessage('The reservation form is not available right now.');
-                $this->redirect('/yummy/ratatouille');
+                $this->redirect($fallbackUrl);
                 return;
             }
 
@@ -158,13 +181,13 @@ final class YummyController extends BaseController
 
             if ($date === '' || $session === '' || !in_array($date, $dates, true) || !in_array($session, $sessions, true)) {
                 $this->setErrorMessage('Please choose a valid date and session.');
-                $this->redirect('/yummy/ratatouille');
+                $this->redirect($fallbackUrl);
                 return;
             }
 
             if (($adultCount + $childCount) < 1) {
                 $this->setErrorMessage('Please choose at least one adult or child.');
-                $this->redirect('/yummy/ratatouille');
+                $this->redirect($fallbackUrl);
                 return;
             }
 
@@ -194,7 +217,7 @@ final class YummyController extends BaseController
                 'unit_price' => $totalPrice,
                 'selection_text' => $date . ', ' . $session,
                 'ticket_summary_text' => implode(', ', $guestParts),
-                'location_name' => 'Ratatouille Food & Wine',
+                'location_name' => $locationName,
                 'category_label' => 'Yummy',
                 'special_requests' => $specialRequests,
                 'customer_name' => $customerName,
@@ -217,13 +240,13 @@ final class YummyController extends BaseController
             $this->redirect('/program');
         } catch (\Throwable $e) {
             $this->setErrorMessage('Your reservation could not be booked right now.');
-            $this->redirect('/yummy/ratatouille');
+            $this->redirect($fallbackUrl);
         }
     }
 
-    private function getRatatouilleReservationSection(): array
+    private function getReservationSection(string $pageSlug): array
     {
-        $page = $this->adminPageService->getPageBySlug('ratatouille');
+        $page = $this->adminPageService->getPageBySlug($pageSlug);
         $pageId = $page->page_id ?? null;
         if ($pageId === null) {
             return [];

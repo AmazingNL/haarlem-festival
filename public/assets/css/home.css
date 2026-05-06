@@ -363,37 +363,6 @@
     min-height: 613px;
 }
 
-.home-back-top {
-    background: #e5daa1;
-    border-top: 1px solid rgba(65, 6, 6, 0.08);
-    padding: 18px 0;
-}
-
-.home-back-top .home-container {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.home-back-top__link {
-    align-items: center;
-    color: #410606;
-    display: inline-flex;
-    font-family: Poppins, Arial, sans-serif;
-    gap: 12px;
-    text-decoration: none;
-}
-
-.home-back-top__icon {
-    align-items: center;
-    background: #8f1d1d;
-    border-radius: 999px;
-    color: #fcf7f7;
-    display: inline-flex;
-    height: 36px;
-    justify-content: center;
-    width: 36px;
-}
-
 @media (max-width: 1200px) {
     .home-gallery__button--prev {
         left: 12px;

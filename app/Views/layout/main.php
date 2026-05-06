@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="/assets/css/yummy/ratatouille.css" />
 </head>
 
-<body>
+<body id="top">
     <?php
     $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
     $isActive = static function (string $path) use ($currentPath): string {
@@ -48,6 +48,13 @@
             <?php require $content; ?>
         <?php endif; ?>
     </main>
+
+    <section class="site-back-top" aria-label="Back to top">
+        <a class="site-back-top__link" href="#top">
+            <span>Go to top</span>
+            <span class="site-back-top__icon" aria-hidden="true">&uarr;</span>
+        </a>
+    </section>
 
     <?php require __DIR__ . '/partials/site_footer.php'; ?>
 

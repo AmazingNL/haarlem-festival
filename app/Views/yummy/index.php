@@ -4,6 +4,7 @@ $sectionData = isset($section) && is_array($section) ? $section : [];
 $sections = array_values($sectionData);
 $total = count($sections);
 $showFallbackHero = !empty($showFallbackHero);
+$tasteGallery = null;
 
 ?>
 <div class="yummy-page">
@@ -43,6 +44,7 @@ for ($i = 0; $i < $total; $i++) {
         if ($nextType === 'gallery') {
             $textSection = $s;
             $gallerySection = $next;
+            $tasteGallery = $next;
             require __DIR__ . '/text_block_gallery.php';
             $i++; // skip the paired gallery section
             continue;
@@ -58,6 +60,11 @@ for ($i = 0; $i < $total; $i++) {
 
         case 'haarlem_unique':
             require __DIR__ . '/haarlem_unique.php';
+            if ($tasteGallery !== null) {
+                $s = $tasteGallery;
+                require __DIR__ . '/haarlem_taste.php';
+                $tasteGallery = null;
+            }
             break;
 
         case 'gallery':
@@ -68,6 +75,11 @@ for ($i = 0; $i < $total; $i++) {
             require __DIR__ . '/inspection.php';
             break;
     }
+}
+
+if ($tasteGallery !== null) {
+    $s = $tasteGallery;
+    require __DIR__ . '/haarlem_taste.php';
 }
 
 if (!empty($resCard)) {

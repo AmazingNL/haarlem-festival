@@ -5,9 +5,9 @@
 $welcomeBannerCard = [];
 $welcomeBannerSection = null;
 $ourChef = null;
-$aboutRatatouille;
+$aboutBistroToujours = null;
 $gallery = [];
-$ratatouilleGallery = null;
+$bistroGallery = null;
 $reservation = null;
 
 $sectionData = isset($section) && is_array($section) ? $section : [];
@@ -27,7 +27,7 @@ foreach ($sections as $s) {
         $welcomeBannerSection = $s;
     }
     if ($type === 'text_block' && trim($s['sub_title']) === 'about') {
-        $aboutRatatouille = $s;
+        $aboutBistroToujours = $s;
     }
     if ($type === 'text_block' && trim($s['custom_class']) === 'chef_section') {
         $ourChef = $s;
@@ -35,8 +35,8 @@ foreach ($sections as $s) {
     if ($type === 'gallery' && trim($s['custom_class']) === 'chef_section') {
         $gallery[] = $s;
     }
-    if ($type === 'gallery' && trim((string) ($s['custom_class'] ?? '')) === 'ratatouille_gallery') {
-        $ratatouilleGallery = $s;
+    if ($type === 'gallery' && in_array(trim((string) ($s['custom_class'] ?? '')), ['bistro_gallery', 'ratatouille_gallery'], true)) {
+        $bistroGallery = $s;
     }
     if ($type === 'reservation') {
         $reservation = $s;
@@ -55,10 +55,9 @@ if ($welcomeBannerSection) {
     <div class="ratatouille-detail-grid">
         <div class="ratatouille-detail-content">
             <?php
-            // Handle "About Ratatouille" (Standard Text Block + Banner Cards)
-            if (!empty($aboutRatatouille) && !empty($welcomeBannerCard)) {
-                $s = $aboutRatatouille;
-                require __DIR__ . '/about_ratatouille.php';
+            if (!empty($aboutBistroToujours) && !empty($welcomeBannerCard)) {
+                $s = $aboutBistroToujours;
+                require __DIR__ . '/about_bistro_toujours.php';
             }
 
             if (!empty($ourChef) && !empty($gallery)) {
@@ -66,12 +65,12 @@ if ($welcomeBannerSection) {
                 require __DIR__ . '/our_chef.php';
             }
 
-            if (!empty($ratatouilleGallery)) {
-                $s = $ratatouilleGallery;
-                require __DIR__ . '/ratatouille_gallery.php';
+            if (!empty($bistroGallery)) {
+                $s = $bistroGallery;
+                require __DIR__ . '/bistro_gallery.php';
             }
 
-            require __DIR__ . '/ratatouille_location.php';
+            require __DIR__ . '/bistro_location.php';
             ?>
         </div>
 

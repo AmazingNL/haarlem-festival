@@ -18,8 +18,35 @@
         if (card.dataset.reservationPickerReady === 'true') return;
         card.dataset.reservationPickerReady = 'true';
 
+        const closeButton = card.querySelector('.ratatouille-booking-close');
+        const reservationColumn = card.closest('.ratatouille-reservation-column');
+        const detailGrid = card.closest('.ratatouille-detail-grid');
         const totalRow = card.querySelector('.ratatouille-total-row strong');
         const totalInput = card.querySelector('[data-reservation-total-input]');
+
+        if (closeButton && reservationColumn && detailGrid) {
+            const openButton = document.createElement('button');
+            openButton.type = 'button';
+            openButton.className = 'ratatouille-reservation-float';
+            openButton.hidden = true;
+            openButton.setAttribute('aria-label', 'Open reservation form');
+            openButton.innerHTML = '<span>Reservation</span><span class="ratatouille-reservation-float__icon" aria-hidden="true">&uarr;</span>';
+            document.body.appendChild(openButton);
+
+            closeButton.addEventListener('click', function () {
+                card.querySelectorAll('[data-ticket-picker]').forEach(closePicker);
+                detailGrid.classList.add('is-reservation-closed');
+                reservationColumn.hidden = true;
+                openButton.hidden = false;
+            });
+
+            openButton.addEventListener('click', function () {
+                reservationColumn.hidden = false;
+                detailGrid.classList.remove('is-reservation-closed');
+                openButton.hidden = true;
+                reservationColumn.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
 
         const updateGrandTotal = function () {
             const total = Array.from(card.querySelectorAll('[data-ticket-picker]')).reduce(function (sum, picker) {
