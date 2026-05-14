@@ -95,14 +95,15 @@ if (is_array($sectionImage)) {
 
 	.food-culture-copy-title {
 		margin: 0 0 10px;
-		font-size: 34px;
+		font-size: 22px;
 		line-height: 1.15;
+		font-weight: 600;
 	}
 
 	.food-culture-copy-body {
 		font-size: 16px;
 		line-height: 1.7;
-		max-width: 60ch;
+		width: 100%;
 	}
 
 	.food-culture-images {
@@ -117,7 +118,7 @@ if (is_array($sectionImage)) {
 
 	.food-culture-images img {
 		display: block;
-		width: 90%;
+		width: 100%;
 		height: 180px;
 		object-fit: cover;
 		border-radius: 14px;
@@ -146,16 +147,40 @@ if (is_array($sectionImage)) {
 			padding: 0 14px;
 		}
 
-		.food-culture-combined-title {
+		.food-culture-title {
 			font-size: 22px;
+			margin-bottom: 18px;
 		}
 
 		.food-culture-copy-title {
-			font-size: 28px;
+			font-size: 20px;
+		}
+
+		.food-culture-copy-body {
+			font-size: 15px;
+			line-height: 1.65;
 		}
 
 		.food-culture-images {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 520px) {
+		.food-culture-combined {
+			padding: 0 12px;
+		}
+
+		.food-culture-title {
+			font-size: 20px;
+		}
+
+		.food-culture-copy-title {
+			font-size: 24px;
+		}
+
+		.food-culture-images {
+			grid-template-columns: 1fr;
 		}
 	}
 </style>

@@ -1,4 +1,5 @@
 <?php
+// Small helper functions used by the St. Bavo partials.
 $historyText = static function (?string $value): string {
     return nl2br(htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'));
 };
@@ -8,6 +9,7 @@ $historyUrl = static function (?string $value, string $default = '#'): string {
     return htmlspecialchars($url !== '' ? $url : $default, ENT_QUOTES, 'UTF-8');
 };
 
+// Re-index sections by section_type so each St. Bavo block can be loaded directly.
 $sectionsByType = [];
 foreach (($section ?? []) as $item) {
     if (empty($item['is_published'])) {

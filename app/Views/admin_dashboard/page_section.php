@@ -1,5 +1,23 @@
 <?php
 $section = $pageSection;
+$sectionTitle = static function (array $section): string {
+    $title = trim((string) ($section['title'] ?? ''));
+    if ($title !== '') {
+        return $title;
+    }
+
+    $content = json_decode((string) ($section['content'] ?? ''), true);
+    if (is_array($content)) {
+        foreach (['heading', 'title', 'item_one_label', 'card_one_title', 'button_text'] as $key) {
+            $value = trim((string) ($content[$key] ?? ''));
+            if ($value !== '') {
+                return $value;
+            }
+        }
+    }
+
+    return ucwords(str_replace('_', ' ', (string) ($section['section_type'] ?? 'Section')));
+};
 ?>
 
 <?php /* Sections list: show all sections for this page with edit/delete actions */ ?>
@@ -28,7 +46,7 @@ $section = $pageSection;
 
                     $id = $s['section_id'] ?? 0;
                     $type = $s['section_type'] ?? '';
-                    $title = $s['title'] ?? '';
+                    $title = $sectionTitle($s);
                     $order = isset($s['sort_order']) ? (int) $s['sort_order'] + 1 : 0;
                     $pub = !empty($s['is_published']);
                     $PageId = $s['page_id'] ?? $pageId;

@@ -59,4 +59,23 @@
             gap: 36px;
         }
     }
+
+    @media (max-width: 560px) {
+        .wis-section {
+            padding: 48px 16px;
+        }
+
+        .wis-title {
+            font-size: 1.9rem;
+        }
+
+        .wis-body p {
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .wis-image {
+            height: 260px;
+        }
+    }
 </style>

@@ -51,19 +51,19 @@ VALUES
 -- -------------------------
 
 -- Hero (uses main image_id 5)
-INSERT INTO page_section (page_id, section_type, title, content, image_id, button_text, button_link, sort_order, is_published)
+INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
 VALUES
-(1, 'hero', 'Visit Haarlem', '<p>Discover events, buy tickets, and build your personal program.</p>', 5, 'Explore Events', '/events', 1, 1);
+(1, 'hero', 'Visit Haarlem', '<p>Discover events, buy tickets, and build your personal program.</p>', 'Explore Events', '/events', 1, 1);
 
 -- Intro text block
-INSERT INTO page_section (page_id, section_type, title, content, image_id, button_text, button_link, sort_order, is_published)
+INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
 VALUES
-(1, 'text_block', 'Welcome to Haarlem', '<p>Haarlem is a charming city with canals, historic streets, and great culture. Explore highlights and plan your visit.</p>', NULL, NULL, NULL, 2, 1);
+(1, 'text_block', 'Welcome to Haarlem', '<p>Haarlem is a charming city with canals, historic streets, and great culture. Explore highlights and plan your visit.</p>', NULL, NULL, 2, 1);
 
 -- Two image row (gallery section without main image)
-INSERT INTO page_section (page_id, section_type, title, content, image_id, button_text, button_link, sort_order, is_published)
+INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
 VALUES
-(1, 'two_image_row', NULL, NULL, NULL, NULL, NULL, 3, 1);
+(1, 'two_image_row', NULL, NULL, NULL, NULL, 3, 1);
 
 -- Link exactly 2 images to that gallery section
 -- Assumes the last insert made section_id = 3 (safe approach below uses LAST_INSERT_ID)
@@ -75,17 +75,17 @@ VALUES
 (@two_img_section_id, 7, 2);
 
 -- Grote Markt (image left)
-INSERT INTO page_section (page_id, section_type, title, content, image_id, button_text, button_link, sort_order, is_published)
+INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
 VALUES
-(1, 'image_left', 'Grote Markt', '<p>The heart of Haarlem with terraces, history, and lively atmosphere.</p>', 8, 'Read more', '/locations/grote-markt', 4, 1);
+(1, 'image_left', 'Grote Markt', '<p>The heart of Haarlem with terraces, history, and lively atmosphere.</p>', 'Read more', '/locations/grote-markt', 4, 1);
 
 -- Canal Houses (image right)
-INSERT INTO page_section (page_id, section_type, title, content, image_id, button_text, button_link, sort_order, is_published)
+INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
 VALUES
-(1, 'image_right', 'Canal Houses', '<p>Walk along the Spaarne and enjoy classic Haarlem architecture.</p>', 9, 'Discover', '/visit/canals', 5, 1);
+(1, 'image_right', 'Canal Houses', '<p>Walk along the Spaarne and enjoy classic Haarlem architecture.</p>', 'Discover', '/visit/canals', 5, 1);
 
 -- Cards grid (store JSON in content for now)
-INSERT INTO page_section (page_id, section_type, title, content, image_id, button_text, button_link, sort_order, is_published)
+INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
 VALUES
 (
   1,
@@ -100,15 +100,14 @@ VALUES
   ]',
   NULL,
   NULL,
-  NULL,
   6,
   1
 );
 
 -- Transportation block
-INSERT INTO page_section (page_id, section_type, title, content, image_id, button_text, button_link, sort_order, is_published)
+INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
 VALUES
-(1, 'transport', 'Transportation', '<p>Getting around is easy: buses, trains, bikes, and walking routes connect everything.</p>', NULL, 'Plan your route', '/transport', 7, 1);
+(1, 'transport', 'Transportation', '<p>Getting around is easy: buses, trains, bikes, and walking routes connect everything.</p>', 'Plan your route', '/transport', 7, 1);
 
 -- -------------------------
 -- Locations

@@ -32,6 +32,7 @@ MODIFY section_type ENUM(
   'history_route',
   'history_info',
   'history_cta',
+  'history_page_nav',
   'history_book_tour_hero',
   'history_book_tour_booking',
   'history_book_tour_route',
@@ -47,7 +48,12 @@ MODIFY section_type ENUM(
   'history_st_bavo_facts',
   'history_st_bavo_article',
   'history_st_bavo_sidebar',
-  'history_st_bavo_route_cta'
+  'history_st_bavo_route_cta',
+  'history_molen_hero',
+  'history_molen_facts',
+  'history_molen_article',
+  'history_molen_sidebar',
+  'history_molen_route_cta'
 ) NOT NULL;
 
 DELETE ps FROM page_section ps

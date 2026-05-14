@@ -1,9 +1,6 @@
 (function () {
+    // Handle the interactive booking widget on the History book tour page.
     const widgets = document.querySelectorAll('[data-booking-widget]');
-    if (!widgets.length) {
-        return;
-    }
-
     const formatter = new Intl.NumberFormat('nl-NL', {
         style: 'currency',
         currency: 'EUR',
@@ -17,6 +14,7 @@
         const languageButtons = Array.from(widget.querySelectorAll('[data-booking-choice="language"]'));
         const ticketButtons = Array.from(widget.querySelectorAll('[data-booking-ticket]'));
         const quantityButtons = Array.from(widget.querySelectorAll('[data-booking-quantity-action]'));
+        const bookingForm = widget.querySelector('.history-tour-booking-form');
 
         const inputs = {
             day: widget.querySelector('[data-booking-input="day"]'),
@@ -39,16 +37,20 @@
             note: widget.querySelector('[data-booking-summary="note"]')
         };
 
+        const submitButton = widget.querySelector('[data-booking-submit]');
+
         const labels = {
             individual: ticketButtons.find((button) => button.dataset.bookingTicket === 'individual')?.dataset.label || 'Individual',
             family: ticketButtons.find((button) => button.dataset.bookingTicket === 'family')?.dataset.label || 'Family'
         };
 
         const state = {
-            day: widget.dataset.defaultDay || dayButtons[0]?.dataset.value || '',
-            time: widget.dataset.defaultTime || timeButtons[0]?.dataset.value || '',
-            language: widget.dataset.defaultLanguage || languageButtons[0]?.dataset.value || '',
-            ticket: widget.dataset.defaultTicket === 'family' ? 'family' : 'individual',
+            day: widget.dataset.defaultDay || '',
+            time: widget.dataset.defaultTime || '',
+            language: widget.dataset.defaultLanguage || '',
+            ticket: widget.dataset.defaultTicket === 'family' || widget.dataset.defaultTicket === 'individual'
+                ? widget.dataset.defaultTicket
+                : '',
             quantity: Math.max(1, parseInt(widget.dataset.defaultQuantity || '1', 10) || 1)
         };
 
@@ -68,18 +70,37 @@
         }
 
         function currentUnitPrice() {
+            if (!state.ticket) {
+                return 0;
+            }
+
             return state.ticket === 'family' ? prices.family : prices.individual;
         }
 
         function currentTicketTitle() {
+            if (!state.ticket) {
+                return '';
+            }
+
             return state.ticket === 'family' ? labels.family : labels.individual;
         }
 
         function currentSelectionText() {
-            return [state.day, state.time].filter(Boolean).join(', ') + (state.language ? ' | ' + state.language : '');
+            const parts = [state.day, state.time].filter(Boolean);
+            let text = parts.join(', ');
+
+            if (state.language) {
+                text += (text ? ' | ' : '') + state.language;
+            }
+
+            return text;
         }
 
         function currentTicketSummary() {
+            if (!state.ticket) {
+                return '';
+            }
+
             if (state.ticket === 'family') {
                 if (state.quantity === 1) {
                     return labels.family + ' (up to ' + familySize + ')';
@@ -95,6 +116,10 @@
             return currentUnitPrice() * state.quantity;
         }
 
+        function isComplete() {
+            return state.day !== '' && state.time !== '' && state.language !== '' && state.ticket !== '';
+        }
+
         function currentSavings() {
             if (state.ticket !== 'family') {
                 return 0;
@@ -103,6 +128,7 @@
             return (prices.individual * familySize * state.quantity) - currentTotalPrice();
         }
 
+        // Refresh the button states, summaries, and hidden form inputs.
         function updateView() {
             setSelected(dayButtons, state.day, (button) => button.dataset.value || '');
             setSelected(timeButtons, state.time, (button) => button.dataset.value || '');
@@ -114,10 +140,11 @@
             const unitPrice = currentUnitPrice();
             const totalPrice = currentTotalPrice();
             const savings = currentSavings();
+            const hasCompleteSelection = isComplete();
 
             if (summaries.quantity) summaries.quantity.textContent = String(state.quantity);
-            if (summaries.selection) summaries.selection.textContent = selectionText;
-            if (summaries.ticket) summaries.ticket.textContent = ticketSummary;
+            if (summaries.selection) summaries.selection.textContent = selectionText || 'Choose day, time, and language';
+            if (summaries.ticket) summaries.ticket.textContent = ticketSummary || 'Choose a ticket type';
             if (summaries.total) summaries.total.textContent = formatter.format(totalPrice);
             if (summaries.note) summaries.note.textContent = savings > 0 ? 'Save ' + formatter.format(savings) + ' vs individual tickets!' : '';
 
@@ -128,9 +155,10 @@
             if (inputs.ticketTitle) inputs.ticketTitle.value = currentTicketTitle();
             if (inputs.quantity) inputs.quantity.value = String(state.quantity);
             if (inputs.unitPrice) inputs.unitPrice.value = unitPrice.toFixed(2);
-            if (inputs.totalPrice) inputs.totalPrice.value = totalPrice.toFixed(2);
-            if (inputs.selectionText) inputs.selectionText.value = selectionText;
-            if (inputs.ticketSummaryText) inputs.ticketSummaryText.value = ticketSummary;
+            if (inputs.totalPrice) inputs.totalPrice.value = hasCompleteSelection ? totalPrice.toFixed(2) : '0.00';
+            if (inputs.selectionText) inputs.selectionText.value = hasCompleteSelection ? selectionText : '';
+            if (inputs.ticketSummaryText) inputs.ticketSummaryText.value = state.ticket ? ticketSummary : '';
+            if (submitButton) submitButton.disabled = !hasCompleteSelection;
         }
 
         dayButtons.forEach((button) => {
@@ -173,6 +201,48 @@
             });
         });
 
+        if (bookingForm && submitButton) {
+            // Prevent double-submit after the booking is complete.
+            bookingForm.addEventListener('submit', () => {
+                if (!isComplete() || submitButton.disabled) {
+                    return;
+                }
+
+                submitButton.disabled = true;
+            });
+        }
+
         updateView();
+    });
+
+    const scheduleWidgets = document.querySelectorAll('[data-schedule-widget]');
+    scheduleWidgets.forEach((widget) => {
+        const scheduleButtons = Array.from(widget.querySelectorAll('[data-schedule-choice]'));
+        const schedulePanels = Array.from(widget.querySelectorAll('[data-schedule-panel]'));
+
+        let activeDay = widget.dataset.defaultDay || scheduleButtons[0]?.dataset.value || '';
+
+        function updateSchedule() {
+            scheduleButtons.forEach((button) => {
+                const isSelected = (button.dataset.value || '') === activeDay;
+                button.classList.toggle('is-selected', isSelected);
+                button.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+            });
+
+            schedulePanels.forEach((panel) => {
+                const isActive = (panel.dataset.schedulePanel || '') === activeDay;
+                panel.classList.toggle('is-active', isActive);
+                panel.hidden = !isActive;
+            });
+        }
+
+        scheduleButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                activeDay = button.dataset.value || '';
+                updateSchedule();
+            });
+        });
+
+        updateSchedule();
     });
 })();

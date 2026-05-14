@@ -2,7 +2,13 @@
 
 namespace App\ViewModels;
 
-use App\ViewModels\history\HistoryCta;
+use App\ViewModels\home\HomeCardsGrid;
+use App\ViewModels\home\HomeFeature;
+use App\ViewModels\home\HomeGallery;
+use App\ViewModels\home\HomeHero;
+use App\ViewModels\home\HomeImageLeft;
+use App\ViewModels\home\HomeImageRight;
+use App\ViewModels\home\HomeTransport;
 use App\ViewModels\history\HistoryBookTourAlert;
 use App\ViewModels\history\HistoryBookTourBooking;
 use App\ViewModels\history\HistoryBookTourHero;
@@ -10,39 +16,54 @@ use App\ViewModels\history\HistoryBookTourNotice;
 use App\ViewModels\history\HistoryBookTourPricing;
 use App\ViewModels\history\HistoryBookTourRoute;
 use App\ViewModels\history\HistoryBookTourSchedule;
+use App\ViewModels\history\HistoryCta;
 use App\ViewModels\history\HistoryFeaturedLocations;
 use App\ViewModels\history\HistoryGallery;
 use App\ViewModels\history\HistoryHero;
 use App\ViewModels\history\HistoryInfo;
-use App\ViewModels\history\HistoryPageNav;
-use App\ViewModels\history\HistoryRouteMapCta;
-use App\ViewModels\history\HistoryRouteMapDirections;
-use App\ViewModels\history\HistoryRouteMapHero;
-use App\ViewModels\history\HistoryRouteMapStops;
-use App\ViewModels\history\HistoryRoute;
-use App\ViewModels\history\HistoryStBavoArticle;
-use App\ViewModels\history\HistoryStBavoFacts;
-use App\ViewModels\history\HistoryStBavoHero;
-use App\ViewModels\history\HistoryStBavoRouteCta;
-use App\ViewModels\history\HistoryStBavoSidebar;
 use App\ViewModels\history\HistoryMolenArticle;
 use App\ViewModels\history\HistoryMolenFacts;
 use App\ViewModels\history\HistoryMolenHero;
 use App\ViewModels\history\HistoryMolenRouteCta;
 use App\ViewModels\history\HistoryMolenSidebar;
+use App\ViewModels\history\HistoryPageNav;
+use App\ViewModels\history\HistoryRoute;
+use App\ViewModels\history\HistoryRouteMapCta;
+use App\ViewModels\history\HistoryRouteMapDirections;
+use App\ViewModels\history\HistoryRouteMapHero;
+use App\ViewModels\history\HistoryRouteMapStops;
+use App\ViewModels\history\HistoryStBavoArticle;
+use App\ViewModels\history\HistoryStBavoFacts;
+use App\ViewModels\history\HistoryStBavoHero;
+use App\ViewModels\history\HistoryStBavoRouteCta;
+use App\ViewModels\history\HistoryStBavoSidebar;
 use App\ViewModels\history\HistoryTimeline;
+use App\ViewModels\yummy\HaarlemUnique;
+use App\ViewModels\yummy\RestaurantCard;
 use App\ViewModels\yummy\TextBlock;
 use App\ViewModels\yummy\WelcomeBanner;
-use App\ViewModels\yummy\HaarlemUnique;
+use App\ViewModels\yummy\WelcomeBannerCard;
 
-
-class SectionFactory 
+// Map a section type string to the ViewModel class that defines its CMS fields.
+class SectionFactory
 {
-    public static function returnSectionClass(string $type, ): ?string
+    // Return the correct ViewModel class for the requested section type.
+    public static function returnSectionClass(string $type): ?string
     {
         $map = [
+            'hero' => HomeHero::class,
+            'feature' => HomeFeature::class,
+            'gallery' => HomeGallery::class,
+            'image_left' => HomeImageLeft::class,
+            'image_right' => HomeImageRight::class,
+            'cards_grid' => HomeCardsGrid::class,
+            'transport' => HomeTransport::class,
             'text_block' => TextBlock::class,
+            'restaurant_card' => RestaurantCard::class,
+            'restaurants_card' => RestaurantCard::class,
             'welcome_banner' => WelcomeBanner::class,
+            'welcome_banner_card' => WelcomeBannerCard::class,
+            'haarlem_unique' => HaarlemUnique::class,
             'history_hero' => HistoryHero::class,
             'history_timeline' => HistoryTimeline::class,
             'history_gallery' => HistoryGallery::class,
@@ -76,6 +97,4 @@ class SectionFactory
 
         return $map[$type] ?? null;
     }
-
-
 }

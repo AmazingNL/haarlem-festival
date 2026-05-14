@@ -30,41 +30,38 @@ if (is_array($sectionImage)) {
 }
 ?>
 
-    <section class="taste-section">
-        <div class="taste-inner">
-            <div class="carousel-wrap">
-                <button class="carousel-btn carousel-prev">&#10094;</button>
-                <div class="carousel">
-                    <?php if (!empty($images)): ?>
-                        <?php foreach ($images as $img): ?>
-                            <figure class="taste-card">
-                                <img
-                                    src="<?= htmlspecialchars((string) ($img['src'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
-                                    alt="<?= htmlspecialchars((string) (($img['alt'] ?? '') !== '' ? $img['alt'] : 'Gallery image'), ENT_QUOTES, 'UTF-8') ?>"
-                                    loading="lazy"
-                                >
-                                <?php if (($img['caption'] ?? '') !== ''): ?>
-                                    <figcaption><?= htmlspecialchars((string) $img['caption'], ENT_QUOTES, 'UTF-8') ?></figcaption>
-                                <?php endif; ?>
-                            </figure>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-                <button class="carousel-btn carousel-next">&#10095;</button>
-            </div>
+<section class="taste-section">
+    <div class="carousel-wrap">
+        <button class="carousel-btn carousel-prev">&#10094;</button>
+        <div class="carousel">
+            <?php if (!empty($images)): ?>
+                <?php foreach ($images as $img): ?>
+                    <figure class="taste-card">
+                        <img src="<?= htmlspecialchars((string) ($img['src'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+                            alt="<?= htmlspecialchars((string) (($img['alt'] ?? '') !== '' ? $img['alt'] : 'Gallery image'), ENT_QUOTES, 'UTF-8') ?>"
+                            loading="lazy">
+                        <?php if (($img['caption'] ?? '') !== ''): ?>
+                            <figcaption><?= htmlspecialchars((string) $img['caption'], ENT_QUOTES, 'UTF-8') ?></figcaption>
+                        <?php endif; ?>
+                    </figure>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
-    </section>
+        <button class="carousel-btn carousel-next">&#10095;</button>
+    </div>
+</section>
 
 <style>
     .taste-section {
+        margin-top: 40px;
         background: #e5daa1;
         padding: 36px 12px;
     }
 
-    .taste-inner {
+    /* .taste-inner {
         max-width: 1200px;
         margin: 0 auto;
-    }
+    } */
 
     .taste-title {
         text-align: center;
@@ -261,6 +258,38 @@ if (is_array($sectionImage)) {
             height: 120px;
         }
     }
+
+    @media (max-width: 500px) {
+        .taste-section {
+            padding: 28px 8px;
+        }
+
+        .carousel-wrap {
+            gap: 8px;
+        }
+
+        .carousel {
+            gap: 8px;
+            padding: 10px;
+        }
+
+        .card,
+        .taste-card {
+            flex: 0 0 calc(100% - 2px);
+            min-width: 0;
+        }
+
+        .card img,
+        .taste-card img {
+            height: 180px;
+        }
+
+        .carousel-btn {
+            width: 28px;
+            height: 28px;
+            font-size: 13px;
+        }
+    }
 </style>
 
 <script>
@@ -268,15 +297,15 @@ if (is_array($sectionImage)) {
         const carousel = document.querySelector('.carousel');
         const prev = document.querySelector('.carousel-prev');
         const next = document.querySelector('.carousel-next');
-        
+
         if (!carousel || !prev || !next) return;
-        
+
         const scrollAmount = 280; // ~card width + gap
-        
+
         prev.addEventListener('click', () => {
             carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
         });
-        
+
         next.addEventListener('click', () => {
             carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         });

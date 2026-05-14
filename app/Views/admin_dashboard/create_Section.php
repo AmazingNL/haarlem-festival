@@ -36,6 +36,11 @@ use App\ViewModels\SectionFactory;
 
         <section class="field" id="sections"></section>
 
+        <div class="field">
+            <label for="sort_order">Sort Order</label>
+            <input id="sort_order" name="sort_order" type="number" class="input" value="0" min="0">
+        </div>
+
         <div>
             <label class="checkbox-label">
                 <input class="published" type="checkbox" name="is_published" value="1">

@@ -14,6 +14,7 @@ final class Event
     public string $startTime = date("Y-m-d H:i:s"); 
     public string $endTime = date("Y-m-d H:i:s");
     public int $locationId = 0;
+    public int $capacity = 0;
 
     public function __construct(
         int $eventid, string $title, string $type, int $location, int $capacity

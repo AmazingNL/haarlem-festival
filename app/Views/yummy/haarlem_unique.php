@@ -78,7 +78,9 @@ if (is_array($sectionImage)) {
         display: grid;
         grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr);
         gap: 30px;
-        align-items: start;
+        align-items: center;
+        justify-content: center;
+        padding: 0 18px;
     }
 
     .haarlem-unique-gallery {
@@ -139,9 +141,10 @@ if (is_array($sectionImage)) {
     }
 
     @media (max-width: 1024px) {
-        .haarlem-unique-grid {
+        .haarlem-unique {
             grid-template-columns: 1fr;
             gap: 18px;
+            padding: 0 16px;
         }
 
         .haarlem-unique-title {
@@ -155,11 +158,7 @@ if (is_array($sectionImage)) {
     }
 
     @media (max-width: 640px) {
-        .haarlem-unique-section {
-            padding: 18px 0;
-        }
-
-        .haarlem-unique-inner {
+        .haarlem-unique {
             padding: 0 14px;
         }
 
@@ -177,6 +176,22 @@ if (is_array($sectionImage)) {
 
         .haarlem-unique-copy {
             font-size: 16px;
+            line-height: 1.7;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .haarlem-unique {
+            padding: 0 12px;
+            gap: 14px;
+        }
+
+        .haarlem-unique-image {
+            height: 200px;
+        }
+
+        .haarlem-unique-title {
+            font-size: 25px;
         }
     }
 </style>

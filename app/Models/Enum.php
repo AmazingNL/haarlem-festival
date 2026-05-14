@@ -47,8 +47,8 @@ enum PageStatus: string
 
 enum SectionType: string
 {
-    case CTA = 'cta';
     case TEXT_BLOCK = 'text_block';
+    case RESTAURANT_CARD = 'restaurant_card';
     case IMAGE_TEXT = 'image_text';
     case HERO = 'hero';
     case FEATURE = 'feature';
@@ -63,6 +63,7 @@ enum SectionType: string
     case CARDS_GRID = 'cards_grid';
     case RESTAURANTS_CARD = 'restaurants_card';
     case WELCOME_BANNER = "welcome_banner";
+    case WELCOME_BANNER_CARD = 'welcome_banner_card';
     case GALLERY = "gallery";
     case STORIES_HERO = 'stories_hero';
     case WHAT_IS_STORIES = 'what_is_stories';

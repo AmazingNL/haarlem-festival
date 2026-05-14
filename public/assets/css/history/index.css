@@ -1108,6 +1108,12 @@
     color: #fff;
 }
 
+.history-tour-card__submit:disabled {
+    background: #c4b7b1;
+    color: #f8f6f1;
+    cursor: not-allowed;
+}
+
 .history-tour-card__button {
     display: inline-flex;
     justify-content: center;
@@ -1253,11 +1259,32 @@
     gap: 0.7rem;
 }
 
-.history-tour-schedule__time {
+.history-tour-schedule__panel {
+    display: none;
+}
+
+.history-tour-schedule__panel.is-active {
+    display: block;
+}
+
+.history-tour-schedule__row {
+    align-items: start;
     border-top: 1px solid #eee5da;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    padding-top: 0.85rem;
+}
+
+.history-tour-schedule__time {
     color: #2b211b;
     font-weight: 700;
-    padding-top: 0.85rem;
+    padding-top: 0;
+}
+
+.history-tour-schedule__detail {
+    color: #5f5348;
+    line-height: 1.6;
 }
 
 .history-tour-pricing__grid {

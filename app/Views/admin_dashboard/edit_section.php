@@ -16,7 +16,6 @@ $sectionData = is_array($sectionData ?? null) ? $sectionData : [];
     <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf ?? '') ?>">
     <input type="hidden" name="section_id" value="<?= htmlspecialchars($sectionId) ?>">
     <input type="hidden" name="page_id" value="<?= htmlspecialchars($pageId) ?>">
-    <input type="hidden" name="sort_order" value="<?= htmlspecialchars((string) $sortOrder) ?>">
     <input type="hidden" name="section_type" value="<?= htmlspecialchars((string) $sectionType) ?>">
 
     <header class="form-head">
@@ -29,6 +28,12 @@ $sectionData = is_array($sectionData ?? null) ? $sectionData : [];
         <section class="field" id="sections">
             <?= require __DIR__ . '/section_partial_view/index.php' ?>
         </section>
+
+        <div class="field">
+            <label for="sort_order">Sort Order</label>
+            <input id="sort_order" name="sort_order" type="number" class="input"
+                value="<?= htmlspecialchars((string) $sortOrder) ?>" min="0">
+        </div>
 
         <div>
             <label class="checkbox-label">

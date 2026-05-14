@@ -1,0 +1,2 @@
+ALTER TABLE image
+ADD COLUMN caption VARCHAR(255) NULL AFTER alt_text;

@@ -116,4 +116,17 @@
         .sched-title { font-size: 1.6rem; }
         .sched-card-body { padding: 18px 20px; }
     }
+
+    @media (max-width: 420px) {
+        .sched-section { padding: 48px 14px; }
+        .sched-tabs { gap: 8px; }
+        .sched-tab {
+            width: calc(50% - 4px);
+            padding: 10px 12px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .sched-card-title { font-size: 1.05rem; }
+    }
 </style>
