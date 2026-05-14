@@ -45,7 +45,7 @@ use App\ViewModels\stories\StorytellingSchedule;
 use App\ViewModels\stories\WhatIsStories;
 use App\ViewModels\yummy\TextBlock;
 use App\ViewModels\yummy\WelcomeBanner;
-use App\ViewModels\yummy\WelcomeBannerCard;
+use App\ViewModels\yummy\HaarlemUnique;
 
 class SectionFactory
 {
