@@ -38,6 +38,37 @@ try {
 
     $ensureMigrationTable = static function () use ($pdo, $db, $migrationTable): void {
         $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$db}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+
+        $stmt = $pdo->prepare(
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = :db AND table_name = :table"
+        );
+        $stmt->execute([':db' => $db, ':table' => $migrationTable]);
+        $tableExists = (int) $stmt->fetchColumn() > 0;
+
+        if ($tableExists) {
+            $stmt = $pdo->prepare(
+                "SELECT column_name FROM information_schema.columns WHERE table_schema = :db AND table_name = :table"
+            );
+            $stmt->execute([':db' => $db, ':table' => $migrationTable]);
+            $columns = array_map('strval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+
+            if (!in_array('filename', $columns, true) && in_array('version', $columns, true)) {
+                $pdo->exec("ALTER TABLE `{$db}`.`{$migrationTable}` ADD COLUMN filename VARCHAR(255) NULL");
+                $pdo->exec("ALTER TABLE `{$db}`.`{$migrationTable}` ADD COLUMN checksum CHAR(32) NULL");
+                $pdo->exec("ALTER TABLE `{$db}`.`{$migrationTable}` ADD COLUMN applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
+                $pdo->exec("UPDATE `{$db}`.`{$migrationTable}` SET filename = version, checksum = ''");
+                $pdo->exec("ALTER TABLE `{$db}`.`{$migrationTable}` DROP PRIMARY KEY");
+                $pdo->exec("ALTER TABLE `{$db}`.`{$migrationTable}` MODIFY version VARCHAR(128) NULL");
+                $pdo->exec("ALTER TABLE `{$db}`.`{$migrationTable}` MODIFY filename VARCHAR(255) NOT NULL");
+                $pdo->exec("ALTER TABLE `{$db}`.`{$migrationTable}` MODIFY checksum CHAR(32) NOT NULL");
+                $pdo->exec("ALTER TABLE `{$db}`.`{$migrationTable}` ADD PRIMARY KEY (filename)");
+            }
+
+            if (in_array('filename', $columns, true) && in_array('version', $columns, true)) {
+                $pdo->exec("ALTER TABLE `{$db}`.`{$migrationTable}` MODIFY version VARCHAR(128) NULL");
+            }
+        }
+
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS `{$db}`.`{$migrationTable}` (
                 filename VARCHAR(255) NOT NULL,

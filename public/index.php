@@ -100,8 +100,11 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/checkout/success', [ShopController::class, 'checkoutSuccess']);
     $r->get('/checkout/cancel', [ShopController::class, 'checkoutCancel']);
     $r->get('/orders/{orderId:\d+}/success', [ShopController::class, 'success']);
-    $r->get('/yummy', [HomeController::class, 'yummy']);
-    $r->get('/yummy/ratatouille', [HomeController::class, 'ratatouille']);
+    $r->get('/yummy', [YummyController::class, 'yummy']);
+    $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
+    $r->post('/yummy/ratatouille/book-reservation', [YummyController::class, 'bookReservation']);
+    $r->get('/yummy/bistro-toujours', [YummyController::class, 'bistroToujours']);
+    $r->post('/yummy/bistro-toujours/book-reservation', [YummyController::class, 'bookBistroToujoursReservation']);
 
     $r->get('/stories', [StoriesController::class, 'index']);
     $r->post('/stories/add-to-program', [StoriesController::class, 'addShowToProgram']);
@@ -199,8 +202,12 @@ function createController(string $controllerClass)
 
             $resRepo = new App\Repositories\RestaurantRepository();
             $restaurantService = new App\Services\RestaurantService($resRepo);
+            $programService = new App\Services\ProgramService();
+            $reservationEmailService = new App\Services\ReservationEmailService();
+            $userRepo = new App\Repositories\UserRepository();
+            $userService = new App\Services\UserService($userRepo);
 
-            return new App\Controllers\YummyController($restaurantService, $pageService, $sectionService);
+            return new App\Controllers\YummyController($restaurantService, $pageService, $sectionService, $programService, $reservationEmailService, $userService);
 
 
         case App\Controllers\HistoryController::class:

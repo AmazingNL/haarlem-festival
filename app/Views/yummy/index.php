@@ -4,6 +4,11 @@ $sectionData = isset($section) && is_array($section) ? $section : [];
 $sections = array_values($sectionData);
 $total = count($sections);
 $showFallbackHero = !empty($showFallbackHero);
+$tasteGallery = null;
+
+?>
+<div class="yummy-page">
+<?php
 
 if ($showFallbackHero) {
     ?>
@@ -36,9 +41,10 @@ for ($i = 0; $i < $total; $i++) {
     if ($type === 'text_block' && isset($sections[$i + 1])) {
         $next = $sections[$i + 1];
         $nextType = trim((string) ($next['section_type'] ?? ''));
-        if (!empty($next['is_published']) && $nextType === 'gallery') {
+        if ($nextType === 'gallery') {
             $textSection = $s;
             $gallerySection = $next;
+            $tasteGallery = $next;
             require __DIR__ . '/text_block_gallery.php';
             $i++; // skip the paired gallery section
             continue;
@@ -52,19 +58,17 @@ for ($i = 0; $i < $total; $i++) {
             require __DIR__ . '/breadcrumb.php';
             break;
 
-        case 'text_block':
-        case 'gallery':
-            $title = trim((string) ($s['title'] ?? ''));
-            if($title === "haarlem taste"){
-            require __DIR__ . '/haarlem_taste.php';
-            }
-            else{
-            require __DIR__ . '/text_block_gallery.php';
+        case 'haarlem_unique':
+            require __DIR__ . '/haarlem_unique.php';
+            if ($tasteGallery !== null) {
+                $s = $tasteGallery;
+                require __DIR__ . '/haarlem_taste.php';
+                $tasteGallery = null;
             }
             break;
 
-        case 'haarlem_unique':
-            require __DIR__ . '/haarlem_unique.php';
+        case 'gallery':
+            require __DIR__ . '/haarlem_taste.php';
             break;
 
         default:
@@ -73,7 +77,13 @@ for ($i = 0; $i < $total; $i++) {
     }
 }
 
+if ($tasteGallery !== null) {
+    $s = $tasteGallery;
+    require __DIR__ . '/haarlem_taste.php';
+}
+
 if (!empty($resCard)) {
     require __DIR__ . '/restaurants_card.php';
 }
 ?>
+</div>

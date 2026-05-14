@@ -1,23 +1,21 @@
-@echo off
-REM team-sync.ps1 - One-command database and schema sync for the team (PowerShell)
-REM 
-REM Usage:
-REM   .\team-sync.ps1              # Full sync
-REM   .\team-sync.ps1 -Command sync  # Sync only
-REM   .\team-sync.ps1 -Command up    # Start containers
-REM   .\team-sync.ps1 -Command reset # Full reset
+# team-sync.ps1 - One-command database and schema sync for the team (PowerShell)
+#
+# Usage:
+#   .\team-sync.ps1                 # Full sync
+#   .\team-sync.ps1 -Command sync   # Sync only
+#   .\team-sync.ps1 -Command up     # Start containers
+#   .\team-sync.ps1 -Command reset  # Full reset
 
 param(
     [string]$Command = "sync"
 )
 
-$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ErrorActionPreference = "Stop"
 
 Write-Host "`n Haarlem Festival Team Database Sync" -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan
 
-function Run-Command {
+function Run_Command {
     param([string]$Description, [scriptblock]$Script)
     
     Write-Host $Description -ForegroundColor Green
@@ -27,7 +25,7 @@ function Run-Command {
 
 switch ($Command) {
     "up" {
-        Run-Command " Starting Docker containers..." {
+        Run_Command " Starting Docker containers..." {
             docker compose up -d
             docker compose ps
             Write-Host " Containers started" -ForegroundColor Green
@@ -39,6 +37,7 @@ switch ($Command) {
             Write-Host ""
             
             # Step 1: Star  Starting containers..." -ForegroundColor Yellow
+            Write-Host "1) Starting containers..." -ForegroundColor Yellow
             docker compose up -d
             docker compose ps
             Write-Host ""

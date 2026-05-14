@@ -26,11 +26,6 @@ final class TextBlock extends BaseSection
         $customClass,
         $sortOrder
     );
-        $this->page_id = $pageId;
-        $this->section_id = $sectionId;
-        $this->type = 'text_block';
-        $this->customClass = $customClass;
-        $this->sortOrder = $sortOrder;
 
         $this->title = $title;
         $this->subTitle = $subTitle;

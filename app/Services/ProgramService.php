@@ -201,6 +201,7 @@ final class ProgramService
             $ticketTitle = trim((string) ($normalizedItem['ticket_title'] ?? 'Ticket'));
             $ticketSummaryText = trim((string) ($normalizedItem['ticket_summary_text'] ?? ''));
             $locationName = trim((string) ($normalizedItem['location_name'] ?? 'Bavo Church'));
+            $specialRequests = trim((string) ($normalizedItem['special_requests'] ?? ''));
 
             $orderItems[] = [
                 'title' => $title,
@@ -211,6 +212,7 @@ final class ProgramService
                 'unit_price' => $unitPrice,
                 'line_total' => $lineTotal,
                 'location_name' => $locationName,
+                'special_requests' => $specialRequests,
             ];
 
             for ($index = 0; $index < $quantity; $index++) {
@@ -224,6 +226,7 @@ final class ProgramService
                     'ticket_title' => $ticketTitle,
                     'ticket_summary_text' => $ticketSummaryText,
                     'location_name' => $locationName,
+                    'special_requests' => $specialRequests,
                 ];
 
                 $ticketNumber++;
@@ -381,6 +384,10 @@ final class ProgramService
             'ticket_summary_text' => trim((string) ($item['ticket_summary_text'] ?? '')),
             'location_name' => trim((string) ($item['location_name'] ?? 'Bavo Church')),
             'category_label' => trim((string) ($item['category_label'] ?? 'Festival')),
+            'special_requests' => trim((string) ($item['special_requests'] ?? '')),
+            'customer_name' => trim((string) ($item['customer_name'] ?? '')),
+            'customer_email' => trim((string) ($item['customer_email'] ?? '')),
+            'customer_phone' => trim((string) ($item['customer_phone'] ?? '')),
             'starts_at' => trim((string) ($item['starts_at'] ?? '')),
             'ends_at' => trim((string) ($item['ends_at'] ?? '')),
         ];

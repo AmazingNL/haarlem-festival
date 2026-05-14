@@ -63,7 +63,11 @@ $programCategory = static function (array $programItem): string {
                         </article>
                     <?php else: ?>
                         <?php foreach ($programItems as $programItem): ?>
-                            <?php $isHistoryBooking = (string) ($programItem['type'] ?? '') === 'history-book-tour'; ?>
+                            <?php
+                            $programType = (string) ($programItem['type'] ?? '');
+                            $isHistoryBooking = $programType === 'history-book-tour';
+                            $isYummyReservation = $programType === 'yummy-reservation';
+                            ?>
                             <article class="program-ticket-card">
                                 <div class="program-ticket-card__header">
                                     <div>
@@ -100,14 +104,31 @@ $programCategory = static function (array $programItem): string {
                                             <strong><?= htmlspecialchars((string) ($programItem['ticket_title'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></strong>
                                         </li>
                                         <li>
-                                            <span><?= $isHistoryBooking ? 'Guests' : 'Quantity' ?></span>
-                                            <strong><?= htmlspecialchars((string) ($isHistoryBooking ? ($programItem['ticket_summary_text'] ?? '-') : (string) ($programItem['quantity'] ?? 1)), ENT_QUOTES, 'UTF-8') ?></strong>
+                                            <span><?= ($isHistoryBooking || $isYummyReservation) ? 'Guests' : 'Quantity' ?></span>
+                                            <strong><?= htmlspecialchars((string) (($isHistoryBooking || $isYummyReservation) ? ($programItem['ticket_summary_text'] ?? '-') : (string) ($programItem['quantity'] ?? 1)), ENT_QUOTES, 'UTF-8') ?></strong>
                                         </li>
                                         <li>
                                             <span><?= $isHistoryBooking ? 'Location' : 'Type' ?></span>
                                             <strong><?= htmlspecialchars((string) ($isHistoryBooking ? ($programItem['location_name'] ?? 'Bavo Church') : ($programItem['category_label'] ?? 'Festival')), ENT_QUOTES, 'UTF-8') ?></strong>
                                         </li>
                                     </ul>
+
+                                    <?php if ($isYummyReservation): ?>
+                                        <ul class="program-detail-list">
+                                            <li>
+                                                <span>Customer</span>
+                                                <strong><?= htmlspecialchars((string) (($programItem['customer_name'] ?? '') !== '' ? $programItem['customer_name'] : '-'), ENT_QUOTES, 'UTF-8') ?></strong>
+                                            </li>
+                                            <li>
+                                                <span>Email</span>
+                                                <strong><?= htmlspecialchars((string) (($programItem['customer_email'] ?? '') !== '' ? $programItem['customer_email'] : '-'), ENT_QUOTES, 'UTF-8') ?></strong>
+                                            </li>
+                                            <li>
+                                                <span>Requests</span>
+                                                <strong><?= htmlspecialchars((string) (($programItem['special_requests'] ?? '') !== '' ? $programItem['special_requests'] : '-'), ENT_QUOTES, 'UTF-8') ?></strong>
+                                            </li>
+                                        </ul>
+                                    <?php endif; ?>
                                 </div>
 
                                 <div class="program-ticket-card__footer">

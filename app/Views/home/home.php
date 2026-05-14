@@ -48,13 +48,4 @@ $homeParagraphs = static function (?string $value): array {
                 break;
         endswitch; ?>
     <?php endforeach; ?>
-
-    <section class="home-back-top">
-        <div class="home-container">
-            <a class="home-back-top__link" href="#home-top">
-                <span>Go to top</span>
-                <span class="home-back-top__icon" aria-hidden="true">&uarr;</span>
-            </a>
-        </div>
-    </section>
 </div>

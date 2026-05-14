@@ -27,11 +27,7 @@ final class RestaurantCard extends BaseSection
         ?string $image = null,
         array $cuisine = []
     ) {
-        $this->page_id = $pageId;
-        $this->section_id = $sectionId;
-        $this->type = 'restaurant_card';
-        $this->sortOrder = $sortOrder;
-        $this->customClass = $customClass;
+        parent::__construct($pageId, $sectionId, 'restaurant_card', $customClass, $sortOrder);
 
         $this->title = $title;
         $this->introduction = $introduction;

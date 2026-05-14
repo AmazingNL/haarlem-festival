@@ -232,7 +232,7 @@ final class AdminPageController extends BaseController
             $this->pageSectionService->createSection($section);
 
             $this->setFlash('success', 'Section created successful');
-            $this->redirect('/admin/dashboard');
+            $this->redirect('/admin/pageSection/'. $pageId . '/viewPageSections');
         } catch (Throwable $e) {
             error_log('Section creation error: ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
             error_log('Stack trace: ' . $e->getTraceAsString());

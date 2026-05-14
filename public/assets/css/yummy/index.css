@@ -1,223 +1,486 @@
 /** @format */
-/* ===================== Welcome banner ===================== */
+
+.yummy-page {
+	background: #f6e8e8;
+	color: #3b0b0b;
+}
 
 .welcome-banner {
 	position: relative;
-	max-height: 750px;
+	min-height: clamp(330px, 29vw, 420px);
 	overflow: hidden;
+	background: #210505;
+}
+
+.welcome-banner::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(90deg, rgba(20, 3, 3, 0.38) 0%, rgba(20, 3, 3, 0.2) 44%, rgba(20, 3, 3, 0.08) 100%);
+	pointer-events: none;
 }
 
 .welcome-banner-image {
 	display: block;
 	width: 100%;
-	height: clamp(260px, 60vw, 800px);
+	height: clamp(330px, 29vw, 420px);
 	object-fit: cover;
-	filter: blur(1.5px);
-	transform: scale(1.08);
+	object-position: center 45%;
+	filter: saturate(1.05) contrast(1.02);
 }
 
 .welcome-card-inner {
 	position: absolute;
-	top: 40%;
+	top: 52%;
+	left: max(24px, calc((100vw - 1180px) / 2));
+	z-index: 2;
 	transform: translateY(-50%);
 	display: flex;
 	flex-direction: column;
-	z-index: 100;
-	padding: 24px 70px;
-	gap: 20px;
-	max-width: 640px;
-	left: 0;
-	right: auto;
+	gap: 11px;
+	width: min(560px, calc(100% - 48px));
 }
 
 .welcome-card-title {
+	margin: 0;
 	text-transform: uppercase;
+}
+
+.welcome-card-title h1 {
+	margin: 0;
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
-	margin: 0;
+	line-height: 0.9;
+}
+
+.welcome-card-title span {
+	display: block;
+	line-height: 0.9;
 }
 
 .welcome-card-title--accent {
-	font-size: 8rem;
-	font-weight: 1000;
-	background: linear-gradient(90deg, #f2b53a 0%, #e24a2b 45%, #c21f1f 100%);
+	font-family: "Bebas Neue", Impact, sans-serif;
+	font-size: clamp(3rem, 4.9vw, 4.85rem);
+	font-weight: 900;
+	letter-spacing: 0;
+	background: linear-gradient(90deg, #f5d037 0%, #f0a313 45%, #b51414 100%);
 	-webkit-background-clip: text;
 	background-clip: text;
 	color: transparent;
-	white-space: normal;
-	line-height: 0.85;
-	margin: 0;
 }
 
 .welcome-card-title--main {
-	font-size: 4.5rem;
+	font-family: "Bebas Neue", Impact, sans-serif;
+	font-size: clamp(1.9rem, 3vw, 3.05rem);
 	font-weight: 900;
-	color: var(--color-text-primary);
-	line-height: 0.95;
-	margin: 0;
-		width: 90px;
-
+	letter-spacing: 0.04em;
+	color: #ffffff;
+	width: auto;
 }
 
 .welcome-card-content {
-	font-size: 1.3rem;
-	color: var(--color-text-primary);
-	margin-top: 2px;
+	max-width: 500px;
+	color: #ffffff;
+	font-size: clamp(0.92rem, 1.16vw, 1.05rem);
+	font-weight: 600;
+	line-height: 1.35;
+	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+.welcome-card-content p {
+	margin: 0;
+	line-height: inherit;
+}
+
+.welcome-card-content * {
+	line-height: inherit;
+}
+
+.welcome-card-inner .primary-button a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: min(420px, 100%);
+	min-height: 44px;
+	border-radius: 8px;
+	background: #9d1f1f;
+	color: #ffffff;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.welcome-card-inner .primary-button,
+.welcome-card-inner .primary-button * {
+	line-height: 1;
 }
 
 .primary-button .icon-explore {
 	margin-left: 20px;
-	stroke: var(--color-text-primary);
+	stroke: currentColor;
 }
 
 .primary-button:hover .icon-explore {
-	stroke: var(--color-text-header);
-	transform: rotate(90deg);
-}
-
-@media (max-width: 1100px) {
-	.welcome-card-inner {
-		padding: 20px 28px;
-	}
-
-	.welcome-card-title--accent {
-		font-size: 5rem;
-	}
-
-	.welcome-card-title--main {
-		font-size: 2.7rem;
-	}
-}
-
-@media (max-width: 700px) {
-	.welcome-card-inner {
-		padding: 32px 18px;
-		max-width: 100%;
-	}
-
-	.welcome-banner-image {
-	height: clamp(460px, 60vw, 800px);
-
-}
-
-}
-
-@media (max-width: 600px) {
-	.welcome-card {
-		width: calc(100% - 28px);
-	}
-
-	.welcome-card-inner {
-		padding: 32px 18px;
-		max-width: 100%;
-	}
-
-	.welcome-card-title--accent {
-		font-size: 3.1rem;
-	}
-
-	.welcome-card-title--main {
-		font-size: 1.8rem;
-	}
-
-	.welcome-card-content {
-		font-size: 1rem;
-		line-height: 1.55;
-		margin-top: 6px;
-	}
-}
-
-@media (max-width: 420px) {
-	.welcome-card-inner {
-		padding: 24px 12px 80px;
-	}
-
-	.welcome-card-title--accent {
-		font-size: 2.4rem;
-	}
-
-	.welcome-card-title--main {
-		font-size: 1.45rem;
-	}
-
-	.welcome-card-content {
-		font-size: 0.92rem;
-	}
-}
-
-/* ===================== BreadCrumb ===================== */
-.icon-fixed svg {
-	width: 100%;
-	height: 100%;
+	transform: translateX(4px);
 }
 
 .yummy-breadcrumb {
 	width: 100%;
-	background: #9f9999;
-	box-sizing: border-box;
+	background: #9b9696;
 	position: relative;
-	z-index: 50;
+	z-index: 10;
 	margin: 0;
 }
 
 .yummy-breadcrumb-inner {
-	max-width: 1200px;
+	max-width: 1180px;
 	margin: 0 auto;
-	padding: 18px 24px;
+	padding: 17px 24px;
 	display: flex;
 	align-items: center;
-	gap: 18px;
-	font-family: var(--font-primary);
+	gap: 16px;
 }
 
 .crumb {
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-	margin-left: 20px;
+	margin: 0;
 	text-decoration: none;
-	font-size: 18px;
-	font-weight: 600;
-	position: relative;
-	z-index: 60;
-}
-.crumb--home span {
-	color: var(--color-accent-yellow);
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1;
 }
 
-.crumb--home:hover {
-	color: var(--color-accent-pink);
-}
-.crumb--home:hover .icon-arrow-front {
-	transform: rotate(90deg);
+.crumb--home span {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	color: #ffffff;
 }
 
 .crumb--current {
-	color: var(--color-text-header);
+	color: #5a1919;
 }
 
-/* Responsive adjustments */
-@media (max-width: 700px) {
-	.yummy-breadcrumb-inner {
-		padding: 12px 16px;
+.crumb--home:hover span,
+.crumb--current:hover {
+	color: #f7d117;
+}
+
+.food-culture-combined {
+	max-width: 1180px;
+	margin: 0 auto 40px !important;
+	padding: 44px 24px 34px !important;
+	color: #3b0b0b;
+}
+
+.food-culture-title {
+	font-family: "Bebas Neue", Impact, sans-serif;
+	text-align: center;
+	letter-spacing: 0.18em !important;
+	text-transform: uppercase;
+	margin: 0 0 34px !important;
+	font-size: clamp(2rem, 3.4vw, 3rem) !important;
+	line-height: 1 !important;
+}
+
+.food-culture-combined-grid {
+	display: grid;
+	grid-template-columns: minmax(320px, 0.95fr) minmax(520px, 1.25fr) !important;
+	gap: 34px !important;
+	align-items: start;
+}
+
+.food-culture-copy-title {
+	margin: 0 0 10px !important;
+	font-size: 22px !important;
+	line-height: 1.15 !important;
+	font-weight: 800 !important;
+}
+
+.food-culture-copy-body {
+	font-size: 14px !important;
+	line-height: 1.85 !important;
+	font-weight: 600;
+	color: #392226;
+}
+
+.food-culture-copy-body p {
+	margin: 0 0 12px;
+	line-height: inherit;
+}
+
+.food-culture-images {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px !important;
+}
+
+.food-culture-images figure {
+	margin: 0;
+}
+
+.food-culture-images img {
+	display: block;
+	width: 100%;
+	aspect-ratio: 1.42 / 1;
+	height: auto !important;
+	object-fit: cover;
+	border-radius: 8px !important;
+}
+
+.food-culture-images figcaption {
+	margin-top: 4px;
+	font-size: 10px;
+	font-weight: 700;
+	text-align: right;
+	line-height: 1.2;
+	color: #5c3034;
+}
+
+.haarlem-unique {
+	max-width: 1180px;
+	margin: 30px auto 44px !important;
+	padding: 0 24px !important;
+	display: grid;
+	grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr) !important;
+	gap: 34px !important;
+	align-items: center;
+}
+
+.haarlem-unique-gallery {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 12px !important;
+}
+
+.haarlem-unique-figure {
+	margin: 0;
+}
+
+.haarlem-unique-image {
+	display: block;
+	width: 100%;
+	height: 292px !important;
+	object-fit: cover;
+	border-radius: 8px !important;
+}
+
+.haarlem-unique-caption {
+	margin-top: 6px;
+	font-size: 12px;
+	color: #6c3d42;
+	line-height: 1.35;
+}
+
+.haarlem-unique-copy-wrap--full {
+	max-width: 760px;
+}
+
+.haarlem-unique-title {
+	margin: 0;
+	color: #3b0b0b;
+	font-size: 24px !important;
+	line-height: 1.15 !important;
+	font-weight: 900;
+	letter-spacing: 0 !important;
+}
+
+.haarlem-unique-copy {
+	margin-top: 12px;
+	color: #392226;
+	font-size: 14px !important;
+	font-weight: 600;
+	line-height: 1.9 !important;
+	max-width: 62ch;
+}
+
+.haarlem-unique-copy p {
+	margin: 0 0 12px;
+	line-height: inherit;
+}
+
+.haarlem-unique-copy p:last-child {
+	margin-bottom: 0;
+}
+
+.taste-section {
+	background: #e5d993 !important;
+	padding: 28px 24px 38px !important;
+}
+
+.carousel-wrap {
+	max-width: 1220px;
+	margin: 0 auto;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 16px !important;
+}
+
+.carousel {
+	overflow: hidden;
+	display: flex;
+	gap: 24px !important;
+	padding: 22px 28px !important;
+	background: #817715 !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	scroll-snap-type: x mandatory;
+	width: min(100%, 1060px) !important;
+	scroll-behavior: smooth;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.carousel::-webkit-scrollbar {
+	display: none;
+}
+
+.taste-card {
+	flex: 0 0 calc(25% - 18px) !important;
+	min-width: 190px;
+	scroll-snap-align: center;
+	margin: 0;
+	display: flex;
+	flex-direction: column-reverse;
+	gap: 8px;
+	color: #ffffff;
+}
+
+.taste-card img {
+	width: 100%;
+	height: 150px !important;
+	object-fit: cover;
+	border-radius: 8px !important;
+	box-shadow: none !important;
+}
+
+.taste-card figcaption {
+	font-size: 11px;
+	color: #fff7dd;
+	font-weight: 800;
+	text-align: center;
+	line-height: 1.25;
+	padding: 0 4px;
+}
+
+.carousel-btn {
+	flex-shrink: 0;
+	width: 36px !important;
+	height: 36px !important;
+	border-radius: 50%;
+	border: 0 !important;
+	background: #2f0909 !important;
+	color: #ffffff !important;
+	font-size: 18px !important;
+	font-weight: 900;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	z-index: 5;
+	transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.carousel-btn:hover {
+	background: #9d1f1f !important;
+	transform: scale(1.04);
+}
+
+.carousel-prev {
+	order: -1;
+}
+
+@media (max-width: 1024px) {
+	.food-culture-combined-grid,
+	.haarlem-unique {
+		grid-template-columns: 1fr !important;
 	}
 
-	.crumb,
-	.crumb--current {
-		font-size: 16px;
+	.food-culture-images {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.taste-card {
+		flex-basis: calc(33.333% - 16px) !important;
 	}
 }
 
-@media (max-width: 420px) {
-	.yummy-breadcrumb-inner {
-		padding: 10px 12px;
-		gap: 8px;
+@media (max-width: 720px) {
+	.welcome-card-inner {
+		left: 18px;
+		width: calc(100% - 36px);
 	}
 
-	.crumb,
-	.crumb--current {
-		font-size: 14px;
-		margin-left: 8px;
+	.yummy-breadcrumb-inner,
+	.food-culture-combined,
+	.haarlem-unique {
+		padding-left: 16px !important;
+		padding-right: 16px !important;
+	}
+
+	.food-culture-images,
+	.haarlem-unique-gallery {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.haarlem-unique-image {
+		height: 240px !important;
+	}
+
+	.taste-section {
+		padding: 24px 12px 32px !important;
+	}
+
+	.carousel-wrap {
+		gap: 10px !important;
+	}
+
+	.carousel {
+		gap: 12px !important;
+		padding: 16px !important;
+	}
+
+	.taste-card {
+		flex-basis: calc(50% - 8px) !important;
+		min-width: 170px;
+	}
+
+	.taste-card img {
+		height: 130px !important;
+	}
+}
+
+@media (max-width: 520px) {
+	.welcome-banner,
+	.welcome-banner-image {
+		min-height: 480px;
+		height: 480px;
+	}
+
+	.welcome-card-inner .primary-button a {
+		min-width: 100%;
+	}
+
+	.food-culture-images,
+	.haarlem-unique-gallery {
+		grid-template-columns: 1fr;
+	}
+
+	.taste-card {
+		flex-basis: calc(100% - 2px) !important;
+		min-width: 0;
+	}
+
+	.taste-card img {
+		height: 180px !important;
+	}
+
+	.carousel-btn {
+		width: 30px !important;
+		height: 30px !important;
+		font-size: 14px !important;
 	}
 }

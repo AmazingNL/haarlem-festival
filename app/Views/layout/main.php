@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, width=device-width">
     <title><?= htmlspecialchars((string) ($title ?? 'Haarlem Festival'), ENT_QUOTES, 'UTF-8') ?></title>
-    <meta name="description" content="Haarlem Festival - events, programs and city guides">
+    <meta name="description" content="Haarlem Festival - events, programs and city guides" />
     <link rel="stylesheet" href="/assets/css/output.css" />
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/home.css" />
@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="/assets/css/yummy/ratatouille.css" />
 </head>
 
-<body>
+<body id="top">
     <?php
     $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
     $isActive = static function (string $path) use ($currentPath): string {
@@ -48,6 +48,13 @@
             <?php require $content; ?>
         <?php endif; ?>
     </main>
+
+    <section class="site-back-top" aria-label="Back to top">
+        <a class="site-back-top__link" href="#top">
+            <span>Go to top</span>
+            <span class="site-back-top__icon" aria-hidden="true">&uarr;</span>
+        </a>
+    </section>
 
     <?php require __DIR__ . '/partials/site_footer.php'; ?>
 
