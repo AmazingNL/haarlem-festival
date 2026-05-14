@@ -1,3 +1,4 @@
+-- migrate:up
 USE haarlem_festival;
 
 DELETE ps FROM page_section ps
@@ -178,3 +179,9 @@ VALUES
   7,
   1
 );
+
+-- migrate:down
+DELETE ps FROM page_section ps
+INNER JOIN page p ON p.page_id = ps.page_id
+WHERE p.slug = 'history';
+DELETE FROM page WHERE slug = 'history';

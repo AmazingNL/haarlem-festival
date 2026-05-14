@@ -12,8 +12,8 @@ use App\Controllers\AdminPageController;
 use App\Controllers\EventController;
 use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
-use App\Controllers\ProgramController;
-use App\Controllers\ShopController;
+use App\Controllers\StoriesController;
+use App\Controllers\PaymentController;
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
@@ -103,7 +103,12 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/yummy', [HomeController::class, 'yummy']);
     $r->get('/yummy/ratatouille', [HomeController::class, 'ratatouille']);
 
-    $r->get('/stories', [HomeController::class, 'stories']);
+    $r->get('/stories', [StoriesController::class, 'index']);
+    $r->post('/stories/add-to-program', [StoriesController::class, 'addShowToProgram']);
+    // Payments
+    $r->get('/payments/checkout/{order_id:\d+}', [PaymentController::class, 'checkoutPage']);
+    $r->post('/payments/create-session', [PaymentController::class, 'createCheckoutSession']);
+    $r->post('/webhook/stripe', [PaymentController::class, 'webhook']);
     $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
     $r->get('/history', [HistoryController::class, 'index']);
     $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
@@ -210,7 +215,31 @@ function createController(string $controllerClass)
             $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
             $programService = new App\Services\ProgramService();
 
-            return new App\Controllers\HistoryController($sectionService, $pageService, $programService);
+            return new App\Controllers\HistoryController($sectionService, $pageService);
+
+
+        case App\Controllers\StoriesController::class:
+
+            $pageRepo = new App\Repositories\AdminPageRepository();
+            $pageService = new App\Services\AdminPageService($pageRepo);
+
+            $imageRepo = new App\Repositories\ImageRepository();
+            $imageService = new App\Services\ImageService($imageRepo);
+
+            $sectionRepo = new App\Repositories\PageSectionRepository();
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
+
+            $storiesRepo = new App\Repositories\StoriesRepository();
+            $storiesService = new App\Services\StoriesService($pageService, $sectionService, $storiesRepo);
+
+            return new App\Controllers\StoriesController($storiesService);
+
+        case App\Controllers\PaymentController::class:
+
+            $paymentRepo = new App\Repositories\PaymentRepository();
+            $stripeService = new App\Services\StripeService($paymentRepo);
+
+            return new App\Controllers\PaymentController($stripeService);
 
 
         case App\Controllers\AuthController::class:

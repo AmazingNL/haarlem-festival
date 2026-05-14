@@ -1,3 +1,4 @@
+-- migrate:up
 USE haarlem_festival;
 
 ALTER TABLE page_section
@@ -132,3 +133,5 @@ SET ps.content = JSON_SET(
 )
 WHERE p.slug = 'history-route-map'
   AND ps.section_type = 'history_route_map_stops';
+
+-- migrate:down
