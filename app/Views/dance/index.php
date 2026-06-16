@@ -1,5 +1,6 @@
 <?php
 $sections = is_array($sections ?? null) ? array_values($sections) : [];
+$events = is_array($events ?? null) ? array_values($events) : [];
 $hasCmsContent = !empty($hasCmsContent);
 
 $text = static function (mixed $value, string $default = ''): string {
@@ -103,4 +104,6 @@ $quickLinks = [
             </p>
         <?php endif; ?>
     </section>
+
+    <?php require __DIR__ . '/partials/events.php'; ?>
 </div>

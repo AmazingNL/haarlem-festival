@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
+use App\Services\EventCatalogService;
 use App\Services\IAdminPageService;
 use App\Services\IPageSectionService;
 
@@ -12,11 +13,16 @@ final class DanceController extends BaseController
 {
     private IAdminPageService $adminPageService;
     private IPageSectionService $pageSectionService;
+    private EventCatalogService $eventCatalogService;
 
-    public function __construct(IAdminPageService $adminPageService, IPageSectionService $pageSectionService)
-    {
+    public function __construct(
+        IAdminPageService $adminPageService,
+        IPageSectionService $pageSectionService,
+        EventCatalogService $eventCatalogService
+    ) {
         $this->adminPageService = $adminPageService;
         $this->pageSectionService = $pageSectionService;
+        $this->eventCatalogService = $eventCatalogService;
     }
 
     public function index(): void
@@ -29,6 +35,7 @@ final class DanceController extends BaseController
             'title' => 'Dance',
             'sections' => $sections,
             'hasCmsContent' => $sections !== [],
+            'events' => $this->eventCatalogService->getPublishedEvents('dance'),
         ]);
     }
 

@@ -180,6 +180,123 @@
     padding-top: 18px;
 }
 
+.dance-events {
+    margin: 0 auto;
+    max-width: 1180px;
+    padding: 0 24px clamp(80px, 10vw, 132px);
+}
+
+.dance-events__header {
+    border-top: 1px solid var(--dance-line);
+    margin-bottom: 34px;
+    padding-top: 44px;
+}
+
+.dance-events__header h2 {
+    color: var(--dance-text);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-style: italic;
+    letter-spacing: 0.16em;
+    margin: 0 0 12px;
+    text-transform: uppercase;
+}
+
+.dance-events__header p:last-child {
+    color: var(--dance-yellow);
+    font-style: italic;
+    font-weight: 700;
+    margin: 0;
+}
+
+.dance-event-list {
+    display: grid;
+    gap: 18px;
+}
+
+.dance-event-card,
+.dance-empty-state {
+    border: 1px solid var(--dance-line);
+    background: var(--dance-surface);
+}
+
+.dance-event-card {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.8fr) minmax(180px, 0.5fr);
+    padding: 26px;
+}
+
+.dance-event-card__label,
+.dance-event-card__details span,
+.dance-ticket-row span {
+    color: var(--dance-yellow);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.dance-event-card__label {
+    margin: 0 0 10px;
+}
+
+.dance-event-card h3,
+.dance-empty-state h3 {
+    color: var(--dance-text);
+    font-size: clamp(1.45rem, 3vw, 2.2rem);
+    font-style: italic;
+    letter-spacing: 0.1em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.dance-event-card__description,
+.dance-empty-state p {
+    color: var(--dance-muted);
+    font-style: italic;
+    font-weight: 700;
+    margin: 14px 0 0;
+}
+
+.dance-event-card__details {
+    display: grid;
+    gap: 18px;
+}
+
+.dance-event-card__details p {
+    color: var(--dance-text);
+    display: grid;
+    gap: 6px;
+    margin: 0;
+}
+
+.dance-ticket-list {
+    align-content: start;
+    display: grid;
+    gap: 10px;
+}
+
+.dance-ticket-row {
+    border: 1px solid rgba(255, 209, 10, 0.55);
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    padding: 12px 14px;
+}
+
+.dance-ticket-row strong,
+.dance-ticket-list__empty {
+    color: var(--dance-text);
+}
+
+.dance-ticket-list__empty {
+    margin: 0;
+}
+
+.dance-empty-state {
+    padding: 28px;
+}
+
 body:has(.dance-page) .site-back-top {
     background: #000;
     border-top-color: var(--dance-line);
@@ -205,5 +322,9 @@ body:has(.dance-page) .site-back-top__icon {
 
     .dance-hero {
         min-height: 340px;
+    }
+
+    .dance-event-card {
+        grid-template-columns: 1fr;
     }
 }

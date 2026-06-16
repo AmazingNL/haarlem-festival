@@ -214,7 +214,11 @@ function createController(string $controllerClass)
 
         case App\Controllers\DanceController::class:
 
-            return new App\Controllers\DanceController(createPageService(), createSectionService());
+            return new App\Controllers\DanceController(
+                createPageService(),
+                createSectionService(),
+                createEventCatalogService()
+            );
 
 
         case App\Controllers\AuthController::class:
