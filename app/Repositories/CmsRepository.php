@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Repositories;
+use App\DTO\PageData;
 use App\Models\Page;
 use App\Models\Enum\PageStatus;
 use App\Core\BaseRepository;
@@ -44,45 +45,48 @@ final class CmsRepository extends BaseRepository implements ICmsRepository
         }
     }
 
-    public function createPage(array $pageData): int
+    public function createPage(PageData $pageData): int
     {
         try {
-            $page = $this->hydratePage($pageData);
             $sql = "INSERT INTO " . self::TABLE . "
                 (title, slug, created_at, updated_at, status)
                 VALUES
                 (:title, :slug, NOW(), NOW(), :status)";
 
             $stmt = $this->getConnection()->prepare($sql);
-            $pageData = $this->pageToDbArray($page);
-            $stmt->execute($pageData);
+            $stmt->execute([
+                'title' => $pageData->title,
+                'slug' => $pageData->slug,
+                'status' => $pageData->status->value,
+            ]);
 
             return (int) $this->getConnection()->lastInsertId();
-        } 
+        }
         catch (\Exception $e) {
             throw new \RuntimeException('Failed to create page.');
         }
 
     }
 
-    public function updatePage(int $id, array $pageData): bool
+    public function updatePage(int $id, PageData $pageData): bool
     {
         try {
             $existingPage = $this->getPageById($id);
             if ($existingPage === null) {
                 throw new \InvalidArgumentException("Page with ID {$id} does not exist.");
             }
-            $page = $this->hydratePage($pageData);
-            $page->page_id = $id;
             $sql = "UPDATE " . self::TABLE . "
                     SET title = :title, slug = :slug, updated_at = NOW(), status = :status
                     WHERE " . self::PK . " = :id";
             $stmt = $this->getConnection()->prepare($sql);
-            $params = $this->pageToDbArray($page);
-            $params['id'] = $id; 
-            $stmt->execute($params);
+            $stmt->execute([
+                'title' => $pageData->title,
+                'slug' => $pageData->slug,
+                'status' => $pageData->status->value,
+                'id' => $id,
+            ]);
             return (bool) $stmt->rowCount();
-        } 
+        }
         catch (\Exception $e) {
             throw new \RuntimeException('Failed to update page.');
         }
@@ -103,15 +107,6 @@ final class CmsRepository extends BaseRepository implements ICmsRepository
         } catch (\Exception $e) {
             throw new \RuntimeException('Failed to delete page.');
         }
-    }
-
-    private function pageToDbArray(Page $page): array
-    {
-        return [
-            'title' => $page->title,
-            'slug' => $page->slug,
-            'status' => $page->status->value
-        ];
     }
 
     private function hydratePage(array $data): Page

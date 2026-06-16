@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
+use App\DTO\PageData;
 use App\DTO\SectionInput;
 use App\Models\Page;
 use App\Models\User;
+use App\Models\Enum\PageStatus;
 use App\Models\Enum\SectionType;
 use App\Models\Enum\UserRole;
 use App\Services\ICmsService;
@@ -83,12 +85,8 @@ final class CmsController extends BaseController
             $this->verifyCsrf();
             $this->requireFields(['title', 'slug']);
 
-            $pageData = $this->cmsService->preparePageData(
-                $this->str('title'),
-                $this->str('slug'),
-                $this->str('content'),
-                $this->str('status', 'draft')
-            );
+            $pageData = $this->mapPageData();
+
             $page_id = $this->cmsService->createPage($pageData);
             if ((int) $page_id <= 0) {
                 $this->setFlash('error', 'Page failed to create');
@@ -143,12 +141,7 @@ final class CmsController extends BaseController
             $this->verifyCsrf();
             $this->requireFields(['title', 'slug']);
 
-            $pageData = $this->cmsService->preparePageData(
-                $this->str('title'),
-                $this->str('slug'),
-                $this->str('content'),
-                $this->str('status', 'draft')
-            );
+            $pageData = $this->mapPageData();
 
             $updated = $this->cmsService->updatePage($page_id, $pageData);
             if ($updated === false) {
@@ -360,6 +353,17 @@ final class CmsController extends BaseController
             'sectionData' => $sectionData,
             'sectionField' => $sectionField,
         ];
+    }
+
+    // Build a PageData DTO from the submitted create/edit page form.
+    private function mapPageData(): PageData
+    {
+        return new PageData(
+            $this->str('title'),
+            $this->str('slug'),
+            $this->str('content'),
+            PageStatus::tryFrom($this->str('status', 'draft')) ?? PageStatus::draft
+        );
     }
 
     /**

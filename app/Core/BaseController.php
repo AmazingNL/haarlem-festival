@@ -172,28 +172,6 @@ abstract class BaseController
         return $cleanUrl;
     }
 
-    // ---------- Auth helpers ----------
-
-    // protected function userId(): ?int
-    // {
-    //     return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
-    // }
-
-    // protected function adminId(): ?int
-    // {
-    //     return isset($_SESSION['admin_user_id']) ? (int) $_SESSION['admin_user_id'] : null;
-    // }
-    // protected function userRole(): ?string
-    // {
-    //     return isset($_SESSION['role']) ? (string) $_SESSION['role'] : null;
-    // }
-
-    // protected function requireLogin(): void
-    // {
-    //     if ($this->userId() === null) {
-    //         $this->redirect('/login');
-    //     }
-    // }
 
     // ---------- CSRF ----------
 
