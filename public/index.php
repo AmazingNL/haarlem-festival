@@ -168,6 +168,16 @@ function createImageService(): App\Services\ImageService
     return new App\Services\ImageService(new App\Repositories\ImageRepository());
 }
 
+function createMailer(): App\Services\IMailer
+{
+    return new App\Services\Mailer();
+}
+
+function createAccountEmailService(): App\Services\IAccountEmailService
+{
+    return new App\Services\AccountEmailService(createMailer());
+}
+
 function createPageService(): App\Services\CmsService
 {
     return new App\Services\CmsService(new App\Repositories\CmsRepository());
@@ -206,7 +216,7 @@ function createController(string $controllerClass)
                 createPageService(),
                 createSectionService(),
                 new App\Services\ProgramService(),
-                new App\Services\ReservationEmailService(),
+                new App\Services\ReservationEmailService(createMailer()),
                 createYummyReservationCatalogService()
             );
 
@@ -231,7 +241,7 @@ function createController(string $controllerClass)
             $repo = new App\Repositories\UserRepository();
             $service = new App\Services\UserService($repo);
 
-            return new App\Controllers\AuthController($service);
+            return new App\Controllers\AuthController($service, createAccountEmailService());
 
 
         case App\Controllers\ShopController::class:
