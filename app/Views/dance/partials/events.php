@@ -24,7 +24,7 @@ $formatEventDateTime = static function (?string $startDateTime, ?string $endDate
     <div class="dance-events__header">
         <p class="dance-kicker">Tickets</p>
         <h2 id="dance-events-title">Dance Sessions</h2>
-        <p>Explore the published Dance events. Adding tickets to My Program will be added in the next slice.</p>
+        <p>Choose your Dance session, select a quantity, and add the tickets to My Program.</p>
     </div>
 
     <?php if ($events === []): ?>
@@ -35,7 +35,10 @@ $formatEventDateTime = static function (?string $startDateTime, ?string $endDate
     <?php else: ?>
         <div class="dance-event-list">
             <?php foreach ($events as $event): ?>
-                <?php $ticketTypes = is_array($event['ticket_types'] ?? null) ? $event['ticket_types'] : []; ?>
+                <?php
+                $eventId = max(0, (int) ($event['event_id'] ?? 0));
+                $ticketTypes = is_array($event['ticket_types'] ?? null) ? $event['ticket_types'] : [];
+                ?>
                 <article class="dance-event-card">
                     <div class="dance-event-card__main">
                         <p class="dance-event-card__label">
@@ -72,10 +75,43 @@ $formatEventDateTime = static function (?string $startDateTime, ?string $endDate
                             <p class="dance-ticket-list__empty">Ticket types are not configured yet.</p>
                         <?php else: ?>
                             <?php foreach ($ticketTypes as $ticketType): ?>
-                                <div class="dance-ticket-row">
-                                    <span><?= htmlspecialchars((string) ($ticketType['name'] ?? 'Ticket'), ENT_QUOTES, 'UTF-8') ?></span>
-                                    <strong><?= htmlspecialchars($formatMoney((float) ($ticketType['price'] ?? 0)), ENT_QUOTES, 'UTF-8') ?></strong>
-                                </div>
+                                <?php
+                                $ticketTypeId = max(0, (int) ($ticketType['ticket_type_id'] ?? 0));
+                                $availableQuantity = max(0, (int) ($ticketType['max_quantity'] ?? 0));
+                                ?>
+                                <?php if ($eventId <= 0 || $ticketTypeId <= 0 || $availableQuantity <= 0): ?>
+                                    <div class="dance-ticket-row dance-ticket-row--sold-out">
+                                        <div class="dance-ticket-row__details">
+                                            <span><?= htmlspecialchars((string) ($ticketType['name'] ?? 'Ticket'), ENT_QUOTES, 'UTF-8') ?></span>
+                                            <strong><?= htmlspecialchars($formatMoney((float) ($ticketType['price'] ?? 0)), ENT_QUOTES, 'UTF-8') ?></strong>
+                                        </div>
+                                        <p>Sold out</p>
+                                    </div>
+                                <?php else: ?>
+                                    <form method="post" action="/events/add-to-program" class="dance-ticket-row dance-ticket-form">
+                                        <input type="hidden" name="_csrf" value="<?= htmlspecialchars((string) ($csrf ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                        <input type="hidden" name="event_id" value="<?= $eventId ?>">
+                                        <input type="hidden" name="ticket_type_id" value="<?= $ticketTypeId ?>">
+
+                                        <div class="dance-ticket-row__details">
+                                            <span><?= htmlspecialchars((string) ($ticketType['name'] ?? 'Ticket'), ENT_QUOTES, 'UTF-8') ?></span>
+                                            <strong><?= htmlspecialchars($formatMoney((float) ($ticketType['price'] ?? 0)), ENT_QUOTES, 'UTF-8') ?></strong>
+                                            <small>Available: <?= $availableQuantity ?></small>
+                                        </div>
+
+                                        <label class="dance-ticket-form__quantity">
+                                            <span>Qty</span>
+                                            <input
+                                                type="number"
+                                                name="quantity"
+                                                min="1"
+                                                max="<?= $availableQuantity ?>"
+                                                value="1">
+                                        </label>
+
+                                        <button type="submit" class="dance-ticket-form__button">Add to My Program</button>
+                                    </form>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
