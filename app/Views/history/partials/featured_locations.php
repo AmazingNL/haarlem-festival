@@ -45,7 +45,7 @@ $featuredCards = [
         </div>
 
         <div class="history-featured__list">
-            <?php foreach ($featuredCards as $card): ?>
+            <?php foreach ($featuredCards as $cardIndex => $card): ?>
                 <article class="history-featured__card">
                     <div class="history-featured__image-wrap">
                         <img src="<?= htmlspecialchars((string) $card['image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string) $card['title'], ENT_QUOTES, 'UTF-8') ?>">
@@ -67,7 +67,10 @@ $featuredCards = [
                         </ul>
 
                         <?php if ($card['button_text'] !== ''): ?>
-                            <a class="history-btn history-btn--outline" href="<?= $historyUrl($card['button_link']) ?>">
+                            <a class="history-btn history-btn--outline" href="<?= $historyUrl(
+                                $card['button_link'],
+                                $cardIndex === 0 ? '/history/st-bavos-church' : '/history/molen-de-adriaan'
+                            ) ?>">
                                 <?= htmlspecialchars((string) $card['button_text'], ENT_QUOTES, 'UTF-8') ?>
                             </a>
                         <?php endif; ?>

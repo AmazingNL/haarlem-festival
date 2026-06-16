@@ -33,7 +33,7 @@
             <div class="admin-nav-user">
                 <?php
                 $displayName = htmlspecialchars((string) ($_SESSION['display_name'] ?? 'Admin'), ENT_QUOTES, 'UTF-8');
-                $role = htmlspecialchars((string) ($_SESSION['role'] ?? 'admin'), ENT_QUOTES, 'UTF-8');
+                $role = htmlspecialchars((string) ($_SESSION['user_role'] ?? 'admin'), ENT_QUOTES, 'UTF-8');
                 ?>
                 <div class="admin-nav-info">
                     <span class="admin-nav-name"><?= $displayName ?></span>

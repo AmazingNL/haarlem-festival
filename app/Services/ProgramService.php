@@ -7,10 +7,6 @@ namespace App\Services;
 final class ProgramService
 {
     private const ITEMS_KEY = 'program_items';
-    private const ORDERS_KEY = 'program_orders';
-    private const PENDING_CHECKOUTS_KEY = 'pending_stripe_checkouts';
-    private const ORDER_SEQUENCE_KEY = 'program_order_sequence';
-    private const LAST_ORDER_KEY = 'last_order_id';
 
     // Return the current My Program items from the session.
     public function getItems(): array
@@ -108,240 +104,6 @@ final class ProgramService
         return $this->calculateTotal($this->getItems());
     }
 
-    // Save a Stripe checkout snapshot so success can rebuild the order after redirecting back.
-    public function storePendingStripeCheckout(
-        string $sessionId,
-        int $userId,
-        array $customer,
-        array $items,
-        string $provider
-    ): void
-    {
-        $this->ensureSession();
-
-        $pendingCheckouts = $_SESSION[self::PENDING_CHECKOUTS_KEY] ?? [];
-        if (!is_array($pendingCheckouts)) {
-            $pendingCheckouts = [];
-        }
-
-        $pendingCheckouts[$sessionId] = [
-            'session_id' => $sessionId,
-            'user_id' => $userId,
-            'customer' => $customer,
-            'items' => array_map(fn(array $item): array => $this->normalizeItem($item), $items),
-            'provider' => $provider,
-            'created_at' => date('Y-m-d H:i:s'),
-        ];
-
-        $_SESSION[self::PENDING_CHECKOUTS_KEY] = $pendingCheckouts;
-    }
-
-    // Read one pending Stripe checkout by session id.
-    public function getPendingStripeCheckout(string $sessionId): ?array
-    {
-        $this->ensureSession();
-
-        $pendingCheckouts = $_SESSION[self::PENDING_CHECKOUTS_KEY] ?? [];
-        $checkout = is_array($pendingCheckouts) ? ($pendingCheckouts[$sessionId] ?? null) : null;
-
-        return is_array($checkout) ? $checkout : null;
-    }
-
-    // Remove a pending Stripe checkout after the order is completed.
-    public function clearPendingStripeCheckout(string $sessionId): void
-    {
-        $this->ensureSession();
-
-        $pendingCheckouts = $_SESSION[self::PENDING_CHECKOUTS_KEY] ?? [];
-        if (!is_array($pendingCheckouts)) {
-            return;
-        }
-
-        unset($pendingCheckouts[$sessionId]);
-        $_SESSION[self::PENDING_CHECKOUTS_KEY] = $pendingCheckouts;
-    }
-
-    // Turn paid program items into an order record with invoice data and generated tickets.
-    public function createPaidOrder(
-        int $userId,
-        array $customer,
-        string $provider = 'stripe-ideal',
-        ?array $itemsOverride = null,
-        ?string $stripeSessionId = null
-    ): int
-    {
-        $this->ensureSession();
-
-        if ($stripeSessionId !== null) {
-            $existingOrder = $this->findOrderByStripeSessionId($userId, $stripeSessionId);
-            if ($existingOrder !== null) {
-                $_SESSION[self::LAST_ORDER_KEY] = (int) ($existingOrder['order_id'] ?? 0);
-                return (int) ($existingOrder['order_id'] ?? 0);
-            }
-        }
-
-        $items = is_array($itemsOverride) ? array_values($itemsOverride) : $this->getItems();
-        if ($items === []) {
-            throw new \InvalidArgumentException('My Program is empty.');
-        }
-
-        $orderId = $this->getNextOrderId();
-        $timestamp = date('Y-m-d H:i:s');
-        $orderItems = [];
-        $tickets = [];
-        $ticketNumber = 1;
-
-        foreach ($items as $item) {
-            $normalizedItem = $this->normalizeItem($item);
-            $quantity = max(1, (int) ($normalizedItem['quantity'] ?? 1));
-            $unitPrice = round((float) ($normalizedItem['unit_price'] ?? 0), 2);
-            $lineTotal = round($unitPrice * $quantity, 2);
-            $title = trim((string) ($normalizedItem['title'] ?? 'Festival Booking'));
-            $selectionText = trim((string) ($normalizedItem['selection_text'] ?? ''));
-            $ticketTitle = trim((string) ($normalizedItem['ticket_title'] ?? 'Ticket'));
-            $ticketSummaryText = trim((string) ($normalizedItem['ticket_summary_text'] ?? ''));
-            $locationName = trim((string) ($normalizedItem['location_name'] ?? 'Bavo Church'));
-            $specialRequests = trim((string) ($normalizedItem['special_requests'] ?? ''));
-
-            $orderItems[] = [
-                'title' => $title,
-                'selection_text' => $selectionText,
-                'ticket_title' => $ticketTitle,
-                'ticket_summary_text' => $ticketSummaryText,
-                'quantity' => $quantity,
-                'unit_price' => $unitPrice,
-                'line_total' => $lineTotal,
-                'location_name' => $locationName,
-                'special_requests' => $specialRequests,
-            ];
-
-            for ($index = 0; $index < $quantity; $index++) {
-                $tickets[] = [
-                    'ticket_id' => ($orderId * 100) + $ticketNumber,
-                    'ticket_number' => $ticketNumber,
-                    'qr_token' => strtoupper(substr(bin2hex(random_bytes(10)), 0, 16)),
-                    'status' => 'valid',
-                    'title' => $title,
-                    'selection_text' => $selectionText,
-                    'ticket_title' => $ticketTitle,
-                    'ticket_summary_text' => $ticketSummaryText,
-                    'location_name' => $locationName,
-                    'special_requests' => $specialRequests,
-                ];
-
-                $ticketNumber++;
-            }
-        }
-
-        $order = [
-            'order_id' => $orderId,
-            'user_id' => $userId,
-            'total_price' => $this->calculateTotal($items),
-            'status' => 'paid',
-            'created_at' => $timestamp,
-            'provider' => $provider,
-            'payment_status' => 'paid',
-            'paid_at' => $timestamp,
-            'stripe_session_id' => $stripeSessionId,
-            'first_name' => trim((string) ($customer['first_name'] ?? '')),
-            'last_name' => trim((string) ($customer['last_name'] ?? '')),
-            'email' => trim((string) ($customer['email'] ?? '')),
-            'phone' => trim((string) ($customer['phone'] ?? '')),
-            'items' => $orderItems,
-            'tickets' => $tickets,
-        ];
-
-        $orders = $_SESSION[self::ORDERS_KEY] ?? [];
-        if (!is_array($orders)) {
-            $orders = [];
-        }
-
-        $orders[(string) $orderId] = $order;
-        $_SESSION[self::ORDERS_KEY] = $orders;
-        $_SESSION[self::LAST_ORDER_KEY] = $orderId;
-
-        if (is_array($itemsOverride)) {
-            $this->removeItemsByIds(array_column($itemsOverride, 'id'));
-        } else {
-            $this->clearItems();
-        }
-
-        return $orderId;
-    }
-
-    // Return all paid orders that belong to the current user.
-    public function getPaidOrdersForUser(int $userId): array
-    {
-        $this->ensureSession();
-
-        $orders = $_SESSION[self::ORDERS_KEY] ?? [];
-        if (!is_array($orders)) {
-            return [];
-        }
-
-        $userOrders = array_values(array_filter(
-            $orders,
-            static fn(mixed $order): bool => is_array($order) && (int) ($order['user_id'] ?? 0) === $userId
-        ));
-
-        usort(
-            $userOrders,
-            static fn(array $left, array $right): int => (int) ($right['order_id'] ?? 0) <=> (int) ($left['order_id'] ?? 0)
-        );
-
-        return $userOrders;
-    }
-
-    // Return one order only if it belongs to the logged-in user.
-    public function getOrderForUser(int $orderId, int $userId): ?array
-    {
-        $this->ensureSession();
-
-        $orders = $_SESSION[self::ORDERS_KEY] ?? [];
-        $order = is_array($orders) ? ($orders[(string) $orderId] ?? null) : null;
-        if (!is_array($order)) {
-            return null;
-        }
-
-        if ((int) ($order['user_id'] ?? 0) !== $userId) {
-            return null;
-        }
-
-        return $order;
-    }
-
-    // Prevent duplicate success handling by checking whether this Stripe session already created an order.
-    public function findOrderByStripeSessionId(int $userId, string $stripeSessionId): ?array
-    {
-        $this->ensureSession();
-
-        foreach ($this->getPaidOrdersForUser($userId) as $order) {
-            if ((string) ($order['stripe_session_id'] ?? '') === $stripeSessionId) {
-                return $order;
-            }
-        }
-
-        return null;
-    }
-
-    // Return the last successful order id for the confirmation shortcut on My Program.
-    public function getLastOrderId(): int
-    {
-        $this->ensureSession();
-
-        $orderId = (int) ($_SESSION[self::LAST_ORDER_KEY] ?? 0);
-        if ($orderId < 1) {
-            return 0;
-        }
-
-        $orders = $_SESSION[self::ORDERS_KEY] ?? [];
-        if (!is_array($orders) || !is_array($orders[(string) $orderId] ?? null)) {
-            return 0;
-        }
-
-        return $orderId;
-    }
-
     // Sum all normalized item totals into one final amount.
     private function calculateTotal(array $items): float
     {
@@ -388,6 +150,11 @@ final class ProgramService
             'customer_name' => trim((string) ($item['customer_name'] ?? '')),
             'customer_email' => trim((string) ($item['customer_email'] ?? '')),
             'customer_phone' => trim((string) ($item['customer_phone'] ?? '')),
+            'page_slug' => trim((string) ($item['page_slug'] ?? '')),
+            'adult_count' => max(0, (int) ($item['adult_count'] ?? 0)),
+            'child_count' => max(0, (int) ($item['child_count'] ?? 0)),
+            'adult_price' => round((float) ($item['adult_price'] ?? 0), 2),
+            'child_price' => round((float) ($item['child_price'] ?? 0), 2),
             'starts_at' => trim((string) ($item['starts_at'] ?? '')),
             'ends_at' => trim((string) ($item['ends_at'] ?? '')),
         ];
@@ -440,7 +207,13 @@ final class ProgramService
                 && $leftTicketTypeId === $rightTicketTypeId;
         }
 
-        $keys = ['type', 'title', 'day', 'time', 'language', 'ticket_key', 'location_name'];
+        $leftType = trim((string) ($left['type'] ?? ''));
+        $rightType = trim((string) ($right['type'] ?? ''));
+        if ($leftType === 'yummy-reservation' || $rightType === 'yummy-reservation') {
+            $keys = ['type', 'page_slug', 'title', 'day', 'time', 'location_name'];
+        } else {
+            $keys = ['type', 'title', 'day', 'time', 'language', 'ticket_key', 'location_name'];
+        }
 
         foreach ($keys as $key) {
             if (trim((string) ($left[$key] ?? '')) !== trim((string) ($right[$key] ?? ''))) {
@@ -449,15 +222,6 @@ final class ProgramService
         }
 
         return true;
-    }
-
-    // Generate the next simple order number in this session-based checkout flow.
-    private function getNextOrderId(): int
-    {
-        $currentValue = (int) ($_SESSION[self::ORDER_SEQUENCE_KEY] ?? 0) + 1;
-        $_SESSION[self::ORDER_SEQUENCE_KEY] = $currentValue;
-
-        return $currentValue;
     }
 
     // Start the PHP session if it has not been started yet.

@@ -39,7 +39,6 @@
   }
 </style>
 
-<body>
 <div class="split-screen">
   <div class="left-panel">
     <div class="overlay"></div>
@@ -59,8 +58,6 @@
 
       <?php if (!empty($errorMessage)): ?>
         <div class="error-msg"><?= htmlspecialchars((string) $errorMessage, ENT_QUOTES, 'UTF-8') ?></div>
-      <?php elseif (isset($error)): ?>
-        <div class="error-msg"><?= htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8') ?></div>
       <?php endif; ?>
 
       <form action="/register" method="POST" autocomplete="on">

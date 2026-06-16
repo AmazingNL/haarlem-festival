@@ -1,4 +1,6 @@
 <?php
+use App\Support\SessionUser;
+
 $programCount = 0;
 if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['program_items']) && is_array($_SESSION['program_items'])) {
     foreach ($_SESSION['program_items'] as $programItem) {
@@ -6,7 +8,8 @@ if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['program_items']
     }
 }
 
-$isLoggedIn = session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id']);
+$isLoggedIn = SessionUser::isLoggedIn();
+$loggedInUserLabel = SessionUser::displayName();
 $authLabel = $isLoggedIn ? 'Logout' : 'Login';
 $authHref = $isLoggedIn ? '/logout' : '/loginForm';
 $isAuthPage = $currentPath === '/loginForm' || $currentPath === '/registerForm';
@@ -97,9 +100,22 @@ $headerIcons = [
                 <?php endif; ?>
             </a>
 
-            <a href="<?= htmlspecialchars($authHref, ENT_QUOTES, 'UTF-8') ?>" class="auth-link <?= $isAuthPage && !$isLoggedIn ? 'active' : '' ?>">
-                <?= htmlspecialchars($authLabel, ENT_QUOTES, 'UTF-8') ?>
-            </a>
+            <div class="navbar-account">
+                <?php if ($isLoggedIn && $loggedInUserLabel !== ''): ?>
+                    <span
+                        class="navbar-user"
+                        role="status"
+                        aria-label="Signed in as <?= htmlspecialchars($loggedInUserLabel, ENT_QUOTES, 'UTF-8') ?>"
+                    >
+                        <span class="navbar-user__greeting">Hi,</span>
+                        <span class="navbar-user__name"><?= htmlspecialchars($loggedInUserLabel, ENT_QUOTES, 'UTF-8') ?></span>
+                    </span>
+                <?php endif; ?>
+
+                <a href="<?= htmlspecialchars($authHref, ENT_QUOTES, 'UTF-8') ?>" class="auth-link <?= $isAuthPage && !$isLoggedIn ? 'active' : '' ?>">
+                    <?= htmlspecialchars($authLabel, ENT_QUOTES, 'UTF-8') ?>
+                </a>
+            </div>
 
             <div class="icon-actions">
                 <?php foreach ($headerIcons as $icon): ?>

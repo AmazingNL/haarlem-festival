@@ -30,7 +30,7 @@ VALUES
     'rating', '4.0',
     'capacity', '52',
     'button_text', 'View',
-    'button_link', '/ratatouille',
+    'button_link', '/yummy/ratatouille',
     'cuisine', JSON_ARRAY('Sea Food', 'French', 'European'),
     'section_image', JSON_ARRAY('/assets/images/yummy/yummy.jpg')
   ),
@@ -47,7 +47,7 @@ VALUES
     'rating', '3.0',
     'capacity', '48',
     'button_text', 'View',
-    'button_link', '#',
+    'button_link', '/yummy/bistro-toujours',
     'cuisine', JSON_ARRAY('Sea Food', 'Dutch', 'European'),
     'section_image', JSON_ARRAY('/assets/images/yummy/yummy.jpg')
   ),
@@ -139,14 +139,4 @@ VALUES
   70,
   1
 );
-
-/* -- migrate:down
-SET @yummy_page_id = (SELECT page_id FROM page WHERE slug = 'yummy' LIMIT 1);
-
-DELETE FROM page_section
-WHERE page_id = @yummy_page_id
-  AND section_type IN ('restaurant_card', 'restaurant_card');
-
-DELETE FROM page WHERE slug = 'yummy';
-*/
 

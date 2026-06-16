@@ -79,7 +79,7 @@ $didYouKnowFacts = [
         <?php endif; ?>
 
         <?php if (!empty($s['tour_button_text'])): ?>
-            <a class="history-btn history-btn--gold" href="<?= $historyUrl($s['tour_button_link']) ?>">
+            <a class="history-btn history-btn--gold" href="<?= $historyUrl($s['tour_button_link'], '/history/book-tour') ?>">
                 <?= htmlspecialchars((string) $s['tour_button_text'], ENT_QUOTES, 'UTF-8') ?>
             </a>
         <?php endif; ?>

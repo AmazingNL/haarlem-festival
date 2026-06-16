@@ -2,7 +2,6 @@
 
 namespace App\ViewModels;
 
-use App\Controllers\YummyController;
 use App\ViewModels\home\HomeCardsGrid;
 use App\ViewModels\home\HomeFeature;
 use App\ViewModels\home\HomeGallery;

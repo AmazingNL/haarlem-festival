@@ -15,24 +15,12 @@ use App\Controllers\HistoryController;
 use App\Controllers\ProgramController;
 use App\Controllers\ShopController;
 
+require __DIR__ . '/../app/bootstrap.php';
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
 require_once __DIR__ . '/../app/config.php';
 
-session_start();
-
-$envFile = __DIR__ . '/../.env';
-if (is_file($envFile)) {
-    $env = parse_ini_file($envFile, false, INI_SCANNER_RAW);
-    foreach ($env as $k => $v) {
-        $_ENV[$k] = $v;
-    }
-}
-
-$debug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
-error_reporting(E_ALL);
-ini_set('display_errors', $debug ? '1' : '0');
-
+\App\Support\SessionUser::hydrateFromDatabaseIfNeeded();
 
 $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
@@ -99,6 +87,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->post('/checkout/pay', [ShopController::class, 'pay']);
     $r->get('/checkout/success', [ShopController::class, 'checkoutSuccess']);
     $r->get('/checkout/cancel', [ShopController::class, 'checkoutCancel']);
+    $r->post('/stripe/webhook', [ShopController::class, 'stripeWebhook']);
     $r->get('/orders/{orderId:\d+}/success', [ShopController::class, 'success']);
     $r->get('/yummy', [YummyController::class, 'yummy']);
     $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
@@ -174,50 +163,52 @@ switch ($routeInfo[0]) {
         break;
 }
 
+function createImageService(): App\Services\ImageService
+{
+    return new App\Services\ImageService(new App\Repositories\ImageRepository());
+}
+
+function createPageService(): App\Services\AdminPageService
+{
+    return new App\Services\AdminPageService(new App\Repositories\AdminPageRepository());
+}
+
+function createSectionService(): App\Services\PageSectionService
+{
+    return new App\Services\PageSectionService(
+        new App\Repositories\PageSectionRepository(),
+        createImageService()
+    );
+}
+
 function createController(string $controllerClass)
 {
-
-    $pageRepo = new App\Repositories\AdminPageRepository();
-    $pageService = new App\Services\AdminPageService($pageRepo);
-
-    $imageRepo = new App\Repositories\ImageRepository();
-    $imageService = new App\Services\ImageService($imageRepo);
-
-    $sectionRepo = new App\Repositories\PageSectionRepository();
-    $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
-
 
     switch ($controllerClass) {
 
         case App\Controllers\HomeController::class:
 
-            return new App\Controllers\HomeController($sectionService, $pageService);
+            return new App\Controllers\HomeController(createSectionService(), createPageService());
 
         case App\Controllers\YummyController::class:
 
-            $resRepo = new App\Repositories\RestaurantRepository();
-            $restaurantService = new App\Services\RestaurantService($resRepo);
-            $programService = new App\Services\ProgramService();
-            $reservationEmailService = new App\Services\ReservationEmailService();
-            $userRepo = new App\Repositories\UserRepository();
-            $userService = new App\Services\UserService($userRepo);
-
-            return new App\Controllers\YummyController($restaurantService, $pageService, $sectionService, $programService, $reservationEmailService, $userService);
+            return new App\Controllers\YummyController(
+                createPageService(),
+                createSectionService(),
+                new App\Services\ProgramService(),
+                new App\Services\ReservationEmailService(),
+                createYummyReservationCatalogService()
+            );
 
 
         case App\Controllers\HistoryController::class:
 
-            $pageRepo = new App\Repositories\AdminPageRepository();
-            $pageService = new App\Services\AdminPageService($pageRepo);
-
-            $imageRepo = new App\Repositories\ImageRepository();
-            $imageService = new App\Services\ImageService($imageRepo);
-
-            $sectionRepo = new App\Repositories\PageSectionRepository();
-            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
-            $programService = new App\Services\ProgramService();
-
-            return new App\Controllers\HistoryController($sectionService, $pageService, $programService);
+            return new App\Controllers\HistoryController(
+                createSectionService(),
+                createPageService(),
+                new App\Services\ProgramService(),
+                createHistoryBookingCatalogService()
+            );
 
 
         case App\Controllers\AuthController::class:
@@ -230,49 +221,78 @@ function createController(string $controllerClass)
 
         case App\Controllers\ShopController::class:
 
-            $programService = new App\Services\ProgramService();
-
-            return new App\Controllers\ShopController($programService);
+            return createShopController();
 
 
         case App\Controllers\EventController::class:
 
-            $eventCatalogRepository = new App\Repositories\EventCatalogRepository();
-            $eventCatalogService = new App\Services\EventCatalogService($eventCatalogRepository);
-            $programService = new App\Services\ProgramService();
-
-            return new App\Controllers\EventController($eventCatalogService, $programService);
+            return new App\Controllers\EventController(
+                createEventCatalogService(),
+                new App\Services\ProgramService()
+            );
 
 
         case App\Controllers\ProgramController::class:
 
-            $programService = new App\Services\ProgramService();
-
-            return new App\Controllers\ProgramController($programService);
+            return new App\Controllers\ProgramController(
+                new App\Services\ProgramService(),
+                createOrderService()
+            );
 
 
         case App\Controllers\AdminPageController::class:
 
-            $pageRepo = new App\Repositories\AdminPageRepository();
-            $pageService = new App\Services\AdminPageService($pageRepo);
-
             $userRepo = new App\Repositories\UserRepository();
             $userService = new App\Services\UserService($userRepo);
 
-            $imageRepo = new App\Repositories\ImageRepository();
-            $imageService = new App\Services\ImageService($imageRepo);
-
-            $sectionRepo = new App\Repositories\PageSectionRepository();
-            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
-
             return new App\Controllers\AdminPageController(
-                $pageService,
-                $sectionService,
+                createPageService(),
+                createSectionService(),
                 $userService,
-                $imageService
+                createImageService()
             );
 
         default:
             return new $controllerClass();
     }
+}
+
+function createOrderService(): App\Services\OrderService
+{
+    return new App\Services\OrderService(new App\Repositories\OrderRepository());
+}
+
+function createEventCatalogService(): App\Services\EventCatalogService
+{
+    return new App\Services\EventCatalogService(new App\Repositories\EventCatalogRepository());
+}
+
+function createHistoryBookingCatalogService(): App\Services\HistoryBookingCatalogService
+{
+    return new App\Services\HistoryBookingCatalogService(createPageService(), createSectionService());
+}
+
+function createYummyReservationCatalogService(): App\Services\YummyReservationCatalogService
+{
+    return new App\Services\YummyReservationCatalogService(createPageService(), createSectionService());
+}
+
+function createCheckoutValidationService(): App\Services\CheckoutValidationService
+{
+    return new App\Services\CheckoutValidationService(
+        createEventCatalogService(),
+        createHistoryBookingCatalogService(),
+        createYummyReservationCatalogService()
+    );
+}
+
+function createShopController(): App\Controllers\ShopController
+{
+    return new App\Controllers\ShopController(
+        new App\Services\ProgramService(),
+        createOrderService(),
+        createCheckoutValidationService(),
+        new App\Services\StripePaymentService(),
+        new App\Repositories\PendingCheckoutRepository()
+    );
 }
