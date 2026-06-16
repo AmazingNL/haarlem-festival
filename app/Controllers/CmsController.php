@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 declare(strict_types=1);
 namespace App\Controllers;
@@ -9,7 +9,7 @@ use App\Models\Page;
 use App\Models\User;
 use App\Models\Enum\SectionType;
 use App\Models\Enum\UserRole;
-use App\Services\IAdminPageService;
+use App\Services\ICmsPageService;
 use App\Services\IPageSectionService;
 use App\Services\IUserService;
 use App\Models\PageSection;
@@ -19,15 +19,15 @@ use App\Schemas\SectionFactory;
 use Exception;
 use Throwable;
 
-final class AdminPageController extends BaseController
+final class CmsController extends BaseController
 {
-    private IAdminPageService $adminPageService;
+    private ICmsPageService $adminPageService;
     private IPageSectionService $pageSectionService;
     private IUserService $userService;
     private IImageService $imageService;
 
     public function __construct(
-        IAdminPageService $adminPageService,
+        ICmsPageService $adminPageService,
         IPageSectionService $pageSectionService,
         IUserService $userService,
         IImageService $imageService,

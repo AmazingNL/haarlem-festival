@@ -1,10 +1,10 @@
-<?php
+﻿<?php
 
 namespace App\Repositories;
 use App\Models\Page;
 use App\Models\Enum\PageStatus;
 use App\Core\BaseRepository;
-final class AdminPageRepository extends BaseRepository implements IAdminPageRepository
+final class CmsPageRepository extends BaseRepository implements ICmsPageRepository
 {
     private const TABLE = 'page';
     private const PK = 'page_id';

@@ -1,11 +1,11 @@
-<?php
+﻿<?php
 
 declare(strict_types=1);
 
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\IAdminPageService;
+use App\Services\ICmsPageService;
 use App\Services\IPageSectionService;
 use App\Services\ProgramService;
 
@@ -14,14 +14,14 @@ final class HistoryController extends BaseController
     // Service for loading section records from the CMS.
     private IPageSectionService $pageSectionService;
     // Service for loading page records like "history" or "history-book-tour".
-    private IAdminPageService $adminPageService;
+    private ICmsPageService $adminPageService;
     // Service for saving bookings into My Program.
     private ProgramService $programService;
 
     // Store the services that this controller needs.
     public function __construct(
         IPageSectionService $pageSectionService,
-        IAdminPageService $adminPageService,
+        ICmsPageService $adminPageService,
         ProgramService $programService
     )
     {

@@ -1,19 +1,19 @@
-<?php
+﻿<?php
 
 namespace App\Services;
 
 use App\Models\Page;
-use App\Repositories\IAdminPageRepository;
+use App\Repositories\ICmsPageRepository;
 use App\Models\Enum\PageStatus;
 use RuntimeException;
 use Throwable;
 
-final class AdminPageService implements IAdminPageService
+final class CmsPageService implements ICmsPageService
 {
-    private IAdminPageRepository $repository;
+    private ICmsPageRepository $repository;
 
     // Inject the page repository used by the CMS page layer.
-    public function __construct(IAdminPageRepository $repository)
+    public function __construct(ICmsPageRepository $repository)
     {
         $this->repository = $repository;
     }

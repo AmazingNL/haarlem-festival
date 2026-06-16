@@ -1,9 +1,9 @@
-<?php
+﻿<?php
 
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\IAdminPageService;
+use App\Services\ICmsPageService;
 use App\Services\IPageSectionService;
 use App\Services\IRestaurantService;
 use App\Services\IUserService;
@@ -15,7 +15,7 @@ final class YummyController extends BaseController
 {
 
     private IRestaurantService $restaurantService;
-    private IAdminPageService $adminPageService;
+    private ICmsPageService $adminPageService;
     private IPageSectionService $pageSectionService;
     private ProgramService $programService;
     private ReservationEmailService $reservationEmailService;
@@ -23,7 +23,7 @@ final class YummyController extends BaseController
 
     public function __construct(
         IRestaurantService $restaurantService,
-        IAdminPageService $adminPageService,
+        ICmsPageService $adminPageService,
         IPageSectionService $pageSectionService,
         ProgramService $programService,
         ReservationEmailService $reservationEmailService,
