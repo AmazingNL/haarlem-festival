@@ -8,6 +8,7 @@ use App\Core\BaseController;
 use App\Services\ICmsService;
 use App\Services\IPageSectionService;
 use App\Services\ProgramService;
+use App\Services\HistoryBookingCatalogService;
 
 final class HistoryController extends BaseController
 {
@@ -21,7 +22,8 @@ final class HistoryController extends BaseController
     public function __construct(
         IPageSectionService $pageSectionService,
         ICmsService $adminPageService,
-        ProgramService $programService
+        ProgramService $programService,
+        HistoryBookingCatalogService $historyBookingCatalogService
     )
     {
         $this->pageSectionService = $pageSectionService;

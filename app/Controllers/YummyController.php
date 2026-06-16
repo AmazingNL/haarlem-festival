@@ -13,7 +13,6 @@ use App\Support\SessionUser;
 final class YummyController extends BaseController
 {
 
-    private IRestaurantService $restaurantService;
     private ICmsService $adminPageService;
     private IPageSectionService $pageSectionService;
     private ProgramService $programService;
@@ -21,7 +20,6 @@ final class YummyController extends BaseController
     private YummyReservationCatalogService $yummyReservationCatalogService;
 
     public function __construct(
-        IRestaurantService $restaurantService,
         ICmsService $adminPageService,
         IPageSectionService $pageSectionService,
         ProgramService $programService,

@@ -168,9 +168,9 @@ function createImageService(): App\Services\ImageService
     return new App\Services\ImageService(new App\Repositories\ImageRepository());
 }
 
-function createPageService(): App\Services\AdminPageService
+function createPageService(): App\Services\CmsService
 {
-    return new App\Services\AdminPageService(new App\Repositories\AdminPageRepository());
+    return new App\Services\CmsService(new App\Repositories\CmsRepository());
 }
 
 function createSectionService(): App\Services\PageSectionService
@@ -223,7 +223,7 @@ function createController(string $controllerClass)
             $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
             $programService = new App\Services\ProgramService();
 
-            return new App\Controllers\HistoryController($sectionService, $pageService, $programService);
+            return new App\Controllers\HistoryController($sectionService, $pageService, $programService, createHistoryBookingCatalogService());
 
 
         case App\Controllers\AuthController::class:
