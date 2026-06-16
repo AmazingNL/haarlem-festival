@@ -1,19 +1,19 @@
-﻿<?php
+<?php
 
 declare(strict_types=1);
 
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\ICmsPageService;
+use App\Services\ICmsService;
 use App\Services\IPageSectionService;
 
 final class HomeController extends BaseController
 {
     private IPageSectionService $pageSectionService;
-    private ICmsPageService $adminPageService;
+    private ICmsService $adminPageService;
 
-    public function __construct(IPageSectionService $pageSectionService, ICmsPageService $adminPageService)
+    public function __construct(IPageSectionService $pageSectionService, ICmsService $adminPageService)
     {
         $this->pageSectionService = $pageSectionService;
         $this->adminPageService = $adminPageService;

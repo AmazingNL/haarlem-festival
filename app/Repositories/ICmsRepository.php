@@ -1,8 +1,8 @@
-﻿<?php
+<?php
 
 namespace App\Repositories;
 use App\Models\Page;
-interface ICmsPageRepository
+interface ICmsRepository
 {
     public function getAllPages(): array;
     public function getPageById(int $id): ?Page;

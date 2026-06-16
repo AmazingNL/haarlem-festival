@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 declare(strict_types=1);
 namespace App\Controllers;
@@ -9,7 +9,7 @@ use App\Models\Page;
 use App\Models\User;
 use App\Models\Enum\SectionType;
 use App\Models\Enum\UserRole;
-use App\Services\ICmsPageService;
+use App\Services\ICmsService;
 use App\Services\IPageSectionService;
 use App\Services\IUserService;
 use App\Models\PageSection;
@@ -21,18 +21,18 @@ use Throwable;
 
 final class CmsController extends BaseController
 {
-    private ICmsPageService $adminPageService;
+    private ICmsService $cmsService;
     private IPageSectionService $pageSectionService;
     private IUserService $userService;
     private IImageService $imageService;
 
     public function __construct(
-        ICmsPageService $adminPageService,
+        ICmsService $cmsService,
         IPageSectionService $pageSectionService,
         IUserService $userService,
         IImageService $imageService,
     ) {
-        $this->adminPageService = $adminPageService;
+        $this->cmsService = $cmsService;
         $this->pageSectionService = $pageSectionService;
         $this->userService = $userService;
         $this->imageService = $imageService;
@@ -43,13 +43,12 @@ final class CmsController extends BaseController
         $this->ensureSession();
         $this->refreshAdminDisplayName();
         $users = $this->userService->getAllUsers();
-        $allPages = $this->adminPageService->getAllPages();
-        usort($allPages, fn($a, $b) => strcmp((string) ($b->created_at ?? ''), (string) ($a->created_at ?? '')));
+        $pages = $this->cmsService->getAllPages();
         $this->view(
             'admin_dashboard/index',
             [
-                'allPages' => $allPages,
-                'recentPages' => array_slice($allPages, 0, 5),
+                'pages' => $pages,
+                'recentPages' => array_slice($pages, 0, 5),
                 'userCount' => count($users),
                 'title' => 'Admin Dashboard',
             ],
@@ -59,7 +58,7 @@ final class CmsController extends BaseController
 
     public function viewPages(): void
     {
-        $pages = $this->adminPageService->getAllPages();
+        $pages = $this->cmsService->getAllPages();
         $this->view(
             'admin_dashboard/pages',
             ['pages' => $pages],
@@ -84,13 +83,13 @@ final class CmsController extends BaseController
             $this->verifyCsrf();
             $this->requireFields(['title', 'slug']);
 
-            $pageData = $this->adminPageService->preparePageData(
+            $pageData = $this->cmsService->preparePageData(
                 $this->str('title'),
                 $this->str('slug'),
                 $this->str('content'),
                 $this->str('status', 'draft')
             );
-            $page_id = $this->adminPageService->createPage($pageData);
+            $page_id = $this->cmsService->createPage($pageData);
             if ((int) $page_id <= 0) {
                 $this->setFlash('error', 'Page failed to create');
                 $this->view(
@@ -117,7 +116,7 @@ final class CmsController extends BaseController
     {
         $this->ensureSession();
         try {
-            $page = $this->adminPageService->getPageById((int) $page_id);
+            $page = $this->cmsService->getPageById((int) $page_id);
         } catch (Throwable $e) {
             $this->setFlash('error', 'Failed to load page');
             $this->redirect('/admin/dashboard');
@@ -144,14 +143,14 @@ final class CmsController extends BaseController
             $this->verifyCsrf();
             $this->requireFields(['title', 'slug']);
 
-            $pageData = $this->adminPageService->preparePageData(
+            $pageData = $this->cmsService->preparePageData(
                 $this->str('title'),
                 $this->str('slug'),
                 $this->str('content'),
                 $this->str('status', 'draft')
             );
 
-            $updated = $this->adminPageService->updatePage($page_id, $pageData);
+            $updated = $this->cmsService->updatePage($page_id, $pageData);
             if ($updated === false) {
                 $this->setFlash('error', 'Failed to update page.');
                 $this->view(
@@ -182,7 +181,7 @@ final class CmsController extends BaseController
                 $this->redirect('/admin/pages/viewPage');
                 return;
             }
-            $this->adminPageService->deletePage((int) $page_id);
+            $this->cmsService->deletePage((int) $page_id);
             $this->setFlash('success', 'Deleted successfully');
             $this->redirect('/admin/pages/viewPage');
 
@@ -197,7 +196,7 @@ final class CmsController extends BaseController
     {
         $this->ensureSession();
         try {
-            $pageSection = $this->adminPageService->getPageById((int) $page_id);
+            $pageSection = $this->cmsService->getPageById((int) $page_id);
             if (empty($pageSection)) {
                 $this->setFlash('error', 'No page Found');
                 $this->redirect('/admin/pages/viewPage');

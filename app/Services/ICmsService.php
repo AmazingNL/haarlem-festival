@@ -1,9 +1,9 @@
-﻿<?php
+<?php
 
 namespace App\Services;
 
 use App\Models\Page;
-interface ICmsPageService
+interface ICmsService
 {
     public function getAllPages(): array;
     public function getPublishedPages(): array;

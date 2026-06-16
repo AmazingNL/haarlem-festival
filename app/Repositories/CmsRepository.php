@@ -1,10 +1,10 @@
-﻿<?php
+<?php
 
 namespace App\Repositories;
 use App\Models\Page;
 use App\Models\Enum\PageStatus;
 use App\Core\BaseRepository;
-final class CmsPageRepository extends BaseRepository implements ICmsPageRepository
+final class CmsRepository extends BaseRepository implements ICmsRepository
 {
     private const TABLE = 'page';
     private const PK = 'page_id';
@@ -16,8 +16,7 @@ final class CmsPageRepository extends BaseRepository implements ICmsPageReposito
     public function getAllPages(): array
     {
         try {
-            $sql = "SELECT *
-            FROM " . self::TABLE;
+            $sql = "SELECT * FROM " . self::TABLE . " ORDER BY created_at DESC";
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute();
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
