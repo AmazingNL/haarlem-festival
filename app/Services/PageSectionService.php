@@ -1,11 +1,11 @@
-<?php
+﻿<?php
 namespace App\Services;
 
 use App\DTO\SectionInput;
 use App\Models\Enum\SectionType;
 use App\Models\PageSection;
 use App\Repositories\IPageSectionRepository;
-use App\ViewModels\SectionFactory;
+use App\Schemas\SectionFactory;
 
 final class PageSectionService implements IPageSectionService
 {

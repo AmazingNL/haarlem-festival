@@ -1,8 +1,8 @@
-<?php
+﻿<?php
 $pageId = (int) ($page_id ?? 0);
 
 use App\Models\Enum\SectionType;
-use App\ViewModels\SectionFactory;
+use App\Schemas\SectionFactory;
 ?>
 
 <form class="admin-form admin-form--compact page-section-form" method="post" enctype="multipart/form-data"

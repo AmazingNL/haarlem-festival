@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Repositories;
 
@@ -24,7 +24,7 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             return array_map(fn($row) => $this->hydratePage($row), $rows);
         } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to retrieve pages. ' . $e->getMessage());
+            throw new \RuntimeException('Failed to retrieve pages.');
         }
     }
 
@@ -42,7 +42,7 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
             return $row ? $this->hydratePage($row) : null;
         } 
         catch (\Exception $e) {
-            throw new \RuntimeException('Failed to retrieve page. ' . $e->getMessage());
+            throw new \RuntimeException('Failed to retrieve page.');
         }
     }
 
@@ -56,12 +56,13 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
                 (:title, :slug, NOW(), NOW(), :status)";
 
             $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute($this->pageToDbArray($page));
+            $pageData = $this->pageToDbArray($page);
+            $stmt->execute($pageData);
 
             return (int) $this->getConnection()->lastInsertId();
         } 
         catch (\Exception $e) {
-            throw new \RuntimeException('Failed to create page. ' . $e->getMessage());
+            throw new \RuntimeException('Failed to create page.');
         }
 
     }
@@ -80,11 +81,12 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
                     WHERE " . self::PK . " = :id";
             $stmt = $this->getConnection()->prepare($sql);
             $params = $this->pageToDbArray($page);
+            $params['id'] = $id; 
             $stmt->execute($params);
             return (bool) $stmt->rowCount();
         } 
         catch (\Exception $e) {
-            throw new \RuntimeException('Failed to update page. ' . $e->getMessage());
+            throw new \RuntimeException('Failed to update page.');
         }
     }
 
@@ -101,27 +103,17 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
             $stmt->execute([':id' => $id]);
             return (bool) $stmt->rowCount();
         } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to delete page. ' . $e->getMessage());
+            throw new \RuntimeException('Failed to delete page.');
         }
     }
 
     private function pageToDbArray(Page $page): array
     {
-        $status = $page->status;
-        $statusVal = is_object($status) && property_exists($status, 'value') ? $status->value : (string) $status;
-
-        $result = [
+        return [
             'title' => $page->title,
             'slug' => $page->slug,
-            'status' => $statusVal,
+            'status' => $page->status->value
         ];
-
-        // include id only when present (> 0) as it's required for updates but not inserts
-        if (!empty($page->page_id) && (int)$page->page_id > 0) {
-            $result['id'] = (int) $page->page_id;
-        }
-
-        return $result;
     }
 
     private function hydratePage(array $data): Page
@@ -129,7 +121,7 @@ final class AdminPageRepository extends BaseRepository implements IAdminPageRepo
         $statusRaw = $data['status'] ?? PageStatus::draft;
         $status = $statusRaw instanceof PageStatus
             ? $statusRaw
-            : (PageStatus::tryFrom((string) $statusRaw) ?? PageStatus::draft);
+            : PageStatus::draft;
 
         return new Page(
             isset($data['page_id']) ? (int) $data['page_id'] : null,

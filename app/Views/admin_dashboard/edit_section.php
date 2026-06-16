@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 use App\Models\Enum\SectionType;
-use App\ViewModels\SectionFactory;
+use App\Schemas\SectionFactory;
 
 $sectionId = (int) ($section_id ?? 0);
 $pageId = (int) ($pageId ?? 0);
