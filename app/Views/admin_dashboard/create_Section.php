@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $pageId = (int) ($page_id ?? 0);
 
 use App\Models\Enum\SectionType;

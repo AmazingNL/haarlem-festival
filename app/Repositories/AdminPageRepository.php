@@ -1,7 +1,6 @@
-﻿<?php
+<?php
 
 namespace App\Repositories;
-
 use App\Models\Page;
 use App\Models\Enum\PageStatus;
 use App\Core\BaseRepository;

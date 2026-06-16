@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 use App\Core\BaseEntity;
 
-final class Invoice extends BaseEntity
+final class Invoice
 {
     public ?int $invoice_id = null;
     public int $order_id = 0;

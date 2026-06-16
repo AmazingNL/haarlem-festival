@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use App\Models\Enum\SectionType;
 use App\Schemas\SectionFactory;
 
