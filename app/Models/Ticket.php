@@ -3,10 +3,7 @@
 
 declare(strict_types=1);
 namespace App\Models;
-use App\Core\BaseEntity;
-use App\Models\Enum\TicketStatus;
-
-final class Ticket extends TicketStatus
+final class Ticket
 {
 
     public ?int $id = null;
