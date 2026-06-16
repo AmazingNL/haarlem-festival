@@ -1,6 +1,7 @@
 <?php
 $sections = is_array($sections ?? null) ? array_values($sections) : [];
 $events = is_array($events ?? null) ? array_values($events) : [];
+$artists = is_array($artists ?? null) ? array_values($artists) : [];
 $hasCmsContent = !empty($hasCmsContent);
 
 $text = static function (mixed $value, string $default = ''): string {
@@ -105,5 +106,6 @@ $quickLinks = [
         <?php endif; ?>
     </section>
 
+    <?php require __DIR__ . '/partials/artists.php'; ?>
     <?php require __DIR__ . '/partials/events.php'; ?>
 </div>

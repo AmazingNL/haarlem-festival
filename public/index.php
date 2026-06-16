@@ -181,6 +181,11 @@ function createSectionService(): App\Services\PageSectionService
     );
 }
 
+function createDanceArtistService(): App\Services\DanceArtistService
+{
+    return new App\Services\DanceArtistService(new App\Repositories\DanceArtistRepository());
+}
+
 function createController(string $controllerClass)
 {
 
@@ -236,7 +241,8 @@ function createController(string $controllerClass)
             return new DanceController(
                 createPageService(),
                 createSectionService(),
-                createEventCatalogService()
+                createEventCatalogService(),
+                createDanceArtistService()
             );
 
         case App\Controllers\ProgramController::class:

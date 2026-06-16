@@ -180,6 +180,148 @@
     padding-top: 18px;
 }
 
+.dance-artists {
+    margin: 0 auto;
+    max-width: 1180px;
+    padding: 0 24px clamp(72px, 9vw, 118px);
+}
+
+.dance-artists__header {
+    border-top: 1px solid var(--dance-line);
+    margin-bottom: 34px;
+    padding-top: 44px;
+}
+
+.dance-artists__header h2 {
+    color: var(--dance-text);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-style: italic;
+    letter-spacing: 0.16em;
+    margin: 0 0 12px;
+    text-transform: uppercase;
+}
+
+.dance-artists__header p:last-child {
+    color: var(--dance-yellow);
+    font-style: italic;
+    font-weight: 700;
+    margin: 0;
+}
+
+.dance-artist-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.dance-artist-card {
+    background: var(--dance-surface);
+    border: 1px solid var(--dance-line);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.dance-artist-card__image {
+    aspect-ratio: 4 / 3;
+    background: #111827;
+    border-bottom: 1px solid rgba(255, 209, 10, 0.38);
+    overflow: hidden;
+}
+
+.dance-artist-card__image img {
+    display: block;
+    filter: grayscale(1) contrast(1.12) brightness(0.72);
+    height: 100%;
+    object-fit: cover;
+    transition: filter 0.2s ease, transform 0.2s ease;
+    width: 100%;
+}
+
+.dance-artist-card:hover .dance-artist-card__image img {
+    filter: grayscale(0.35) contrast(1.08) brightness(0.85);
+    transform: scale(1.03);
+}
+
+.dance-artist-card__body {
+    display: grid;
+    flex: 1;
+    gap: 16px;
+    padding: clamp(20px, 3vw, 28px);
+}
+
+.dance-artist-card__genre,
+.dance-artist-card__latest span {
+    color: var(--dance-yellow);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.dance-artist-card h3 {
+    color: var(--dance-text);
+    font-size: clamp(1.45rem, 3vw, 2rem);
+    font-style: italic;
+    letter-spacing: 0.1em;
+    line-height: 1.08;
+    margin: 0;
+    overflow-wrap: anywhere;
+    text-transform: uppercase;
+}
+
+.dance-artist-card__description {
+    color: var(--dance-muted);
+    font-style: italic;
+    font-weight: 700;
+    margin: 0;
+}
+
+.dance-artist-card__latest {
+    border-top: 1px solid var(--dance-line);
+    display: grid;
+    gap: 7px;
+    margin-top: auto;
+    padding-top: 16px;
+}
+
+.dance-artist-card__latest strong {
+    color: var(--dance-text);
+    font-size: 0.98rem;
+}
+
+.dance-artist-card__latest small {
+    color: var(--dance-muted);
+}
+
+.dance-artist-card__link {
+    align-items: center;
+    border: 1px solid var(--dance-yellow);
+    color: var(--dance-yellow);
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 800;
+    justify-content: center;
+    letter-spacing: 0.14em;
+    min-height: 44px;
+    padding: 10px 16px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dance-artist-card__link:hover,
+.dance-artist-card__link:focus-visible {
+    background: var(--dance-yellow);
+    color: #000;
+}
+
+.dance-artist-card__link:focus-visible {
+    outline: 3px solid var(--dance-yellow-soft);
+    outline-offset: 3px;
+}
+
 .dance-events {
     margin: 0 auto;
     max-width: 1180px;
@@ -380,6 +522,10 @@ body:has(.dance-page) .site-back-top__icon {
 }
 
 @media (max-width: 980px) {
+    .dance-artist-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .dance-event-card {
         grid-template-columns: minmax(0, 1fr) minmax(260px, 0.7fr);
     }
@@ -403,6 +549,10 @@ body:has(.dance-page) .site-back-top__icon {
     }
 
     .dance-event-card {
+        grid-template-columns: 1fr;
+    }
+
+    .dance-artist-grid {
         grid-template-columns: 1fr;
     }
 }
