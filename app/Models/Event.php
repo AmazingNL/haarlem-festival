@@ -2,9 +2,8 @@
 // src/Domain/Event.php
 
 declare(strict_types=1);
+
 namespace App\Models;
-use App\Models\Location;
-use DateTime;
 
 final class Event
 {
@@ -19,14 +18,14 @@ final class Event
     public function __construct(
         int $eventid, string $title, string $type, int $location, int $capacity
     ){
-        $now = date("Y-m-d H:i:s");
-        $this->startTime = $now;
-        $this->endTime = $now;
+        $currentDateTime = date('Y-m-d H:i:s');
 
-        $this->eventId;
-        $this->title;
-        $this->type;
-        $this->locationId;
+        $this->eventId = $eventid;
+        $this->title = $title;
+        $this->type = $type;
+        $this->startTime = $currentDateTime;
+        $this->endTime = $currentDateTime;
+        $this->locationId = $location;
         $this->capacity = $capacity;
     }
 

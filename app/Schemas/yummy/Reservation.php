@@ -18,8 +18,6 @@ final class Reservation extends BaseSection
 
 
     public function __construct(
-        int $pageId = 0,
-        int $sectionId = 0,
         string $customClass = '',
         int $sortOrder = 0,
         string $title = '',

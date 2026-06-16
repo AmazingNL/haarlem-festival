@@ -5,21 +5,23 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\HistoryBookingCatalogService;
-use App\Services\IAdminPageService;
+use App\Services\ICmsService;
 use App\Services\IPageSectionService;
 use App\Services\ProgramService;
+use App\Services\HistoryBookingCatalogService;
 
 final class HistoryController extends BaseController
 {
     private IPageSectionService $pageSectionService;
-    private IAdminPageService $adminPageService;
+    // Service for loading page records like "history" or "history-book-tour".
+    private ICmsService $adminPageService;
+    // Service for saving bookings into My Program.
     private ProgramService $programService;
     private HistoryBookingCatalogService $historyBookingCatalogService;
 
     public function __construct(
         IPageSectionService $pageSectionService,
-        IAdminPageService $adminPageService,
+        ICmsService $adminPageService,
         ProgramService $programService,
         HistoryBookingCatalogService $historyBookingCatalogService
     )

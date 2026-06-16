@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\IAdminPageService;
+use App\Services\ICmsService;
 use App\Services\IPageSectionService;
 use App\Services\ProgramService;
 use App\Services\ReservationEmailService;
@@ -12,14 +12,15 @@ use App\Support\SessionUser;
 
 final class YummyController extends BaseController
 {
-    private IAdminPageService $adminPageService;
+
+    private ICmsService $adminPageService;
     private IPageSectionService $pageSectionService;
     private ProgramService $programService;
     private ReservationEmailService $reservationEmailService;
     private YummyReservationCatalogService $yummyReservationCatalogService;
 
     public function __construct(
-        IAdminPageService $adminPageService,
+        ICmsService $adminPageService,
         IPageSectionService $pageSectionService,
         ProgramService $programService,
         ReservationEmailService $reservationEmailService,

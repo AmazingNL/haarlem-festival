@@ -6,17 +6,17 @@ namespace App\Controllers;
 
 use App\Core\BaseController;
 use App\Services\EventCatalogService;
-use App\Services\IAdminPageService;
+use App\Services\ICmsService;
 use App\Services\IPageSectionService;
 
 final class DanceController extends BaseController
 {
-    private IAdminPageService $adminPageService;
+    private ICmsService $adminPageService;
     private IPageSectionService $pageSectionService;
     private EventCatalogService $eventCatalogService;
 
     public function __construct(
-        IAdminPageService $adminPageService,
+        ICmsService $adminPageService,
         IPageSectionService $pageSectionService,
         EventCatalogService $eventCatalogService
     ) {

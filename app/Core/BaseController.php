@@ -175,6 +175,7 @@ abstract class BaseController
         return $cleanUrl;
     }
 
+
     // ---------- CSRF ----------
 
     protected function ensureSession(): void

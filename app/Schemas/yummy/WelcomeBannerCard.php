@@ -9,22 +9,9 @@ final class WelcomeBannerCard extends BaseSection
     public string $title = '';
     public string $info = '';
 
-    public function __construct(
-        int $pageId = 0,
-        int $sectionId = 0,
-        string $customClass = '',
-        int $sortOrder = 0,
-        string $title = '',
-        string $info = ''
-    ) {
-        parent::__construct(
-            $pageId,
-            $sectionId,
-            'welcome_banner_card',
-            $customClass,
-            $sortOrder
-        );
-
+    public function __construct(string $customClass = '', int $sortOrder = 0, string $title = '', string $info = '')
+    {
+        parent::__construct('welcome_banner_card', $customClass, $sortOrder);
         $this->title = $title;
         $this->info = $info;
     }

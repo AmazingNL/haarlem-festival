@@ -13,8 +13,6 @@ final class WelcomeBanner extends BaseSection
     public ?string $backgroundImg = null;
 
     public function __construct(
-        int $pageId = 0,
-        int $sectionId = 0,
         string $customClass = '',
         int $sortOrder = 0,
         string $title = '',
