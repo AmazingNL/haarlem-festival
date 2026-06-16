@@ -1,74 +1,105 @@
 # Haarlem Festival
 
-## Quick Start for Team Members
+A web application for browsing and booking tickets for the Haarlem Festival — events, restaurant reservations, and history tours.
 
-### First Time Setup
+## Requirements
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (includes Docker Compose)
+- [Git](https://git-scm.com/)
+
+---
+
+## Getting Started
+
+### 1. Clone the repository
 
 ```bash
-# Clone and navigate
 git clone <repo-url>
 cd Haarlem_Festival
-
-# One-command sync (handles everything)
-./team-sync.sh              # macOS/Linux
-# OR
-.\team-sync.ps1             # Windows PowerShell
 ```
 
-That's it! Your database is now fully set up.
-
-### Daily Workflow
-
-After pulling code:
+### 2. Start the containers
 
 ```bash
-./team-sync.sh              # macOS/Linux
-# OR  
-.\team-sync.ps1             # Windows
-```
-
----
-
-## Documentation
-
-- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** — Fast answers for common tasks
-- **[TEAM_SYNC.md](TEAM_SYNC.md)** — How to keep your database in sync with the team
-- **[docs/DATABASE_SETUP.md](docs/DATABASE_SETUP.md)** — Complete database guide for new developers
-
----
-
-## Local Email
-
-When running the project with Docker, outgoing emails are captured by Mailpit instead of being sent to a real inbox.
-
-- Mailpit inbox: http://127.0.0.1:8025
-- SMTP host inside Docker: `mailpit`
-- SMTP port: `1025`
-
----
-
-## Manual Setup (if sync scripts don't work)
-
-```bash
-# 1. Start services
 docker compose up --build
+```
 
-# 2. Create database schema (migrations)
-docker compose exec php php /app/migrate.php up
+Wait until all services are running (first build takes a minute).
 
-
-# 3. Backup & Restore (Real Project Data)
-
-- `backup.sql` = Real project data (actual restaurants, events, etc.)
-- You need `backup.sql` to share real data with teammates
-
+### 3. Run the database migrations
 
 ```bash
-# Export the current Docker database data to backup.sql
+docker compose run --rm dbmate up
+```
+
+### 4. Open in browser
+
+| Service | URL |
+|---|---|
+| Application | http://localhost |
+| phpMyAdmin | http://localhost:8080 |
+| Mailpit (email) | http://localhost:8025 |
+
+---
+
+## Daily Workflow
+
+After pulling new changes from the team:
+
+```bash
+docker compose up          # start containers if not running
+docker compose run --rm dbmate up   # apply any new migrations
+```
+
+Or use the sync script which handles both:
+
+```bash
+./team-sync.sh             # macOS/Linux
+.\team-sync.ps1            # Windows PowerShell
+```
+
+---
+
+## Database
+
+### Credentials
+
+| Field | Value |
+|---|---|
+| Host | `localhost` |
+| Port | `3306` |
+| Database | `haarlem_festival` |
+| Username | `developer` |
+| Password | `secret123` |
+
+### Backup & Restore
+
+```bash
+# Export current data to backup.sql
 docker compose exec mysql sh -c 'mariadb-dump -uroot -psecret123 haarlem_festival' > backup.sql
 
-# Restore backup.sql into the Docker database
+# Restore from backup.sql
 cat backup.sql | docker compose exec -T mysql sh -c 'mariadb -uroot -psecret123 haarlem_festival'
 ```
 
+---
 
+## Email
+
+All outgoing emails are captured by Mailpit — nothing is sent to a real inbox.
+
+View captured emails at **http://localhost:8025**
+
+---
+
+## Stopping the project
+
+```bash
+docker compose down
+```
+
+To also delete the database volume (full reset):
+
+```bash
+docker compose down -v
+```

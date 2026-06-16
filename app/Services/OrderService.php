@@ -3,7 +3,7 @@
 namespace App\Services;
 use App\Models\Order;
 use App\Repositories\IOrderRepository;
-use App\ViewModels\yummy\BookReservation;
+use App\Schemas\yummy\BookReservation;
 
 class OrderService implements IOrderService
 {
