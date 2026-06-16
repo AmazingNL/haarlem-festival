@@ -13,7 +13,6 @@ $loggedInUserLabel = SessionUser::displayName();
 $authLabel = $isLoggedIn ? 'Logout' : 'Login';
 $authHref = $isLoggedIn ? '/logout' : '/loginForm';
 $isAuthPage = $currentPath === '/loginForm' || $currentPath === '/registerForm';
-$currentTag = strtolower(trim((string) ($_GET['tag'] ?? '')));
 
 $mainNavigation = [
     [
@@ -38,13 +37,13 @@ $mainNavigation = [
     ],
     [
         'label' => 'Dance',
-        'href' => '/events?tag=dance',
-        'active' => $currentPath === '/events' && $currentTag === 'dance',
+        'href' => '/dance',
+        'active' => $isSectionActive('/dance') !== '',
     ],
     [
         'label' => 'Jazz',
         'href' => '/events?tag=jazz',
-        'active' => $currentPath === '/events' && $currentTag === 'jazz',
+        'active' => $currentPath === '/events' && strtolower(trim((string) ($_GET['tag'] ?? ''))) === 'jazz',
     ],
 ];
 

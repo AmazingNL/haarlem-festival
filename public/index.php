@@ -9,6 +9,7 @@ use function FastRoute\simpleDispatcher;
 
 use App\Controllers\AuthController;
 use App\Controllers\AdminPageController;
+use App\Controllers\DanceController;
 use App\Controllers\EventController;
 use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
@@ -18,7 +19,7 @@ use App\Controllers\ShopController;
 require __DIR__ . '/../app/bootstrap.php';
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
-require_once __DIR__ . '/../app/config.php';
+require_once __DIR__ . '/../app/Config.php';
 
 \App\Support\SessionUser::hydrateFromDatabaseIfNeeded();
 
@@ -81,6 +82,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/', [HomeController::class, 'index']);
     $r->get('/home', [HomeController::class, 'index']);
+    $r->get('/dance', [DanceController::class, 'index']);
     $r->get('/events', [EventController::class, 'index']);
     $r->post('/events/add-to-program', [EventController::class, 'addToProgram']);
     $r->get('/checkout', [ShopController::class, 'checkout']);
@@ -209,6 +211,10 @@ function createController(string $controllerClass)
                 new App\Services\ProgramService(),
                 createHistoryBookingCatalogService()
             );
+
+        case App\Controllers\DanceController::class:
+
+            return new App\Controllers\DanceController(createPageService(), createSectionService());
 
 
         case App\Controllers\AuthController::class:

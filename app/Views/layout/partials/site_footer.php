@@ -16,7 +16,7 @@ $footerColumns = [
     [
         'title' => 'What to do',
         'links' => [
-            ['label' => 'Dance', 'href' => '/home#home-dance-tickets'],
+            ['label' => 'Dance', 'href' => '/dance'],
             ['label' => 'Jazz', 'href' => '/home#home-jazz-tickets'],
             ['label' => 'My Program', 'href' => '/program'],
             ['label' => 'Food and drinks', 'href' => '/yummy'],

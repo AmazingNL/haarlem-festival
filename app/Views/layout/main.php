@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/assets/css/home.css" />
     <link rel="stylesheet" href="/assets/css/shop.css" />
     <link rel="stylesheet" href="/assets/css/program.css" />
+    <link rel="stylesheet" href="/assets/css/dance.css" />
     <link rel="stylesheet" href="/assets/css/history/index.css" />
     <link rel="stylesheet" href="/assets/css/stories/index.css" />
     <link rel="stylesheet" href="/assets/css/yummy/index.css" />

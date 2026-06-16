@@ -1,0 +1,209 @@
+.dance-page {
+    --dance-bg: #000000;
+    --dance-surface: #060606;
+    --dance-yellow: #ffd10a;
+    --dance-yellow-soft: #ffe36b;
+    --dance-text: #f8f8f8;
+    --dance-muted: #aeb4c0;
+    --dance-line: #1b2635;
+    background: var(--dance-bg);
+    color: var(--dance-text);
+    min-height: 100vh;
+}
+
+.dance-page * {
+    line-height: 1.45;
+}
+
+.dance-hero {
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 209, 10, 0.5);
+    display: grid;
+    min-height: clamp(360px, 52vw, 620px);
+    overflow: hidden;
+    position: relative;
+    text-align: center;
+}
+
+.dance-hero__image,
+.dance-hero__overlay {
+    height: 100%;
+    inset: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.dance-hero__image {
+    filter: grayscale(1) contrast(1.25) brightness(0.52);
+    object-fit: cover;
+}
+
+.dance-hero__overlay {
+    background:
+        radial-gradient(circle at 50% 42%, rgba(255, 209, 10, 0.16), transparent 24%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.42), #000 94%);
+}
+
+.dance-hero__content {
+    padding: 72px 24px;
+    position: relative;
+    z-index: 1;
+}
+
+.dance-hero__content p,
+.dance-kicker,
+.dance-breadcrumb,
+.dance-quick-link {
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.dance-hero__content p {
+    color: var(--dance-yellow);
+    font-size: clamp(1rem, 2vw, 1.65rem);
+    margin: 0 0 8px;
+}
+
+.dance-hero h1 {
+    color: var(--dance-yellow);
+    font-size: clamp(4rem, 13vw, 9.5rem);
+    font-style: italic;
+    letter-spacing: 0.04em;
+    line-height: 0.9;
+    margin: 0;
+    text-shadow: 0 12px 40px rgba(0, 0, 0, 0.65);
+    text-transform: uppercase;
+}
+
+.dance-breadcrumb {
+    align-items: center;
+    background: var(--dance-yellow);
+    color: #000;
+    display: flex;
+    gap: 14px;
+    margin: 0 auto;
+    padding: 18px clamp(24px, 10vw, 180px);
+    width: 100%;
+}
+
+.dance-breadcrumb a {
+    color: #000;
+    text-decoration: none;
+}
+
+.dance-breadcrumb span:last-child {
+    color: #5e6570;
+}
+
+.dance-welcome {
+    margin: 0 auto;
+    max-width: 980px;
+    padding: clamp(56px, 8vw, 96px) 24px clamp(76px, 10vw, 120px);
+    text-align: center;
+}
+
+.dance-kicker {
+    color: var(--dance-yellow);
+    font-size: 0.82rem;
+    margin: 0 0 18px;
+}
+
+.dance-welcome h2 {
+    color: var(--dance-yellow);
+    font-size: clamp(2.15rem, 5vw, 4rem);
+    font-style: italic;
+    letter-spacing: 0.16em;
+    line-height: 1.1;
+    margin: 0 0 24px;
+    text-transform: uppercase;
+}
+
+.dance-welcome > p:not(.dance-kicker):not(.dance-fallback-note) {
+    color: var(--dance-muted);
+    font-size: clamp(1rem, 2vw, 1.16rem);
+    font-style: italic;
+    font-weight: 700;
+    margin: 0 auto;
+    max-width: 760px;
+}
+
+.dance-quick-links {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 44px auto 0;
+    max-width: 720px;
+}
+
+.dance-quick-link {
+    align-items: center;
+    border: 2px solid rgba(255, 209, 10, 0.82);
+    color: var(--dance-text);
+    display: inline-flex;
+    gap: 14px;
+    justify-content: center;
+    min-height: 58px;
+    padding: 12px 18px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.dance-quick-link--primary,
+.dance-quick-link:hover,
+.dance-quick-link:focus-visible {
+    background: var(--dance-yellow);
+    color: #000;
+}
+
+.dance-quick-link:focus-visible {
+    outline: 3px solid var(--dance-yellow-soft);
+    outline-offset: 4px;
+}
+
+.dance-quick-link:hover {
+    transform: translateY(-2px);
+}
+
+.dance-quick-link__icon {
+    font-size: 1.3rem;
+    letter-spacing: 0;
+    line-height: 1;
+}
+
+.dance-fallback-note {
+    border-top: 1px solid var(--dance-line);
+    color: #788394;
+    font-size: 0.9rem;
+    margin: 42px auto 0;
+    max-width: 720px;
+    padding-top: 18px;
+}
+
+body:has(.dance-page) .site-back-top {
+    background: #000;
+    border-top-color: var(--dance-line);
+}
+
+body:has(.dance-page) .site-back-top__link {
+    color: var(--dance-text);
+}
+
+body:has(.dance-page) .site-back-top__icon {
+    background: var(--dance-yellow);
+    color: #000;
+}
+
+@media (max-width: 760px) {
+    .dance-breadcrumb {
+        padding-inline: 24px;
+    }
+
+    .dance-quick-links {
+        grid-template-columns: 1fr;
+    }
+
+    .dance-hero {
+        min-height: 340px;
+    }
+}

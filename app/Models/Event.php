@@ -11,14 +11,18 @@ final class Event
     public ?int $eventId = null;
     public string $title = '';
     public string $type = '';
-    public string $startTime = date("Y-m-d H:i:s"); 
-    public string $endTime = date("Y-m-d H:i:s");
+    public string $startTime = '';
+    public string $endTime = '';
     public int $locationId = 0;
     public int $capacity = 0;
 
     public function __construct(
         int $eventid, string $title, string $type, int $location, int $capacity
     ){
+        $now = date("Y-m-d H:i:s");
+        $this->startTime = $now;
+        $this->endTime = $now;
+
         $this->eventId;
         $this->title;
         $this->type;
