@@ -15,8 +15,6 @@ final class RestaurantCard extends BaseSection
     public array $cuisine = [];
 
     public function __construct(
-        int $pageId = 0,
-        int $sectionId = 0,
         string $customClass = '',
         int $sortOrder = 0,
         string $title = '',

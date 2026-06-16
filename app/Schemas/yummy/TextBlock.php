@@ -10,23 +10,9 @@ final class TextBlock extends BaseSection
     public string $subTitle = '';
     public string $article = '';
 
-    public function __construct(
-        int $pageId = 0,
-        int $sectionId = 0,
-        string $customClass = '',
-        int $sortOrder = 0,
-        string $title = '',
-        string $subTitle = '',
-        string $article = ''
-    ) {
-            parent::__construct(
-        $pageId,
-        $sectionId,
-        'text_block',
-        $customClass,
-        $sortOrder
-    );
-
+    public function __construct(string $customClass = '', int $sortOrder = 0, string $title = '', string $subTitle = '', string $article = '')
+    {
+        parent::__construct('text_block', $customClass, $sortOrder);
         $this->title = $title;
         $this->subTitle = $subTitle;
         $this->article = $article;
