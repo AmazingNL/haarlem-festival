@@ -165,7 +165,7 @@ VALUES
     'meeting_title', 'Meeting Point',
     'meeting_text', 'Bavo Church, Grote Markt - Arrive 10 min early',
     'button_text', 'Explore Route',
-    'button_link', '/history#history-route'
+    'button_link', '/history/route-map'
   ),
   3,
   1

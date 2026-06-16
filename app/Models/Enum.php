@@ -32,12 +32,6 @@ enum TicketStatus: string
     case cancelled = 'cancelled';
 }
 
-enum ProgramItemSource: string
-{
-    case ticket = 'ticket';
-    case saved = 'saved';
-}
-
 enum PageStatus: string
 {
     case draft = 'draft';
@@ -61,7 +55,6 @@ enum SectionType: string
     case TWO_IMAGE_ROW = 'two_image_row';
     case VENUE = 'venue';
     case CARDS_GRID = 'cards_grid';
-    case RESTAURANTS_CARD = 'restaurants_card';
     case WELCOME_BANNER = "welcome_banner";
     case WELCOME_BANNER_CARD = 'welcome_banner_card';
     case GALLERY = "gallery";
@@ -103,4 +96,3 @@ enum SectionType: string
     case HISTORY_MOLEN_ROUTE_CTA = 'history_molen_route_cta';
     case RESERVATION = 'reservation';
 }
-

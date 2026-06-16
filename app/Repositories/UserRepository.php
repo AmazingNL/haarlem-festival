@@ -162,44 +162,6 @@ class UserRepository extends BaseRepository implements IUserRepository
         }
     }
 
-    public function findByRole(string $role): array
-    {
-        try {
-            $sql = "SELECT *
-                    FROM " . self::TABLE . "
-                    WHERE role = :role
-                    ORDER BY created_at DESC";
-
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute([':role' => $role]);
-            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            return array_map(fn(array $row): User => $this->hydrateUser($row), $rows);
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to retrieve users by role. ' . $e->getMessage());
-        }
-    }
-
-    public function findByName(string $name): array
-    {
-        try {
-            $sql = "SELECT *
-                    FROM " . self::TABLE . "
-                    WHERE first_name LIKE :q
-                       OR last_name LIKE :q
-                       OR CONCAT(first_name, ' ', last_name) LIKE :q
-                    ORDER BY last_name ASC, first_name ASC";
-
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute([':q' => '%' . $name . '%']);
-            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            return array_map(fn(array $row): User => $this->hydrateUser($row), $rows);
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to retrieve users by name. ' . $e->getMessage());
-        }
-    }
-
     public function existsByEmailOrUsername(string $email, string $username): bool
     {
         $sql = "SELECT 1

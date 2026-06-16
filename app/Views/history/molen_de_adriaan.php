@@ -1,13 +1,5 @@
 <?php
-// Small helper functions used by the Molen partials.
-$historyText = static function (?string $value): string {
-    return nl2br(htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'));
-};
-
-$historyUrl = static function (?string $value, string $default = '#'): string {
-    $url = trim((string) $value);
-    return htmlspecialchars($url !== '' ? $url : $default, ENT_QUOTES, 'UTF-8');
-};
+require __DIR__ . '/partials/_helpers.php';
 
 // Re-index sections by section_type so each Molen block can be loaded directly.
 $sectionsByType = [];

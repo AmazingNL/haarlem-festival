@@ -3,6 +3,9 @@
 
 declare(strict_types=1);
 namespace App\Core;
+
+use App\Support\SessionUser;
+
 abstract class BaseController
 {
     // ---------- Views ----------
@@ -83,7 +86,7 @@ abstract class BaseController
 
     protected function isLoggedIn(): bool
     {
-        return $this->currentUserId() !== null;
+        return SessionUser::isLoggedIn();
     }
 
     protected function requireFields(array $keys): void

@@ -61,12 +61,17 @@ switch ($Command) {
             
             # Step 4: Run migrations
             Write-Host "4️  Running database migrations..." -ForegroundColor Yellow
-            php migrate.php up
+            docker compose exec -T php php /app/migrate.php up
+            Write-Host ""
+
+            # Step 5: Load seed content (home, stories, events, restaurants)
+            Write-Host "5️  Loading seed data..." -ForegroundColor Yellow
+            docker compose exec -T php php /app/migrate.php seed
             Write-Host ""
             
-            # Step 5: Verify status
-            Write-Host "5️ Verifying database status..." -ForegroundColor Yellow
-            php scripts/db-status.php
+            # Step 6: Verify status
+            Write-Host "6️  Verifying database status..." -ForegroundColor Yellow
+            docker compose exec -T php php /app/scripts/db-status.php
             Write-Host ""
             
             Write-Host "Sync complete! You're in sync with the team." -ForegroundColor Green
@@ -90,7 +95,7 @@ switch ($Command) {
             }
             
             Run-Command " Resetting database..." {
-                php migrate.php reset --force
+                docker compose exec -T php php /app/migrate.php reset --force
                 Write-Host ""
                 Write-Host " Reset complete. Sample data restored." -ForegroundColor Green
             }

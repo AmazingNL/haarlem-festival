@@ -18,6 +18,9 @@ try {
     $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $user, $pass, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
+    if (defined('PDO::MYSQL_ATTR_MULTI_STATEMENTS')) {
+        $pdo->setAttribute(PDO::MYSQL_ATTR_MULTI_STATEMENTS, true);
+    }
 
     $migrationTable = 'schema_migrations';
 
@@ -135,7 +138,20 @@ try {
         return (int) $stmt->fetchColumn() > 0;
     };
 
-    $runSqlFiles = function (string $pattern, string $label) use ($pdo): void {
+    $executeSqlBatch = static function (string $sql) use ($pdo): void {
+        if (trim($sql) === '') {
+            return;
+        }
+
+        $statement = $pdo->query($sql);
+        if ($statement instanceof \PDOStatement) {
+            do {
+                $statement->closeCursor();
+            } while ($statement->nextRowset());
+        }
+    };
+
+    $runSqlFiles = function (string $pattern, string $label) use ($executeSqlBatch): void {
         $files = glob($pattern);
         sort($files);
 
@@ -147,12 +163,16 @@ try {
         foreach ($files as $file) {
             echo "Running {$label} " . basename($file) . "...\n";
             $sql = file_get_contents($file);
-            $pdo->exec($sql);
+            if ($sql === false) {
+                throw new RuntimeException("Unable to read {$label} file: {$file}");
+            }
+            $executeSqlBatch($sql);
         }
     };
 
     $applyMigrations = static function (array $files, bool $allowBaselineForExistingSchema) use (
         $pdo,
+        $executeSqlBatch,
         $ensureMigrationTable,
         $getAppliedMigrations,
         $markMigrationApplied,
@@ -221,7 +241,7 @@ try {
                 throw new RuntimeException("Unable to read migration file: {$file}");
             }
 
-            $pdo->exec($sql);
+            $executeSqlBatch($sql);
             $markMigrationApplied($name, $checksum);
             $applied[$name] = $checksum;
         }
@@ -247,6 +267,8 @@ try {
     }
 
     $runSqlFiles(__DIR__ . '/db/reset/*.sql', 'reset');
+    $ensureMigrationTable();
+    $pdo->exec("DELETE FROM `{$db}`.`{$migrationTable}`");
     $applyMigrations($migrationFiles, false);
     $runSqlFiles(__DIR__ . '/db/seeds/*.sql', 'seed');
     echo "Reset completed!\n";

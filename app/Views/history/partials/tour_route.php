@@ -45,7 +45,7 @@ $routeStops = [
         <p><?= $historyText($s['meeting_text'] ?? '') ?></p>
 
         <?php if (!empty($s['button_text'])): ?>
-            <a class="history-btn history-btn--outline" href="<?= $historyUrl($s['button_link']) ?>">
+            <a class="history-btn history-btn--outline" href="<?= $historyUrl($s['button_link'], '/history/route-map') ?>">
                 <?= htmlspecialchars((string) $s['button_text'], ENT_QUOTES, 'UTF-8') ?>
             </a>
         <?php endif; ?>

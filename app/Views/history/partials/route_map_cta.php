@@ -6,7 +6,7 @@
         <?php endif; ?>
 
         <?php if (!empty($s['button_text'])): ?>
-            <a class="history-btn history-btn--dark" href="<?= $historyUrl($s['button_link']) ?>">
+            <a class="history-btn history-btn--dark" href="<?= $historyUrl($s['button_link'], '/history/book-tour') ?>">
                 <?= htmlspecialchars((string) $s['button_text'], ENT_QUOTES, 'UTF-8') ?>
             </a>
         <?php endif; ?>

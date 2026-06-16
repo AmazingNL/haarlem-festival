@@ -14,15 +14,6 @@ interface IUserRepository
     public function updateUser(User $user): void;
     public function deleteUser(int $id): void;
     public function findAllUsers(): array;
-    public function findByRole(string $role): array;
-    public function findByName(string $name): array;
     public function existsByEmailOrUsername(string $email, string $username): bool;
-
-    /**
-     * @param string $role   Empty string = no role filter.
-     * @param string $search Empty string = no name/email filter.
-     * @param string $sort   One of date_desc|date_asc|name_asc|name_desc.
-     * @return User[]
-     */
     public function findFiltered(string $role, string $search, string $sort): array;
 }

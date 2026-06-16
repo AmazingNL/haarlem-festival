@@ -1,13 +1,25 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Repositories;
 
-use App\Models\Order;
+interface IOrderRepository
+{
+    public function createPaidOrder(
+        int $userId,
+        array $customer,
+        string $provider,
+        array $items,
+        string $stripeSessionId,
+        ?string $providerPaymentId
+    ): int;
 
-interface IOrderRepository{
+    public function findOrderForUser(int $orderId, int $userId): ?array;
 
-    public function getOrderById(int $id) : Order;
-    public function getAllOrders() : array;
-    public function createOrder(Order $order) : void;
+    public function findPaidOrdersForUser(int $userId): array;
+
+    public function findByStripeSessionId(int $userId, string $stripeSessionId): ?array;
+
+    public function getLatestOrderIdForUser(int $userId): int;
 }
