@@ -1,50 +1,35 @@
-/* ===================== Stories Hero ===================== */
+/* ===================== Stories Hero (DB-driven) ===================== */
 
 .sh-banner {
+    /* background-image set dynamically via inline style from DB image_path */
     background-size: cover;
-    background-position: center top;
+    background-position: center;
     background-repeat: no-repeat;
-    background-color: #1a0101;
+    background-color: #1a0101; /* fallback if no image set */
     min-height: 560px;
     display: flex;
-    align-items: flex-end;
-    position: relative;
-}
-
-.sh-banner::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to right,
-        rgba(10, 2, 2, 0.82) 0%,
-        rgba(10, 2, 2, 0.55) 60%,
-        rgba(10, 2, 2, 0.1) 100%
-    );
-    pointer-events: none;
+    align-items: center;
 }
 
 .sh-banner-inner {
-    position: relative;
-    z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding: 64px 56px;
-    max-width: 680px;
+    gap: 28px;
+    padding: 56px;
+    max-width: 640px;
 }
 
 .sh-banner-title {
     text-transform: uppercase;
-    line-height: 1;
+    line-height: 1.05;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
     margin: 0;
 }
 
 .sh-title--accent {
-    font-size: 5rem;
+    font-size: 4.1rem;
     font-weight: 900;
     background: linear-gradient(90deg, #f2b53a 0%, #e24a2b 45%, #c21f1f 100%);
     -webkit-background-clip: text;
@@ -55,7 +40,7 @@
 }
 
 .sh-title--main {
-    font-size: 3.8rem;
+    font-size: 3.5rem;
     font-weight: 900;
     color: #fff;
     white-space: normal;
@@ -63,9 +48,9 @@
 }
 
 .sh-banner-content {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     line-height: 1.75;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.92);
     max-width: 520px;
 }
 
@@ -75,98 +60,85 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 14px 36px;
+    padding: 14px 34px;
     border-radius: 999px;
     background: #7f1414;
     color: #fff;
     font-weight: 800;
-    font-size: 1rem;
     text-decoration: none;
     width: fit-content;
-    transition: background 0.2s ease;
 }
 
-.sh-banner-btn:hover { background: #c21f1f; }
+.sh-banner-btn:hover { background: var(--color-accent-pink); color: #410606; }
 
-@media (max-width: 900px) {
-    .sh-banner { min-height: 440px; }
-    .sh-banner-inner { padding: 48px 32px; }
-    .sh-title--accent { font-size: 3.8rem; }
-    .sh-title--main  { font-size: 2.8rem; }
+@media (max-width: 1100px) {
+    .sh-banner-inner { padding: 48px 36px; }
+    .sh-title--accent { font-size: 3rem; }
+    .sh-title--main  { font-size: 2.5rem; }
 }
 
 @media (max-width: 600px) {
-    .sh-banner { min-height: 360px; }
-    .sh-banner-inner { padding: 40px 20px; max-width: 100%; }
-    .sh-title--accent { font-size: 2.8rem; }
-    .sh-title--main  { font-size: 2rem; }
+    .sh-banner-inner { padding: 48px 20px; max-width: 100%; }
 }
 
 @media (max-width: 420px) {
-    .sh-banner { min-height: 320px; }
-    .sh-banner-inner { padding: 28px 14px; gap: 14px; }
-    .sh-title--accent { font-size: 2.1rem; }
-    .sh-title--main { font-size: 1.45rem; }
-    .sh-banner-content { font-size: 0.95rem; line-height: 1.55; }
-    .sh-banner-btn { width: 100%; justify-content: center; padding: 12px 16px; }
+    .sh-banner {
+        min-height: 340px;
+    }
+
+    .sh-banner-inner {
+        padding: 30px 14px;
+        gap: 14px;
+    }
+
+    .sh-title--accent {
+        font-size: 2.1rem;
+    }
+
+    .sh-title--main {
+        font-size: 1.5rem;
+    }
+
+    .sh-banner-content {
+        font-size: 0.95rem;
+        line-height: 1.55;
+    }
+
+    .sh-banner-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 16px;
+    }
 }
 
 /* ===================== What is Stories ===================== */
 
 .wis-section {
-    background: #f6e9e9;
+    background: var(--color-background);
     padding: 72px 24px;
 }
 
 .wis-inner {
-    max-width: 1100px;
+    max-width: 800px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 64px;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
 
 .wis-title {
-    font-size: 2.4rem;
-    font-weight: 900;
-    color: #6b1a1a;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-text-header);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    line-height: 1.15;
-    margin: 0;
+    letter-spacing: 0.08em;
 }
 
 .wis-body p {
     font-size: 1.05rem;
-    line-height: 1.9;
+    line-height: 1.85;
     color: #3a1010;
-    margin: 0 0 16px 0;
-}
-
-.wis-body p:last-child { margin-bottom: 0; }
-
-.wis-image {
-    width: 100%;
-    height: 380px;
-    object-fit: cover;
-    border-radius: 16px;
-    box-shadow: 0 12px 32px rgba(65, 6, 6, 0.15);
-    display: block;
-}
-
-@media (max-width: 900px) {
-    .wis-inner {
-        grid-template-columns: 1fr;
-        gap: 36px;
-    }
-}
-
-@media (max-width: 560px) {
-    .wis-section { padding: 48px 16px; }
-    .wis-title { font-size: 1.9rem; }
-    .wis-body p { font-size: 1rem; line-height: 1.7; }
-    .wis-image { height: 260px; }
+    margin-bottom: 16px;
 }
 
 /* ===================== Stories Preview (mosaic) ===================== */
@@ -177,28 +149,27 @@
 }
 
 .sp-inner {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 32px;
 }
 
 .sp-title {
-    font-size: 2.2rem;
-    font-weight: 900;
+    font-size: 2rem;
+    font-weight: 800;
     color: var(--color-accent-yellow);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     text-align: center;
-    margin: 0;
 }
 
 .sp-body .sp-mosaic {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
-    grid-template-rows: 220px 220px;
-    gap: 14px;
+    grid-template-rows: 200px 200px;
+    gap: 12px;
 }
 
 .sp-body .sp-mosaic img:first-child {
@@ -206,76 +177,64 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 14px;
+    border-radius: 12px;
 }
 
 .sp-body .sp-mosaic img:not(:first-child) {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 14px;
+    border-radius: 12px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 700px) {
     .sp-body .sp-mosaic {
         grid-template-columns: 1fr 1fr;
         grid-template-rows: auto;
     }
-    .sp-body .sp-mosaic img:first-child { grid-row: auto; height: 180px; }
-    .sp-body .sp-mosaic img:not(:first-child) { height: 180px; }
-}
-
-@media (max-width: 480px) {
-    .sp-section { padding: 48px 16px; }
-    .sp-title { font-size: 1.8rem; }
-    .sp-inner { gap: 26px; }
-    .sp-body .sp-mosaic { grid-template-columns: 1fr; }
-    .sp-body .sp-mosaic img:first-child,
-    .sp-body .sp-mosaic img:not(:first-child) { height: 160px; }
+    .sp-body .sp-mosaic img:first-child { grid-row: auto; }
 }
 
 /* ===================== Storytelling Schedule ===================== */
 
 .sched-section {
-    background: #f6e9e9;
+    background: var(--color-background);
     padding: 72px 24px;
 }
 
 .sched-inner {
-    max-width: 960px;
+    max-width: 900px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 36px;
+    gap: 32px;
 }
 
 .sched-title {
-    font-size: 2.2rem;
-    font-weight: 900;
-    color: #6b1a1a;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-text-header);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     text-align: center;
-    margin: 0;
 }
 
 .sched-tabs {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
 .sched-tab {
-    padding: 11px 28px;
+    padding: 10px 24px;
     border-radius: 999px;
     border: 2px solid #7f1414;
     background: transparent;
     color: #7f1414;
     font-weight: 700;
-    font-family: Poppins, system-ui, sans-serif;
-    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-size: 0.95rem;
 }
 
 .sched-tab.active,
@@ -284,6 +243,7 @@
     color: #fff;
 }
 
+/* Day panels — only show the active day */
 .sched-body .sched-day { display: none; }
 .sched-body .sched-day.active { display: flex; flex-direction: column; gap: 16px; }
 
@@ -291,286 +251,75 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    padding-top: 8px;
 }
 
 .sched-card {
     background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 3px 16px rgba(65, 6, 6, 0.09);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(65, 6, 6, 0.08);
     overflow: hidden;
     border-left: 4px solid #7f1414;
 }
 
 .sched-card-body {
-    padding: 22px 28px;
+    padding: 20px 24px;
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
 .sched-card-time {
-    font-size: 0.82rem;
-    font-weight: 800;
+    font-size: 0.85rem;
+    font-weight: 700;
     color: #7f1414;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
 }
 
 .sched-card-title {
     font-size: 1.15rem;
     font-weight: 700;
-    color: #3b0b0b;
+    color: var(--color-text-header);
     margin: 0;
-    line-height: 1.3;
 }
 
 .sched-card-meta {
     font-size: 0.88rem;
-    color: #777;
+    color: #666;
 }
 
-@media (max-width: 600px) {
-    .sched-title { font-size: 1.6rem; }
-    .sched-card-body { padding: 18px 20px; }
-}
+@media (max-width: 520px) {
+    .wis-section,
+    .sp-section,
+    .sched-section {
+        padding: 48px 16px;
+    }
 
-@media (max-width: 420px) {
-    .sched-section { padding: 48px 14px; }
-    .sched-tabs { gap: 8px; }
+    .wis-title,
+    .sp-title,
+    .sched-title {
+        font-size: 1.6rem;
+    }
+
+    .sp-body .sp-mosaic {
+        grid-template-columns: 1fr;
+    }
+
+    .sp-body .sp-mosaic img:first-child,
+    .sp-body .sp-mosaic img:not(:first-child) {
+        height: 160px;
+    }
+
     .sched-tab {
         width: calc(50% - 4px);
-        padding: 10px 12px;
         text-align: center;
+        padding: 10px 12px;
         font-size: 0.85rem;
     }
-    .sched-card-title { font-size: 1.05rem; }
+
+    .sched-card-body {
+        padding: 16px;
+    }
 }
 
-/* ===================== Stories Booking Card ===================== */
-
-.sbc-section {
-    background: #f6e9e9;
-    padding: 72px 24px;
-}
-
-.sbc-inner {
-    max-width: 860px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-}
-
-.sbc-header { text-align: center; }
-
-.sbc-heading {
-    font-size: 1.9rem;
-    font-weight: 900;
-    color: #3b1010;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    margin: 0 0 6px;
-}
-
-.sbc-subheading {
-    font-size: 0.97rem;
-    color: #6b3030;
-    margin: 0;
-}
-
-.sbc-callout {
-    background: #f0e0c0;
-    border-left: 4px solid #b8860b;
-    border-radius: 8px;
-    padding: 16px 20px;
-    font-size: 0.92rem;
-    font-style: italic;
-    color: #4a3000;
-    line-height: 1.7;
-}
-
-.sbc-callout p { margin: 0; }
-
-.sbc-card {
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 4px 24px rgba(65, 6, 6, 0.10);
-    overflow: hidden;
-}
-
-.sbc-card-header {
-    background: #2d2416;
-    padding: 20px 28px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-}
-
-.sbc-card-title-group { flex: 1; min-width: 0; }
-
-.sbc-card-title {
-    font-size: 1.05rem;
-    font-weight: 800;
-    color: #fff;
-    margin: 0 0 4px;
-    line-height: 1.3;
-}
-
-.sbc-card-desc {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.65);
-    margin: 0;
-}
-
-.sbc-price-badge {
-    background: #c8a84b;
-    color: #1a0e00;
-    font-size: 1.25rem;
-    font-weight: 900;
-    padding: 6px 18px;
-    border-radius: 999px;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.sbc-details {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0;
-    border-bottom: 1px solid #f0e8e8;
-}
-
-.sbc-detail-item {
-    padding: 18px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    border-right: 1px solid #f0e8e8;
-}
-
-.sbc-detail-item:last-child { border-right: none; }
-
-.sbc-detail-icon { color: #7f1414; }
-
-.sbc-detail-label {
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: #7f1414;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-}
-
-.sbc-detail-value {
-    font-size: 0.88rem;
-    color: #2d1a1a;
-    font-weight: 600;
-    line-height: 1.35;
-}
-
-.sbc-booking-row {
-    background: #fdf5ec;
-    padding: 22px 28px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.sbc-booking-title {
-    font-size: 1rem;
-    font-weight: 800;
-    color: #2d1a1a;
-    margin: 0 0 2px;
-}
-
-.sbc-booking-sub {
-    font-size: 0.82rem;
-    color: #7a5a5a;
-    margin: 0;
-}
-
-.sbc-booking-form {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.sbc-stepper {
-    display: flex;
-    align-items: center;
-    border: 2px solid #7f1414;
-    border-radius: 999px;
-    overflow: hidden;
-}
-
-.sbc-stepper-btn {
-    background: transparent;
-    border: none;
-    width: 38px;
-    height: 38px;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #7f1414;
-    cursor: pointer;
-    line-height: 1;
-    padding: 0;
-    transition: background 0.15s ease, color 0.15s ease;
-}
-
-.sbc-stepper-btn:hover {
-    background: #7f1414;
-    color: #fff;
-}
-
-.sbc-stepper-count {
-    width: 40px;
-    text-align: center;
-    border: none;
-    border-left: 1px solid #7f1414;
-    border-right: 1px solid #7f1414;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #2d1a1a;
-    padding: 0 4px;
-    height: 38px;
-    -moz-appearance: textfield;
-    background: #fff;
-}
-
-.sbc-stepper-count::-webkit-outer-spin-button,
-.sbc-stepper-count::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-
-.sbc-add-btn {
-    background: #7f1414;
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    padding: 10px 28px;
-    font-size: 0.9rem;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: background 0.2s ease;
-    white-space: nowrap;
-    font-family: inherit;
-}
-
-.sbc-add-btn:hover { background: #c21f1f; }
-
-@media (max-width: 700px) {
-    .sbc-details { grid-template-columns: repeat(2, 1fr); }
-    .sbc-detail-item:nth-child(2) { border-right: none; }
-    .sbc-detail-item:nth-child(3),
-    .sbc-detail-item:nth-child(4) { border-top: 1px solid #f0e8e8; }
-    .sbc-detail-item:nth-child(4) { border-right: none; }
-}
-
-@media (max-width: 480px) {
-    .sbc-card-header { flex-direction: column; align-items: flex-start; }
-    .sbc-booking-row { flex-direction: column; align-items: flex-start; }
-    .sbc-details { grid-template-columns: 1fr 1fr; }
-}
