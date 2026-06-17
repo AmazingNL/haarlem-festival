@@ -18,19 +18,31 @@ $formatEventDateTime = static function (?string $startDateTime, ?string $endDate
 
     return $dateLabel . ' | ' . $timeLabel;
 };
+
+$danceEventsSectionId = trim((string) ($eventsSectionId ?? 'dance-tickets'));
+if ($danceEventsSectionId === '') {
+    $danceEventsSectionId = 'dance-tickets';
+}
+
+$danceEventsTitleId = $danceEventsSectionId . '-title';
+$danceEventsKicker = trim((string) ($eventsKicker ?? 'Tickets'));
+$danceEventsTitle = trim((string) ($eventsTitle ?? 'Dance Sessions'));
+$danceEventsIntro = trim((string) ($eventsIntro ?? 'Choose your Dance session, select a quantity, and add the tickets to My Program.'));
+$danceEventsEmptyTitle = trim((string) ($eventsEmptyTitle ?? 'No Dance events found'));
+$danceEventsEmptyText = trim((string) ($eventsEmptyText ?? 'Dance events are not available yet. Please check back later.'));
 ?>
 
-<section class="dance-events" id="dance-tickets" aria-labelledby="dance-events-title">
+<section class="dance-events" id="<?= htmlspecialchars($danceEventsSectionId, ENT_QUOTES, 'UTF-8') ?>" aria-labelledby="<?= htmlspecialchars($danceEventsTitleId, ENT_QUOTES, 'UTF-8') ?>">
     <div class="dance-events__header">
-        <p class="dance-kicker">Tickets</p>
-        <h2 id="dance-events-title">Dance Sessions</h2>
-        <p>Choose your Dance session, select a quantity, and add the tickets to My Program.</p>
+        <p class="dance-kicker"><?= htmlspecialchars($danceEventsKicker, ENT_QUOTES, 'UTF-8') ?></p>
+        <h2 id="<?= htmlspecialchars($danceEventsTitleId, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($danceEventsTitle, ENT_QUOTES, 'UTF-8') ?></h2>
+        <p><?= htmlspecialchars($danceEventsIntro, ENT_QUOTES, 'UTF-8') ?></p>
     </div>
 
     <?php if ($events === []): ?>
         <article class="dance-empty-state">
-            <h3>No Dance events found</h3>
-            <p>Dance events are not available yet. Please check back later.</p>
+            <h3><?= htmlspecialchars($danceEventsEmptyTitle, ENT_QUOTES, 'UTF-8') ?></h3>
+            <p><?= htmlspecialchars($danceEventsEmptyText, ENT_QUOTES, 'UTF-8') ?></p>
         </article>
     <?php else: ?>
         <div class="dance-event-list">

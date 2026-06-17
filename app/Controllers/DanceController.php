@@ -44,6 +44,26 @@ final class DanceController extends BaseController
         ]);
     }
 
+    public function artistDetail(string $slug): void
+    {
+        $this->rememberProgramReturnUrl($this->currentUrl());
+
+        $artist = $this->danceArtistService->getArtistDetailBySlug($slug);
+        if ($artist === null) {
+            http_response_code(404);
+            $this->view('no_page/index', [
+                'error' => 'Dance artist not found.',
+                'title' => 'Artist not found',
+            ]);
+            return;
+        }
+
+        $this->view('dance/artist_detail', [
+            'artist' => $artist,
+            'title' => $artist['name'] . ' | Dance',
+        ]);
+    }
+
     private function loadDanceSections(): array
     {
         try {

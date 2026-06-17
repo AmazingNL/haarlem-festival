@@ -81,6 +81,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/', [HomeController::class, 'index']);
     $r->get('/home', [HomeController::class, 'index']);
     $r->get('/dance', [DanceController::class, 'index']);
+    $r->get('/dance/artists/{slug:[a-z0-9-]+}', [DanceController::class, 'artistDetail']);
     $r->get('/events', [EventController::class, 'index']);
     $r->post('/events/add-to-program', [EventController::class, 'addToProgram']);
     $r->get('/checkout', [ShopController::class, 'checkout']);

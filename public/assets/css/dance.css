@@ -322,6 +322,163 @@
     outline-offset: 3px;
 }
 
+.dance-artist-hero {
+    align-items: end;
+    border-bottom: 1px solid rgba(255, 209, 10, 0.5);
+    display: grid;
+    min-height: clamp(420px, 58vw, 660px);
+    overflow: hidden;
+    position: relative;
+}
+
+.dance-artist-hero__image,
+.dance-artist-hero__overlay {
+    height: 100%;
+    inset: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.dance-artist-hero__image {
+    filter: grayscale(1) contrast(1.18) brightness(0.56);
+    object-fit: cover;
+}
+
+.dance-artist-hero__overlay {
+    background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.45) 58%, rgba(0, 0, 0, 0.78)),
+        linear-gradient(180deg, transparent 38%, #000 100%);
+}
+
+.dance-artist-hero__content {
+    max-width: 980px;
+    padding: clamp(90px, 13vw, 150px) 24px clamp(58px, 8vw, 96px);
+    position: relative;
+    width: min(100%, 1180px);
+    z-index: 1;
+}
+
+.dance-artist-hero__content > p:first-child {
+    color: var(--dance-yellow);
+    font-size: 0.86rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    margin: 0 0 16px;
+    text-transform: uppercase;
+}
+
+.dance-artist-hero h1 {
+    color: var(--dance-text);
+    font-size: clamp(3rem, 9vw, 7.4rem);
+    font-style: italic;
+    letter-spacing: 0.08em;
+    line-height: 0.96;
+    margin: 0;
+    max-width: 880px;
+    text-transform: uppercase;
+}
+
+.dance-artist-hero__summary {
+    color: var(--dance-muted);
+    font-size: clamp(1rem, 2vw, 1.22rem);
+    font-style: italic;
+    font-weight: 700;
+    margin: 22px 0 0;
+    max-width: 680px;
+}
+
+.dance-artist-profile,
+.dance-artist-highlights,
+.dance-artist-gallery {
+    margin: 0 auto;
+    max-width: 1180px;
+    padding: clamp(54px, 8vw, 92px) 24px 0;
+}
+
+.dance-artist-profile {
+    display: grid;
+    gap: clamp(26px, 4vw, 52px);
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+}
+
+.dance-artist-profile__copy h2,
+.dance-artist-highlights h2,
+.dance-artist-gallery h2 {
+    color: var(--dance-text);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-style: italic;
+    letter-spacing: 0.16em;
+    margin: 0 0 18px;
+    text-transform: uppercase;
+}
+
+.dance-artist-profile__copy p:not(.dance-kicker),
+.dance-artist-highlights li {
+    color: var(--dance-muted);
+    font-size: clamp(1rem, 1.8vw, 1.12rem);
+    font-style: italic;
+    font-weight: 700;
+}
+
+.dance-artist-profile__copy p:not(.dance-kicker) {
+    margin: 0;
+}
+
+.dance-artist-profile__latest {
+    align-self: start;
+    background: var(--dance-surface);
+    border: 1px solid rgba(255, 209, 10, 0.55);
+    display: grid;
+    gap: 10px;
+    padding: clamp(20px, 3vw, 30px);
+}
+
+.dance-artist-profile__latest span {
+    color: var(--dance-yellow);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.dance-artist-profile__latest strong {
+    color: var(--dance-text);
+    font-size: 1.2rem;
+}
+
+.dance-artist-profile__latest small {
+    color: var(--dance-muted);
+}
+
+.dance-artist-highlights ul {
+    display: grid;
+    gap: 14px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dance-artist-highlights li {
+    border-left: 4px solid var(--dance-yellow);
+    background: var(--dance-surface);
+    padding: 16px 18px;
+}
+
+.dance-artist-gallery__grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.dance-artist-gallery__grid img {
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--dance-line);
+    display: block;
+    filter: grayscale(1) contrast(1.12) brightness(0.78);
+    object-fit: cover;
+    width: 100%;
+}
+
 .dance-events {
     margin: 0 auto;
     max-width: 1180px;
@@ -526,6 +683,14 @@ body:has(.dance-page) .site-back-top__icon {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .dance-artist-profile {
+        grid-template-columns: 1fr;
+    }
+
+    .dance-artist-gallery__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .dance-event-card {
         grid-template-columns: minmax(0, 1fr) minmax(260px, 0.7fr);
     }
@@ -553,6 +718,10 @@ body:has(.dance-page) .site-back-top__icon {
     }
 
     .dance-artist-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dance-artist-gallery__grid {
         grid-template-columns: 1fr;
     }
 }
