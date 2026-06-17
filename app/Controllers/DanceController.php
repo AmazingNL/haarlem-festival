@@ -6,7 +6,7 @@ namespace App\Controllers;
 
 use App\Core\BaseController;
 use App\Services\DanceArtistService;
-use App\Services\EventCatalogService;
+use App\Services\DanceScheduleService;
 use App\Services\ICmsService;
 use App\Services\IPageSectionService;
 
@@ -14,19 +14,19 @@ final class DanceController extends BaseController
 {
     private ICmsService $adminPageService;
     private IPageSectionService $pageSectionService;
-    private EventCatalogService $eventCatalogService;
     private DanceArtistService $danceArtistService;
+    private DanceScheduleService $danceScheduleService;
 
     public function __construct(
         ICmsService $adminPageService,
         IPageSectionService $pageSectionService,
-        EventCatalogService $eventCatalogService,
-        DanceArtistService $danceArtistService
+        DanceArtistService $danceArtistService,
+        DanceScheduleService $danceScheduleService
     ) {
         $this->adminPageService = $adminPageService;
         $this->pageSectionService = $pageSectionService;
-        $this->eventCatalogService = $eventCatalogService;
         $this->danceArtistService = $danceArtistService;
+        $this->danceScheduleService = $danceScheduleService;
     }
 
     public function index(): void
@@ -34,13 +34,18 @@ final class DanceController extends BaseController
         $this->rememberProgramReturnUrl($this->currentUrl());
 
         $sections = $this->loadDanceSections();
+        $filterOptions = $this->danceScheduleService->getFilterOptions();
+        $filters = $this->danceScheduleService->getFiltersFromQuery($_GET, $filterOptions);
 
         $this->view('dance/index', [
             'title' => 'Dance',
             'sections' => $sections,
             'hasCmsContent' => $sections !== [],
             'artists' => $this->loadDanceArtists(),
-            'events' => $this->eventCatalogService->getPublishedEvents('dance'),
+            'events' => $this->danceScheduleService->getPublishedDanceSessions($filters),
+            'danceFilters' => $filters,
+            'danceFilterOptions' => $filterOptions,
+            'hasActiveDanceFilters' => $this->danceScheduleService->hasActiveFilters($filters),
         ]);
     }
 

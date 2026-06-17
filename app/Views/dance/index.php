@@ -2,6 +2,9 @@
 $sections = is_array($sections ?? null) ? array_values($sections) : [];
 $events = is_array($events ?? null) ? array_values($events) : [];
 $artists = is_array($artists ?? null) ? array_values($artists) : [];
+$danceFilters = is_array($danceFilters ?? null) ? $danceFilters : [];
+$danceFilterOptions = is_array($danceFilterOptions ?? null) ? $danceFilterOptions : [];
+$hasActiveDanceFilters = !empty($hasActiveDanceFilters);
 $hasCmsContent = !empty($hasCmsContent);
 
 $text = static function (mixed $value, string $default = ''): string {
@@ -107,5 +110,12 @@ $quickLinks = [
     </section>
 
     <?php require __DIR__ . '/partials/artists.php'; ?>
+    <?php require __DIR__ . '/partials/filters.php'; ?>
+    <?php if ($hasActiveDanceFilters): ?>
+        <?php
+        $eventsEmptyTitle = 'No Dance sessions match your filters';
+        $eventsEmptyText = 'Try another date, venue, artist, or session type to find more Dance sessions.';
+        ?>
+    <?php endif; ?>
     <?php require __DIR__ . '/partials/events.php'; ?>
 </div>

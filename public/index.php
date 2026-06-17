@@ -187,6 +187,11 @@ function createDanceArtistService(): App\Services\DanceArtistService
     return new App\Services\DanceArtistService(new App\Repositories\DanceArtistRepository());
 }
 
+function createDanceScheduleService(): App\Services\DanceScheduleService
+{
+    return new App\Services\DanceScheduleService(new App\Repositories\DanceScheduleRepository());
+}
+
 function createController(string $controllerClass)
 {
 
@@ -242,8 +247,8 @@ function createController(string $controllerClass)
             return new DanceController(
                 createPageService(),
                 createSectionService(),
-                createEventCatalogService(),
-                createDanceArtistService()
+                createDanceArtistService(),
+                createDanceScheduleService()
             );
 
         case App\Controllers\ProgramController::class:

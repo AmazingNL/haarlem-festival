@@ -479,6 +479,115 @@
     width: 100%;
 }
 
+.dance-filters {
+    margin: 0 auto;
+    max-width: 1180px;
+    padding: 0 24px clamp(42px, 7vw, 78px);
+}
+
+.dance-filters__header {
+    border-top: 1px solid var(--dance-line);
+    margin-bottom: 24px;
+    padding-top: 40px;
+}
+
+.dance-filters__header h2 {
+    color: var(--dance-text);
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    font-style: italic;
+    letter-spacing: 0.14em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.dance-filters__form {
+    align-items: end;
+    background: var(--dance-surface);
+    border: 1px solid rgba(255, 209, 10, 0.38);
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(180px, 0.7fr);
+    margin: 0;
+    padding: clamp(18px, 3vw, 28px);
+}
+
+.dance-filter-field {
+    color: var(--dance-yellow);
+    display: grid;
+    gap: 8px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    min-width: 0;
+    text-transform: uppercase;
+}
+
+.dance-filter-field select {
+    appearance: none;
+    background:
+        linear-gradient(45deg, transparent 50%, var(--dance-yellow) 50%) calc(100% - 18px) 50% / 7px 7px no-repeat,
+        linear-gradient(135deg, var(--dance-yellow) 50%, transparent 50%) calc(100% - 13px) 50% / 7px 7px no-repeat,
+        #000;
+    border: 1px solid var(--dance-line);
+    color: var(--dance-text);
+    font: inherit;
+    letter-spacing: 0;
+    min-height: 46px;
+    padding: 10px 36px 10px 12px;
+    width: 100%;
+}
+
+.dance-filters__actions {
+    display: grid;
+    gap: 10px;
+}
+
+.dance-filters__actions button,
+.dance-filters__actions a {
+    align-items: center;
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 800;
+    justify-content: center;
+    letter-spacing: 0.12em;
+    min-height: 46px;
+    padding: 11px 14px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.dance-filters__actions button {
+    background: var(--dance-yellow);
+    border: 1px solid var(--dance-yellow);
+    color: #000;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.dance-filters__actions a {
+    border: 1px solid rgba(255, 209, 10, 0.55);
+    color: var(--dance-yellow);
+}
+
+.dance-filter-field select:focus-visible,
+.dance-filters__actions button:focus-visible,
+.dance-filters__actions a:focus-visible {
+    outline: 3px solid var(--dance-yellow-soft);
+    outline-offset: 3px;
+}
+
+.dance-filters__actions button:hover,
+.dance-filters__actions button:focus-visible {
+    background: var(--dance-yellow-soft);
+}
+
+.dance-filters__actions a:hover,
+.dance-filters__actions a:focus-visible {
+    background: var(--dance-yellow);
+    color: #000;
+}
+
 .dance-events {
     margin: 0 auto;
     max-width: 1180px;
@@ -691,6 +800,10 @@ body:has(.dance-page) .site-back-top__icon {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .dance-filters__form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .dance-event-card {
         grid-template-columns: minmax(0, 1fr) minmax(260px, 0.7fr);
     }
@@ -722,6 +835,10 @@ body:has(.dance-page) .site-back-top__icon {
     }
 
     .dance-artist-gallery__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dance-filters__form {
         grid-template-columns: 1fr;
     }
 }
