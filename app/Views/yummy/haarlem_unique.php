@@ -65,7 +65,7 @@ if (is_array($sectionImage)) {
         </h2>
 
         <div class="haarlem-unique-copy">
-            <?= $content ?>
+            <?= \App\Support\Html::clean($content ?? '') ?>
         </div>
     </article>
 </div>

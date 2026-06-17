@@ -49,7 +49,7 @@ use App\Schemas\yummy\WelcomeBannerCard;
 // Map a section type string to the ViewModel class that defines its CMS fields.
 class SectionFactory
 {
-    // Return the correct ViewModel class for the requested section type.
+    // Return the correct Schema class for the requested section type.
     public static function returnSectionClass(string $type): ?string
     {
         $map = [

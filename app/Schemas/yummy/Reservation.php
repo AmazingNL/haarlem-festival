@@ -48,8 +48,8 @@ final class Reservation extends BaseSection
         return [
             'title' => ['type' => 'text', 'label' => 'Main Title', 'required' => true],
             'information' => ['type' => 'textarea', 'label' => 'information', 'class' => 'js-wysiwyg'],
-            'session' => ['type' => 'textarea', 'label' => 'Session (comma or new line separated)', 'class' => 'js-wysiwyg'],
-            'date' => ['type' => 'textarea', 'label' => 'Date (comma or new line separated)', 'class' => 'js-wysiwyg'],
+            'session' => ['type' => 'textarea', 'label' => 'Session (comma or new line separated)', 'class' => 'js-wysiwyg', 'multiple' => true],
+            'date' => ['type' => 'textarea', 'label' => 'Date (comma or new line separated)', 'class' => 'js-wysiwyg', 'multiple' => true],
             'adultPrice' => ['type' => 'text', 'label' => 'AdultPrice', 'required' => true],
             'kidsPrice' => ['type' => 'text', 'label' => 'KidsPrice', 'required' => true],
             'button_text' => ['type' => 'text', 'label' => 'Button Text'],

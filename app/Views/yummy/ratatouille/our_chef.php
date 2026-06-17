@@ -46,7 +46,7 @@ if (is_array($sectionImage)) {
 
             <?php if (!empty($ourChef['article'])): ?>
                 <div class="ratatouille-body-copy">
-                    <?= $ourChef['article'] ?>
+                    <?= \App\Support\Html::clean($ourChef['article'] ?? '') ?>
                 </div>
             <?php endif; ?>
 
