@@ -51,4 +51,31 @@ final class TicketController extends BaseController
         echo (new QRCode($options))->render($token);
         exit;
     }
+
+    /**
+     * Render the employee ticket-scanning page.
+     *
+     * @return void
+     */
+    public function scanPage(): void
+    {
+        $this->view('admin_dashboard/scan_ticket', ['title' => 'Scan Ticket'], layout: 'admin_dashboard');
+    }
+
+    /**
+     * Accept a POST scan request and return JSON with the scan result.
+     *
+     * @param  string $token 64-char hex qr_token from the URL segment.
+     * @return void
+     */
+    public function scan(string $token): void
+    {
+        if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
+            $this->json(['result' => 'not_found'], 400);
+        }
+
+        $result = $this->ticketService->markScanned($token);
+        $statusCode = $result['result'] === 'ok' ? 200 : 422;
+        $this->json($result, $statusCode);
+    }
 }

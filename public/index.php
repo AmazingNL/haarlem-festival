@@ -113,6 +113,8 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/program', [ProgramController::class, 'index']);
     $r->post('/program/remove', [ProgramController::class, 'removeItem']);
     $r->get('/qr/{token:[a-f0-9]{64}}', [TicketController::class, 'qrImage']);
+    $r->get('/admin/tickets/scan', [TicketController::class, 'scanPage']);
+    $r->post('/admin/tickets/{token:[a-f0-9]{64}}/scan', [TicketController::class, 'scan']);
 });
 
 

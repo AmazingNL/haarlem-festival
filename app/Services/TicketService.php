@@ -26,4 +26,26 @@ final class TicketService implements ITicketService
     {
         return $this->ticketRepository->findByToken($token);
     }
+
+    /**
+     * Validate and mark a ticket scanned.
+     *
+     * @param  string $token 64-char hex qr_token
+     * @return array{result:string}
+     */
+    public function markScanned(string $token): array
+    {
+        $ticket = $this->ticketRepository->findByToken($token);
+        if ($ticket === null) {
+            return ['result' => 'not_found'];
+        }
+        if ($ticket['status'] === 'scanned') {
+            return ['result' => 'already_scanned'];
+        }
+        if ($ticket['status'] === 'cancelled') {
+            return ['result' => 'cancelled'];
+        }
+        $updated = $this->ticketRepository->markScanned($token);
+        return ['result' => $updated ? 'ok' : 'already_scanned'];
+    }
 }

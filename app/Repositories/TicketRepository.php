@@ -24,4 +24,19 @@ final class TicketRepository extends BaseRepository implements ITicketRepository
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return is_array($row) ? $row : null;
     }
+
+    /**
+     * Set status='scanned' and scanned_at=NOW() only when status='valid'.
+     *
+     * @param  string $token 64-char hex qr_token
+     * @return bool True when exactly one row was updated.
+     */
+    public function markScanned(string $token): bool
+    {
+        $stmt = $this->getConnection()->prepare(
+            "UPDATE ticket SET status = 'scanned', scanned_at = NOW() WHERE qr_token = ? AND status = 'valid'"
+        );
+        $stmt->execute([$token]);
+        return $stmt->rowCount() === 1;
+    }
 }
