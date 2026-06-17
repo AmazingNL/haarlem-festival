@@ -101,7 +101,6 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/payments/checkout/{order_id:\d+}', [PaymentController::class, 'checkoutPage']);
     $r->post('/payments/create-session', [PaymentController::class, 'createCheckoutSession']);
     $r->post('/webhook/stripe', [PaymentController::class, 'webhook']);
-    $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
     $r->get('/history', [HistoryController::class, 'index']);
     $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
     $r->post('/history/book-tour/add-to-program', [HistoryController::class, 'addTourToProgram']);
@@ -245,6 +244,11 @@ function createController(string $controllerClass)
             );
 
 
+        case App\Controllers\StoriesController::class:
+
+            return new App\Controllers\StoriesController(createStoriesService());
+
+
         case App\Controllers\AdminPageController::class:
 
             $userRepo = new App\Repositories\UserRepository();
@@ -270,6 +274,15 @@ function createOrderService(): App\Services\OrderService
 function createEventCatalogService(): App\Services\EventCatalogService
 {
     return new App\Services\EventCatalogService(new App\Repositories\EventCatalogRepository());
+}
+
+function createStoriesService(): App\Services\StoriesService
+{
+    return new App\Services\StoriesService(
+        createPageService(),
+        createSectionService(),
+        new App\Repositories\StoriesRepository()
+    );
 }
 
 function createHistoryBookingCatalogService(): App\Services\HistoryBookingCatalogService
