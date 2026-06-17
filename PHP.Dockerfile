@@ -1,9 +1,9 @@
-FROM php:fpm-F
+FROM php:8.3-fpm
 
 # Install system dependencies and Composer
 RUN apt-get update \
     && apt-get install -y --no-install-recommends git unzip libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql \
+    && docker-php-ext-install pdo pdo_mysql zip \
     && curl -sS https://getcomposer.org/installer -o composer-setup.php \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
     && rm composer-setup.php \
@@ -14,8 +14,10 @@ RUN apt-get update \
 
 WORKDIR /app
 
+COPY docker/php-entrypoint.sh /usr/local/bin/php-entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/php-entrypoint.sh && chmod +x /usr/local/bin/php-entrypoint.sh
+
 # Allow running Composer as root within the container
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# On container start, install dependencies if vendor is missing, then start php-fpm
-CMD ["sh", "-lc", "[ -f vendor/autoload.php ] || composer install --no-interaction --no-progress; exec php-fpm"]
+ENTRYPOINT ["/usr/local/bin/php-entrypoint.sh"]

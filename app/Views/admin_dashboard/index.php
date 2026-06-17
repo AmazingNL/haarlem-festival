@@ -1,15 +1,15 @@
 <?php
-$allPages    = $data['allPages']    ?? [];
+$pages = $data['pages'] ?? [];
 $recentPages = $data['recentPages'] ?? [];
-$userCount   = $data['userCount']   ?? 0;
+$userCount = $data['userCount'] ?? 0;
 
-$totalPages = count($allPages);
-$published  = 0;
-$drafts     = 0;
-foreach ($allPages as $p) {
+$totalPages = count($pages);
+$published = 0;
+$drafts = 0;
+foreach ($pages as $p) {
     $s = is_object($p->status) && property_exists($p->status, 'value')
         ? $p->status->value
-        : (string)($p->status ?? '');
+        : (string) ($p->status ?? '');
     if ($s === 'published') {
         $published++;
     } elseif ($s === 'draft') {
@@ -76,18 +76,18 @@ foreach ($allPages as $p) {
                     </tr>
                 <?php else: ?>
                     <?php foreach ($recentPages as $p):
-                        $id        = (int)($p->page_id ?? 0);
-                        $title     = htmlspecialchars((string)($p->title ?? ''), ENT_QUOTES, 'UTF-8');
+                        $id = (int) ($p->page_id ?? 0);
+                        $title = htmlspecialchars((string) ($p->title ?? ''), ENT_QUOTES, 'UTF-8');
                         $statusVal = is_object($p->status) && property_exists($p->status, 'value')
                             ? $p->status->value
-                            : (string)($p->status ?? 'draft');
-                        $createdAt = htmlspecialchars((string)($p->created_at ?? '-'), ENT_QUOTES, 'UTF-8');
+                            : (string) ($p->status ?? 'draft');
+                        $createdAt = htmlspecialchars((string) ($p->created_at ?? '-'), ENT_QUOTES, 'UTF-8');
                         $badgeClass = match ($statusVal) {
                             'published' => 'badge-published',
-                            'archived'  => 'badge-archived',
-                            default     => 'badge-draft',
+                            'archived' => 'badge-archived',
+                            default => 'badge-draft',
                         };
-                    ?>
+                        ?>
                         <tr>
                             <td><?= $title ?></td>
                             <td>
@@ -100,7 +100,7 @@ foreach ($allPages as $p) {
                                 <a href="/admin/pages/<?= $id ?>/editForm" class="btn-secondary">Edit</a>
                                 <a href="/admin/pageSection/<?= $id ?>/pageSectionForm" class="btn-secondary">Sections</a>
                                 <a href="/admin/dashboard/<?= $id ?>/delete" class="pill btn-danger"
-                                   onclick="return confirm('Delete \'<?= addslashes($title) ?>\'?')">Delete</a>
+                                    onclick="return confirm('Delete \'<?= addslashes($title) ?>\'?')">Delete</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

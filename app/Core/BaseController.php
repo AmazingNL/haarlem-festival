@@ -3,17 +3,26 @@
 
 declare(strict_types=1);
 namespace App\Core;
+
+use App\Support\SessionUser;
+
 abstract class BaseController
 {
     // ---------- Views ----------
     protected function view(string $template, array $data = [], ?string $layout = 'main', int $status = 200): void
     {
         $data['csrf'] ??= $this->csrfToken();
-        // inject any flash messages stored in session so layouts can render them
+        // Read one-time session messages and also expose simple view variables.
         $data['flash'] = $data['flash'] ?? $this->getAllFlash();
+        $data['errorMessage'] ??= is_string($data['flash']['error'] ?? null)
+            ? (string) $data['flash']['error']
+            : '';
+        $data['successMessage'] ??= is_string($data['flash']['success'] ?? null)
+            ? (string) $data['flash']['success']
+            : '';
         extract($data, EXTR_SKIP);
 
-            $content = __DIR__ . '/../Views/' . ltrim($template, '/') . '.php';
+            $content = __DIR__ . '/../Views/' . $template. '.php';
         if (!is_file($content)) {
             $this->abort(500, "View not found: {$template}");
         }
@@ -39,9 +48,11 @@ abstract class BaseController
     // ---------- Redirect ----------
     protected function redirect(string $to, $status = 302): void
     {
-        header('Location: ' . $to, true,  $status);
-
-        exit;
+        $statusCode = (int) $status;
+        if (!headers_sent()) {
+            header('Location: ' . $to, true, $statusCode);
+            exit;
+        }
     }
 
     // ---------- Request helpers ----------
@@ -59,6 +70,23 @@ abstract class BaseController
     {
         // POST first, then GET
         return $_POST[$key] ?? $_GET[$key] ?? $default;
+    }
+
+    protected function currentUserId(): ?int
+    {
+        $this->ensureSession();
+        return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
+    }
+
+    protected function currentUserRole(): ?string
+    {
+        $this->ensureSession();
+        return isset($_SESSION['user_role']) ? (string) $_SESSION['user_role'] : null;
+    }
+
+    protected function isLoggedIn(): bool
+    {
+        return SessionUser::isLoggedIn();
     }
 
     protected function requireFields(array $keys): void
@@ -83,36 +111,70 @@ abstract class BaseController
         return ($v === null) ? $default : trim((string) $v);
     }
 
-    // ---------- Auth helpers ----------
+    protected function rememberProgramReturnUrl(string $url): void
+    {
+        $this->ensureSession();
 
-    protected function userId(): ?int
-    {
-        return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
-    }
-
-    protected function adminId(): ?int
-    {
-        return isset($_SESSION['admin_user_id']) ? (int) $_SESSION['admin_user_id'] : null;
-    }
-    protected function userRole(): ?string
-    {
-        return isset($_SESSION['role']) ? (string) $_SESSION['role'] : null;
-    }
-
-    protected function requireLogin(): void
-    {
-        if ($this->userId() === null) {
-            $this->redirect('/login');
+        $cleanUrl = $this->cleanInternalUrl($url);
+        if ($cleanUrl === '') {
+            return;
         }
+
+        $pathOnly = (string) (parse_url($cleanUrl, PHP_URL_PATH) ?? '');
+        $blockedPaths = ['/program', '/checkout', '/orders', '/loginForm', '/registerForm', '/logout'];
+
+        foreach ($blockedPaths as $blockedPath) {
+            if (str_starts_with($pathOnly, $blockedPath)) {
+                return;
+            }
+        }
+
+        $_SESSION['program_return_url'] = $cleanUrl;
     }
 
-    protected function requireRole(string ...$roles): void
+    protected function getProgramReturnUrl(string $default = '/home'): string
     {
-        $role = $this->userRole();
-        if ($role === null || !in_array($role, $roles, true)) {
-            $this->abort(403, 'Forbidden');
+        $this->ensureSession();
+
+        $savedUrl = $this->cleanInternalUrl((string) ($_SESSION['program_return_url'] ?? ''));
+        if ($savedUrl !== '') {
+            return $savedUrl;
         }
+
+        $defaultUrl = $this->cleanInternalUrl($default);
+        return $defaultUrl !== '' ? $defaultUrl : '/home';
     }
+
+    protected function currentUrl(): string
+    {
+        return $this->cleanInternalUrl((string) ($_SERVER['REQUEST_URI'] ?? ''));
+    }
+
+    protected function cleanInternalUrl(string $url): string
+    {
+        $url = trim($url);
+        if ($url === '' || !str_starts_with($url, '/')) {
+            return '';
+        }
+
+        $parts = parse_url($url);
+        if ($parts === false) {
+            return '';
+        }
+
+        $path = (string) ($parts['path'] ?? '');
+        if ($path === '' || !str_starts_with($path, '/')) {
+            return '';
+        }
+
+        $cleanUrl = $path;
+        if (!empty($parts['query'])) {
+            $cleanUrl .= '?' . $parts['query'];
+        }
+
+        return $cleanUrl;
+    }
+
 
     // ---------- CSRF ----------
 
@@ -133,7 +195,7 @@ abstract class BaseController
 
     protected function verifyCsrf(): void
     {
-        if ($this->httpMethod() !== 'POST')
+        if (!$this->isPost())
             return;
 
         $this->ensureSession();
@@ -148,6 +210,18 @@ abstract class BaseController
     {
         $this->ensureSession();
         $_SESSION['_flash'][$key] = $value;
+    }
+
+    protected function setErrorMessage(string $message): void
+    {
+        // Save one error message in the session so it can be shown after redirect.
+        $this->setFlash('error', $message);
+    }
+
+    protected function setSuccessMessage(string $message): void
+    {
+        // Save one success message in the session so it can be shown after redirect.
+        $this->setFlash('success', $message);
     }
 
     protected function getFlash(string $key): mixed

@@ -1,54 +1,117 @@
 # Haarlem Festival
 
-## Quick Start
+A web application for browsing and booking tickets for the Haarlem Festival — events, restaurant reservations, and history tours.
 
-1. Start services:
+## Requirements
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (includes Docker Compose)
+- [Git](https://git-scm.com/)
+
+---
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone <repo-url>
+cd Haarlem_Festival
+```
+
+### 2. Start the containers
 
 ```bash
 docker compose up --build
 ```
 
-2. Run schema migrations:
+Wait until all services are running (first build takes a minute).
+
+### 3. Run the database migrations
 
 ```bash
-docker compose exec php php /app/migrate.php up
+docker compose run --rm dbmate up
 ```
 
-3. Load sample data (optional, recommended for local development):
+### 4. Open in browser
+
+| Service | URL |
+|---|---|
+| Application | http://localhost |
+| phpMyAdmin | http://localhost:8080 |
+| Mailpit (email) | http://localhost:8025 |
+
+---
+
+## Daily Workflow
+
+After pulling new changes from the team:
 
 ```bash
-docker compose exec php php /app/migrate.php seed
+docker compose up          # start containers if not running
+docker compose run --rm dbmate up   # apply any new migrations
 ```
 
-## Database Commands
-
-- `up`: applies schema migrations from `db/migrations`.
-- `seed`: loads sample data from `db/seeds`.
-- `reset --force`: drops all tables, recreates schema, then reseeds.
+Or use the sync script which handles both:
 
 ```bash
-docker compose exec php php /app/migrate.php reset --force
+./team-sync.sh             # macOS/Linux
+.\team-sync.ps1            # Windows PowerShell
 ```
 
-## Backup And Restore
+---
 
-Your local database data is stored in Docker volume `mysqldata` and is not committed to Git.
-To share real data between machines, export/import a SQL dump.
+## Database
 
-### Create Backup
+### Credentials
+
+| Field | Value |
+|---|---|
+| Host | `localhost` |
+| Port | `3306` |
+| Database | `haarlem_festival` |
+| Username | `developer` |
+| Password | `secret123` |
+
+### Backup & Restore
 
 ```bash
+# Export current data to backup.sql
 docker compose exec mysql sh -c 'mariadb-dump -uroot -psecret123 haarlem_festival' > backup.sql
-```
 
-### Restore Backup
-
-```bash
+# Restore from backup.sql
 cat backup.sql | docker compose exec -T mysql sh -c 'mariadb -uroot -psecret123 haarlem_festival'
 ```
 
-## Team Workflow
+---
 
-- New clone: run `up` and `seed` to get schema + demo data.
-- Real project data: use backup/restore commands above.
-- Avoid running `reset --force` unless you intentionally want to wipe local DB data.
+## Test Accounts
+
+Seeded by `db/seeds/01_sample_data.sql` — available after running migrations.
+
+| Role | Email | Username | Password |
+|---|---|---|---|
+| Admin | `admin@haarlemfest.test` | `admin` | `Test12345!` |
+| Employee | `employee@haarlemfest.test` | `eline` | `Test12345!` |
+| Customer | `customer1@haarlemfest.test` | `samj` | `Test12345!` |
+
+---
+
+## Email
+
+All outgoing emails are captured by Mailpit — nothing is sent to a real inbox.
+
+View captured emails at **http://localhost:8025**
+
+---
+
+## Stopping the project
+
+```bash
+docker compose down
+```
+
+To also delete the database volume (full reset):
+
+```bash
+docker compose down -v
+```

@@ -6,7 +6,7 @@
         background-color: var(--button-color-primary);
         color: var(--color-text-light);
         padding: 10px 15px 10px 10px;
-        margin: 0 60px;
+        margin: 0px;
         position: relative;
         top: 10px;
     }
@@ -21,6 +21,19 @@
         border: solid;
         border-color: var(--color-accent-pink);
         background-color: transparent;
+    }
+
+    @media (max-width: 520px) {
+        .card-back a {
+            padding: 8px 12px 8px 8px;
+            top: 6px;
+            font-size: 14px;
+        }
+
+        .icon-arrow-back {
+            width: 12px;
+            height: 12px;
+        }
     }
 </style>
 

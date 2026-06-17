@@ -1,3 +1,4 @@
+-- migrate:up
 -- ============================================================
 -- Haarlem Festival Database
 -- Clean Restructured Version (Role inside user)
@@ -51,6 +52,7 @@ CREATE TABLE IF NOT EXISTS image (
   image_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   file_path VARCHAR(500) NOT NULL,
   alt_text VARCHAR(255) NULL,
+  caption VARCHAR(255) NULL,
   uploaded_by_user_id BIGINT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -91,17 +93,49 @@ CREATE TABLE IF NOT EXISTS page_section (
   section_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   page_id BIGINT UNSIGNED NOT NULL,
 
-  section_type VARCHAR(50) NOT NULL,
+  section_type ENUM(
+  'cta',
+  'text_block',
+  'image_text',
+  'hero',
+  'feature',
+  'image_left',
+  'image_right',
+  'journey',
+  'stat',
+  'timeline',
+  'transport',
+  'two_image_row',
+  'venue',
+  'cards_grid',
+  'restaurant_card',
+  'restaurants_card',
+  'welcome_banner',
+  'welcome_banner_card',
+  'gallery',
+  'stories_hero',
+  'what_is_stories',
+  'stories_preview',
+  'storytelling_schedule',
+  'haarlem_unique',
+  'haarlem_taste',
+  'history_hero',
+  'history_timeline',
+  'history_gallery',
+  'history_featured_locations',
+  'history_route',
+  'history_info',
+  'history_cta'
+) NOT NULL,
   title VARCHAR(255) NULL,
   content LONGTEXT NULL,
-  image_id BIGINT UNSIGNED NULL,
 
   button_text VARCHAR(100) NULL,
   button_link VARCHAR(255) NULL,
 
   sort_order INT NOT NULL DEFAULT 0,
   is_published TINYINT(1) NOT NULL DEFAULT 1,
-
+  setting_json JSON NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
@@ -111,12 +145,7 @@ CREATE TABLE IF NOT EXISTS page_section (
   CONSTRAINT fk_section_page
     FOREIGN KEY (page_id)
     REFERENCES page(page_id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-
-  CONSTRAINT fk_section_image
-    FOREIGN KEY (image_id)
-    REFERENCES image(image_id)
-    ON DELETE SET NULL ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 
 COLLATE=utf8mb4_unicode_ci;
 
@@ -331,3 +360,43 @@ CREATE TABLE IF NOT EXISTS program_item (
     ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 
 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- RESTAURANT RESERVATION
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS restaurant (
+  restaurant_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  event_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  order_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  
+  adult_count INT UNSIGNED NOT NULL DEFAULT 0,
+  child_count INT UNSIGNED NOT NULL DEFAULT 0,
+  
+  adult_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+  child_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+  total_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (restaurant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+-- migrate:down
+DROP TABLE IF EXISTS restaurant;
+DROP TABLE IF EXISTS program_item;
+DROP TABLE IF EXISTS payment;
+DROP TABLE IF EXISTS ticket;
+DROP TABLE IF EXISTS order_ticket;
+DROP TABLE IF EXISTS `order`;
+DROP TABLE IF EXISTS ticket_type;
+DROP TABLE IF EXISTS event;
+DROP TABLE IF EXISTS location;
+DROP TABLE IF EXISTS page_section_image;
+DROP TABLE IF EXISTS page_section;
+DROP TABLE IF EXISTS page;
+DROP TABLE IF EXISTS image;
+DROP TABLE IF EXISTS `user`;

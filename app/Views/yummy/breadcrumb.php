@@ -1,5 +1,5 @@
 <nav class="yummy-breadcrumb" aria-label="Breadcrumb">
-    <section class="yummy-breadcrumb__inner">
+    <section class="yummy-breadcrumb-inner">
         <section>
             <a href="/home" class="crumb crumb--home">
                 <span>Home

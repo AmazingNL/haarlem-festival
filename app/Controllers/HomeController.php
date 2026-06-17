@@ -3,114 +3,63 @@
 declare(strict_types=1);
 
 namespace App\Controllers;
+
 use App\Core\BaseController;
+use App\Services\ICmsService;
 use App\Services\IPageSectionService;
-use App\Services\IAdminPageService;
+
 final class HomeController extends BaseController
 {
-
     private IPageSectionService $pageSectionService;
-    private IAdminPageService $adminPageService;
-    public function __construct(IPageSectionService $pageSectionService, IAdminPageService $adminPageService)
+    private ICmsService $adminPageService;
+
+    public function __construct(IPageSectionService $pageSectionService, ICmsService $adminPageService)
     {
         $this->pageSectionService = $pageSectionService;
         $this->adminPageService = $adminPageService;
     }
+
     public function index(): void
     {
         try {
-            $this->ensureSession();
-            $pages = $this->adminPageService->getPageBySlug('home');
-            $page_id = $pages->page_id ?? null;
-            $homePage = $this->pageSectionService->getSectionsByPageId($page_id);
+            $page = $this->adminPageService->getPageBySlug('home');
+            $pageId = $page->page_id ?? null;
 
-            $this->view('/home/home', [
-                'sections' => $homePage,
-                'title' => 'Haarlem Festival',
-                'message' => 'Home page loaded successfully.'
-            ]);
-
-        } catch (\Exception $e) {
-            $this->setFlash('error', 'Failed to load home page: ' . $e->getMessage());
-        }
-    }
-
-    public function yummy(): void
-    {
-        try {
-            $page = $this->adminPageService->getPageBySlug('yummy');
-            $page_id = $page->page_id ?? null;
-            if ($page_id === null) {
-                $this->view(
-                    'no_page/index',
-                    ['error' => 'Yummy page not available']
-                );
+            if ($pageId === null) {
+                $this->view('no_page/index', ['error' => 'Home page not available']);
                 return;
             }
 
-            $yummy = $this->pageSectionService->getSectionsByPageId($page_id);
-            if (empty($yummy)) {
-                $this->setFlash('error', 'page does not exist');
-                $this->redirect('/');
+            $sections = $this->pageSectionService->getSectionsByPageId($pageId);
+            if ($sections === []) {
+                $this->view('no_page/index', ['error' => 'Home page not available']);
+                return;
             }
-            $this->view(
-                'yummy/index',
-                ['section' => $yummy, 'page' => $page, 'title' => 'Yummy']
-            );
 
+            $this->view('home/home', [
+                'section' => $this->mergeSectionContent($sections),
+                'page' => $page,
+                'title' => 'Home',
+            ]);
         } catch (\Throwable $e) {
-            $this->view(
-                'no_page/index',
-                ['error' => 'Yummy page not available']
-            );
+            $this->view('no_page/index', ['error' => 'Home page not available']);
         }
     }
 
 
-    public function stories(): void
+    private function mergeSectionContent(array $sections): array
     {
-        try {
-            $page = $this->adminPageService->getPageBySlug(slug: 'stories');
-            $page_id = $page->page_id ?? null;
-            $stories = $this->pageSectionService->getSectionsByPageId(pageId: $page_id);
-            if (empty($stories)) {
-                $this->setFlash(key: 'error', value: 'page does not exist');
-                $this->redirect(to: '/');
-            }
-            $this->view(
-                template: '/stories/index',
-                data: ['section' => $stories, 'page' => $page, 'title' => 'Stories']
-            );
-        } catch (\Exception $e) {
-            $this->view(
-                template: 'no_page/index',
-                data: ['error' => 'Stories page not available']
-            );
-        }
-    }
-    public function ratatouille(): void
-    {
-        try {
-            $page = $this->adminPageService->getPageBySlug('ratatouille');
-            $page_id = $page->page_id ?? null;
-            $ratatouille = $this->pageSectionService->getSectionsByPageId($page_id);
-            if (empty($ratatouille)) {
-                $this->setFlash('error', 'page does not exist');
-                $this->redirect('/');
-            }
-            $this->view(
-                '/ratatouille/index',
-                ['section' => $ratatouille, 'page' => $page, 'title' => 'ratatouille']
-            );
+        return array_map(
+            function (array $section): array {
+                $content = json_decode((string) ($section['content'] ?? ''), true);
 
-        } catch (\Exception $e) {
-            $this->view(
-                template: 'no_page/index',
-                data: ['error' => 'ratatouille page not available']
-            );
+                if (is_array($content)) {
+                    $section = array_merge($section, $content);
+                }
 
-        }
+                return $section;
+            },
+            $sections
+        );
     }
 }
-
-
