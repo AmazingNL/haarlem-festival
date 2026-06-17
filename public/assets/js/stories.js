@@ -1,20 +1,29 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const tabs = document.querySelectorAll('.sched-tab');
-    const days = document.querySelectorAll('.sched-day');
+    // Filter pills — toggle active state (visual only; filtering wired server-side)
+    document.querySelectorAll('.sched-filter-group').forEach(function (group) {
+        group.querySelectorAll('.sched-filter-pill').forEach(function (pill) {
+            pill.addEventListener('click', function () {
+                group.querySelectorAll('.sched-filter-pill').forEach(function (p) {
+                    p.classList.remove('active');
+                });
+                pill.classList.add('active');
+            });
+        });
+    });
 
-    if (!tabs.length) return;
-
-    // Show first day by default
-    if (days.length) days[0].classList.add('active');
-
-    tabs.forEach(function (tab) {
-        tab.addEventListener('click', function () {
-            tabs.forEach(function (t) { t.classList.remove('active'); });
-            days.forEach(function (d) { d.classList.remove('active'); });
-
-            tab.classList.add('active');
-            const target = document.querySelector('.sched-day[data-day="' + tab.dataset.target + '"]');
-            if (target) target.classList.add('active');
+    // Booking stepper
+    document.querySelectorAll('.sbc-stepper').forEach(function (stepper) {
+        var minus = stepper.querySelector('.sbc-stepper-btn:first-child');
+        var plus  = stepper.querySelector('.sbc-stepper-btn:last-child');
+        var qty   = stepper.querySelector('.sbc-stepper-count');
+        if (!minus || !plus || !qty) return;
+        minus.addEventListener('click', function () {
+            var v = parseInt(qty.value, 10);
+            if (v > 1) qty.value = v - 1;
+        });
+        plus.addEventListener('click', function () {
+            var v = parseInt(qty.value, 10);
+            if (v < 20) qty.value = v + 1;
         });
     });
 });
