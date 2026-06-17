@@ -291,9 +291,23 @@ function createController(string $controllerClass)
                 createImageService()
             );
 
+        case App\Controllers\StoriesController::class:
+
+            return new App\Controllers\StoriesController(createStoriesService());
+
+
         default:
             return new $controllerClass();
     }
+}
+
+function createStoriesService(): App\Services\StoriesService
+{
+    return new App\Services\StoriesService(
+        createPageService(),
+        createSectionService(),
+        new App\Repositories\StoriesRepository()
+    );
 }
 
 function createOrderService(): App\Services\OrderService
