@@ -1,3 +1,4 @@
+-- migrate:up
 USE haarlem_festival;
 
 ALTER TABLE page_section
@@ -162,3 +163,5 @@ VALUES
   4,
   1
 );
+
+-- migrate:down

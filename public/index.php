@@ -12,8 +12,8 @@ use App\Controllers\CmsController;
 use App\Controllers\EventController;
 use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
-use App\Controllers\ProgramController;
-use App\Controllers\ShopController;
+use App\Controllers\StoriesController;
+use App\Controllers\PaymentController;
 
 require __DIR__ . '/../app/bootstrap.php';
 require __DIR__ . '/../vendor/autoload.php';
@@ -95,8 +95,12 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/yummy/bistro-toujours', [YummyController::class, 'bistroToujours']);
     $r->post('/yummy/bistro-toujours/book-reservation', [YummyController::class, 'bookBistroToujoursReservation']);
 
-    $r->get('/stories', [HomeController::class, 'stories']);
-    $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
+    $r->get('/stories', [StoriesController::class, 'index']);
+    $r->post('/stories/add-to-program', [StoriesController::class, 'addShowToProgram']);
+    // Payments
+    $r->get('/payments/checkout/{order_id:\d+}', [PaymentController::class, 'checkoutPage']);
+    $r->post('/payments/create-session', [PaymentController::class, 'createCheckoutSession']);
+    $r->post('/webhook/stripe', [PaymentController::class, 'webhook']);
     $r->get('/history', [HistoryController::class, 'index']);
     $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
     $r->post('/history/book-tour/add-to-program', [HistoryController::class, 'addTourToProgram']);
@@ -299,6 +303,15 @@ function createOrderService(): App\Services\OrderService
 function createEventCatalogService(): App\Services\EventCatalogService
 {
     return new App\Services\EventCatalogService(new App\Repositories\EventCatalogRepository());
+}
+
+function createStoriesService(): App\Services\StoriesService
+{
+    return new App\Services\StoriesService(
+        createPageService(),
+        createSectionService(),
+        new App\Repositories\StoriesRepository()
+    );
 }
 
 function createHistoryBookingCatalogService(): App\Services\HistoryBookingCatalogService

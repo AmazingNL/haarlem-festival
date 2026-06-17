@@ -1,3 +1,4 @@
+-- migrate:up
 -- ============================================================
 -- 03_stories_seed_fix.sql
 -- Fixes placeholder image paths in stories page_section content
@@ -117,3 +118,9 @@ VALUES
   ),
   4, 1
 );
+
+-- migrate:down
+DELETE ps FROM page_section ps
+INNER JOIN page p ON p.page_id = ps.page_id
+WHERE p.slug = 'stories';
+DELETE FROM page WHERE slug = 'stories';
