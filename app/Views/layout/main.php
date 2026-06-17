@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="/assets/css/yummy/index.css" />
     <link rel="stylesheet" href="/assets/css/yummy/restaurant_card.css" />
     <link rel="stylesheet" href="/assets/css/yummy/ratatouille.css" />
+    <link rel="stylesheet" href="/assets/css/tickets/index.css" />
 </head>
 
 <body id="top">

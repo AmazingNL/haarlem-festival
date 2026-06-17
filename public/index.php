@@ -14,6 +14,9 @@ use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
 use App\Controllers\StoriesController;
 use App\Controllers\PaymentController;
+use App\Controllers\ShopController;
+use App\Controllers\ProgramController;
+use App\Controllers\TicketController;
 
 require __DIR__ . '/../app/bootstrap.php';
 require __DIR__ . '/../vendor/autoload.php';
@@ -109,6 +112,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/history/molen-de-adriaan', [HistoryController::class, 'molenDeAdriaan']);
     $r->get('/program', [ProgramController::class, 'index']);
     $r->post('/program/remove', [ProgramController::class, 'removeItem']);
+    $r->get('/qr/{token:[a-f0-9]{64}}', [TicketController::class, 'qrImage']);
 });
 
 
@@ -266,6 +270,12 @@ function createController(string $controllerClass)
             return new App\Controllers\ProgramController(
                 new App\Services\ProgramService(),
                 createOrderService()
+            );
+
+        case App\Controllers\TicketController::class:
+
+            return new App\Controllers\TicketController(
+                new App\Services\TicketService(new App\Repositories\TicketRepository())
             );
 
 
