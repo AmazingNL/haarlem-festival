@@ -22,7 +22,7 @@ if (!empty($s['image_path'])) {
         <?php endif; ?>
 
         <?php if (!empty($s['content'])): ?>
-            <div class="sh-banner-content"><?= $s['content'] ?></div>
+            <div class="sh-banner-content"><?= \App\Support\Html::clean($s['content'] ?? '') ?></div>
         <?php endif; ?>
 
         <?php if (!empty($s['button_text']) && !empty($s['button_link'])): ?>

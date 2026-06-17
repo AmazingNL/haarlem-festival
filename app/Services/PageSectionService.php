@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace App\Services;
 use App\DTO\SectionInput;
@@ -44,113 +45,105 @@ final class PageSectionService implements IPageSectionService
         return $this->pageSectionRepository->getSectionById($sectionId);
     }
 
-    // Build the admin form field list for a given section type by using its ViewModel.
+    // Build the admin form field list for a given section type by using its Admin UI schemas.
     public function resolveSectionFormFields(string $sectionType): array
     {
         if ($sectionType === '') {
-            throw new \InvalidArgumentException('Section type can not be null');
+            throw new \InvalidArgumentException('Section type can not be empty');
         }
 
-        $allowedTypes = array_map(fn($case) => $case->value, SectionType::cases());
-        if (!in_array($sectionType, $allowedTypes, true)) {
-            throw new \InvalidArgumentException('Section type can not allowed');
+        // Comparing the input section type to the allowed section type
+        // Throw an error if there is no match.
+        $sectionType = SectionType::tryFrom($sectionType);
+        if ($sectionType === null) {
+            throw new \InvalidArgumentException('Section type not allowed');
         }
 
-        $sectionClass = SectionFactory::returnSectionClass($sectionType);
+        // Use the section factory to return specific section class that is being called with type
+        $sectionClass = SectionFactory::returnSectionClass($sectionType->value);
         if ($sectionClass === null) {
             throw new \InvalidArgumentException('No Section form for this type');
         }
 
-        $sectionVm = new $sectionClass;
-        return $sectionVm->getAdminFormFields();
+        // Instantiate the class and get the form fields
+        $sectionSchema = new $sectionClass;
+        return $sectionSchema->getAdminFormFields();
     }
 
+
+    // Using sectionDTO to build PageSection object and returning it.
     public function buildSectionFromDto(SectionInput $input): PageSection
     {
-        $pageId = $input->pageId;
-        if ($pageId === 0) {
+        if ($input->pageId === 0) {
             throw new \InvalidArgumentException('Invalid PageId');
         }
 
-        $sectionId = $input->sectionId;
-        $sectionTypeRaw = $input->sectionType;
-        $sectionType = SectionType::tryFrom($sectionTypeRaw);
+        $sectionType = SectionType::tryFrom($input->sectionType);
         if ($sectionType === null) {
             throw new \InvalidArgumentException('Invalid section type.');
         }
 
-        $sectionClass = SectionFactory::returnSectionClass($sectionTypeRaw);
-        if ($sectionClass === null) {
-            throw new \InvalidArgumentException('unsupported section type');
-        }
-
-        $sectionVm = new $sectionClass;
-        $sectionField = $sectionVm->getAdminFormFields();
+        // add the section form field to a variable by using the function above
+        $sectionField = $this->resolveSectionFormFields($input->sectionType);
         $content = $this->buildSectionContent($sectionField, $input->fields, $input->files);
 
         return new PageSection(
-            $sectionId,
-            $pageId,
+            $input->sectionId,
+            $input->pageId,
             $sectionType,
+            // encoding the content array into Json type.
             json_encode($content, JSON_UNESCAPED_UNICODE),
             $input->sortOrder,
             $input->isPublished
         );
     }
 
-    public function buildSectionFromInput(array $post, array $files): PageSection
-    {
-        $input = new SectionInput(
-            (int) ($post['page_id'] ?? 0),
-            (int) ($post['section_id'] ?? 0),
-            (string) ($post['section_type'] ?? ''),
-            (int) ($post['sort_order'] ?? 0),
-            ((int) ($post['is_published'] ?? 0)) === 1,
-            $post,
-            $files
-        );
-
-        return $this->buildSectionFromDto($input);
-    }
-
     // Build the JSON content for a section, including uploaded or embedded images.
     private function buildSectionContent(array $sectionField, array $post, array $files): array
     {
+        // Start with empty accumulators: $content is the field data, 
+        // $galleryImages 
+        // collects every image found so they can be combined into one gallery list.
         $content = [];
-        $sectionImages = [];
+        $galleryImages = [];
+        // True when "section_image" is a single uploaded background image (a string path),
+        // so we never clobber it with the combined gallery array below.
+        $hasSingleSectionImage = false;
 
+        // Walk each field the schema declares: $fieldName is the key, $config its settings.
         foreach ($sectionField as $fieldName => $config) {
             $fieldType = (string) ($config['type'] ?? 'text');
 
+            // A single uploaded image is stored as a string path by normalizeImageField().
             if ($fieldType === 'image') {
-                $this->normalizeImageField($fieldName, $post, $files, $content, $sectionImages);
+                $this->normalizeImageField($fieldName, $post, $files, $content, $galleryImages);
+                if ($fieldName === 'section_image') {
+                    $hasSingleSectionImage = true;
+                }
                 continue;
             }
 
             $fieldValue = (string) ($post[$fieldName] ?? '');
 
-            if ($fieldName === 'cuisine' || $fieldName === 'session' || $fieldName === 'date') {
+            // List fields (declared with 'multiple' in the schema) become normalized arrays.
+            if (!empty($config['multiple'])) {
                 $content[$fieldName] = $this->normalizeArrayValues($fieldValue);
                 continue;
             }
 
             $content[$fieldName] = $fieldValue;
 
+            // Collect any <img> embedded in HTML content for the combined section gallery.
+            // extractImageObjects() returns [] for plain text, so this is safe for every field.
             if ($fieldValue !== '') {
-                try {
-                    if ($fieldName === 'section_image') {
-                        $sectionImages = array_merge($sectionImages, $this->extractImageObjects($fieldValue));
-                    } else {
-                        $sectionImages = array_merge($sectionImages, $this->imageService->extractUrls($fieldValue));
-                    }
-                } catch (\Throwable $e) {
-                    // Plain text content does not contain embedded images.
-                }
+                $galleryImages = array_merge($galleryImages, $this->extractImageObjects($fieldValue));
             }
         }
 
-        if ($sectionImages !== []) {
-            $content['section_image'] = $this->uniqueSectionImages($sectionImages);
+        // Build the combined gallery only when section_image is not a single background image,
+        // so an uploaded background path is never overwritten with an array.
+        if (!$hasSingleSectionImage && $galleryImages !== []) {
+            $content['section_image'] = $this->uniqueSectionImages($galleryImages);
         }
 
         return $content;
@@ -166,7 +159,10 @@ final class PageSectionService implements IPageSectionService
         $previous = libxml_use_internal_errors(true);
 
         $dom = new \DOMDocument();
-        $dom->loadHTML('<!DOCTYPE html><html><body>' . $html . '</body></html>', LIBXML_NOERROR | LIBXML_NOWARNING);
+        // The <meta charset> tells libxml the bytes are UTF-8; without it loadHTML()
+        // assumes ISO-8859-1 and corrupts non-ASCII alt/caption text (e.g. "Café", "Eén").
+        $dom->loadHTML('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' . 
+        $html . '</body></html>', LIBXML_NOERROR | LIBXML_NOWARNING);
 
         foreach ($dom->getElementsByTagName('img') as $img) {
             if (!($img instanceof \DOMElement)) {
@@ -272,10 +268,6 @@ final class PageSectionService implements IPageSectionService
     // Delete a section by id.
     public function deleteSection(int $sectionId): bool
     {
-        try {
-            return $this->pageSectionRepository->deleteSection($sectionId);
-        } catch (\Throwable $e) {
-            throw $e;
-        }
+        return $this->pageSectionRepository->deleteSection($sectionId);
     }
 }

@@ -12,7 +12,7 @@
         </nav>
 
         <?php if (!empty($s['content'])): ?>
-            <div class="sched-body"><?= $s['content'] ?></div>
+            <div class="sched-body"><?= \App\Support\Html::clean($s['content'] ?? '') ?></div>
         <?php endif; ?>
     </div>
 </section>
