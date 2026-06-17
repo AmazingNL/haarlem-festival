@@ -1,32 +1,96 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
-use App\Models\Order;
+
 use App\Repositories\IOrderRepository;
-use App\ViewModels\yummy\BookReservation;
 
-class OrderService implements IOrderService
+final class OrderService
 {
-    private IOrderRepository $orderRepo;
+    private const LAST_ORDER_KEY = 'last_order_id';
 
-    public function OrderService (IOrderRepository $orderRepo)
+    private IOrderRepository $orderRepository;
+
+    public function __construct(IOrderRepository $orderRepository)
     {
-        $this->orderRepo = $orderRepo;
+        $this->orderRepository = $orderRepository;
     }
 
-    public function getAllOrders(): array
+    public function completePaidCheckout(
+        int $userId,
+        array $customer,
+        string $provider,
+        array $items,
+        string $stripeSessionId,
+        ?string $providerPaymentId = null
+    ): int
     {
-        return $this->orderRepo->getAllOrders();
-    }
-    public function getOrderById(int $id) : Order
-    {
-        return $this->orderRepo->getOrderById($id);
-    }
-    public function createOrder(BookReservation $bookReservation): void
-    {
-        $bookReservation->userId = $_SESSION['user_id'] ?? null;
+        $existing = $this->orderRepository->findByStripeSessionId($userId, $stripeSessionId);
+        if ($existing !== null) {
+            $orderId = (int) ($existing['order_id'] ?? 0);
+            $this->rememberLastOrder($orderId);
+            return $orderId;
+        }
 
-        $amount = 
-        $this->orderRepo->createOrder($order);
+        $orderId = $this->orderRepository->createPaidOrder(
+            $userId,
+            $customer,
+            $provider,
+            $items,
+            $stripeSessionId,
+            $providerPaymentId
+        );
+
+        $this->rememberLastOrder($orderId);
+
+        return $orderId;
+    }
+
+    public function findOrderForUser(int $orderId, int $userId): ?array
+    {
+        return $this->orderRepository->findOrderForUser($orderId, $userId);
+    }
+
+    public function findPaidOrdersForUser(int $userId): array
+    {
+        return $this->orderRepository->findPaidOrdersForUser($userId);
+    }
+
+    public function findByStripeSessionId(int $userId, string $stripeSessionId): ?array
+    {
+        return $this->orderRepository->findByStripeSessionId($userId, $stripeSessionId);
+    }
+
+    public function getLastOrderId(int $userId): int
+    {
+        $this->ensureSession();
+
+        $sessionOrderId = (int) ($_SESSION[self::LAST_ORDER_KEY] ?? 0);
+        if ($sessionOrderId > 0) {
+            $order = $this->orderRepository->findOrderForUser($sessionOrderId, $userId);
+            if ($order !== null) {
+                return $sessionOrderId;
+            }
+        }
+
+        return $this->orderRepository->getLatestOrderIdForUser($userId);
+    }
+
+    private function rememberLastOrder(int $orderId): void
+    {
+        if ($orderId <= 0) {
+            return;
+        }
+
+        $this->ensureSession();
+        $_SESSION[self::LAST_ORDER_KEY] = $orderId;
+    }
+
+    private function ensureSession(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
     }
 }

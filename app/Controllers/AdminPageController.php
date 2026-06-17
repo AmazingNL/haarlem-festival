@@ -15,7 +15,7 @@ use App\Services\IUserService;
 use App\Models\PageSection;
 use App\Models\Image;
 use App\Services\IImageService;
-use App\ViewModels\SectionFactory;
+use App\Schemas\SectionFactory;
 use Exception;
 use Throwable;
 

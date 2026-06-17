@@ -37,77 +37,15 @@ VALUES
 UPDATE `user` SET profile_image_id = 4 WHERE user_id = 3;
 
 -- -------------------------
--- CMS Pages (new schema uses status)
+-- CMS Pages (home is created by migration 10_home_page_refresh.sql)
 -- -------------------------
 INSERT INTO page (title, slug, content, status)
-VALUES
-('Home',    'home',    NULL, 'published'),
-('About',   'about',   '<h1>About</h1><p>Festival information and story.</p>', 'published'),
-('Contact', 'contact', '<h1>Contact</h1><p>Email us at info@example.com</p>', 'published');
+SELECT 'About', 'about', '<h1>About</h1><p>Festival information and story.</p>', 'published'
+WHERE NOT EXISTS (SELECT 1 FROM page WHERE slug = 'about');
 
--- -------------------------
--- HOME PAGE SECTIONS (CMS-driven homepage)
--- page_id for home is 1
--- -------------------------
-
--- Hero (uses main image_id 5)
-INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
-VALUES
-(1, 'hero', 'Visit Haarlem', '<p>Discover events, buy tickets, and build your personal program.</p>', 'Explore Events', '/events', 1, 1);
-
--- Intro text block
-INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
-VALUES
-(1, 'text_block', 'Welcome to Haarlem', '<p>Haarlem is a charming city with canals, historic streets, and great culture. Explore highlights and plan your visit.</p>', NULL, NULL, 2, 1);
-
--- Two image row (gallery section without main image)
-INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
-VALUES
-(1, 'two_image_row', NULL, NULL, NULL, NULL, 3, 1);
-
--- Link exactly 2 images to that gallery section
--- Assumes the last insert made section_id = 3 (safe approach below uses LAST_INSERT_ID)
-SET @two_img_section_id = LAST_INSERT_ID();
-
-INSERT INTO page_section_image (section_id, image_id, sort_order)
-VALUES
-(@two_img_section_id, 6, 1),
-(@two_img_section_id, 7, 2);
-
--- Grote Markt (image left)
-INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
-VALUES
-(1, 'image_left', 'Grote Markt', '<p>The heart of Haarlem with terraces, history, and lively atmosphere.</p>', 'Read more', '/locations/grote-markt', 4, 1);
-
--- Canal Houses (image right)
-INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
-VALUES
-(1, 'image_right', 'Canal Houses', '<p>Walk along the Spaarne and enjoy classic Haarlem architecture.</p>', 'Discover', '/visit/canals', 5, 1);
-
--- Cards grid (store JSON in content for now)
-INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
-VALUES
-(
-  1,
-  'cards_grid',
-  'What you can do',
-  '[
-    {"title":"Stories","text":"Local tales and city legends.","link":"/stories"},
-    {"title":"History","text":"Museums and historic streets.","link":"/history"},
-    {"title":"Restaurants","text":"Food spots you should not miss.","link":"/restaurants"},
-    {"title":"Dance","text":"Dance events and nightlife.","link":"/events?tag=dance"},
-    {"title":"Jazz","text":"Jazz highlights and concerts.","link":"/events?tag=jazz"}
-  ]',
-  NULL,
-  NULL,
-  6,
-  1
-);
-
--- Transportation block
-INSERT INTO page_section (page_id, section_type, title, content, button_text, button_link, sort_order, is_published)
-VALUES
-(1, 'transport', 'Transportation', '<p>Getting around is easy: buses, trains, bikes, and walking routes connect everything.</p>', 'Plan your route', '/transport', 7, 1);
+INSERT INTO page (title, slug, content, status)
+SELECT 'Contact', 'contact', '<h1>Contact</h1><p>Email us at info@example.com</p>', 'published'
+WHERE NOT EXISTS (SELECT 1 FROM page WHERE slug = 'contact');
 
 -- -------------------------
 -- Locations
@@ -164,7 +102,7 @@ VALUES
 
 INSERT INTO payment (order_id, provider, amount, status, paid_at)
 VALUES
-(1, 'mollie', 92.65, 'paid', '2026-06-01 11:07:12');
+(1, 'stripe', 92.65, 'paid', '2026-06-01 11:07:12');
 
 -- -------------------------
 -- Program items (NEW schema has no source)
@@ -174,27 +112,3 @@ VALUES
 (3, 1),
 (3, 2),
 (4, 5);
-
-/* -- migrate:down
-SET FOREIGN_KEY_CHECKS = 0;
-
-DELETE FROM program_item;
-
-DELETE FROM ticket;
-DELETE FROM order_ticket;
-DELETE FROM payment;
-DELETE FROM `order`;
-
-DELETE FROM ticket_type;
-DELETE FROM event;
-DELETE FROM location;
-
-DELETE FROM page_section_image;
-DELETE FROM page_section;
-DELETE FROM page;
-
-DELETE FROM image;
-DELETE FROM `user`;
-
-SET FOREIGN_KEY_CHECKS = 1;
- */

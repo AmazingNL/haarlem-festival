@@ -20,6 +20,8 @@ DROP TABLE IF EXISTS page;
 
 DROP TABLE IF EXISTS program_item;
 
+DROP TABLE IF EXISTS pending_stripe_checkout;
+DROP TABLE IF EXISTS order_line;
 DROP TABLE IF EXISTS invoice_line;
 DROP TABLE IF EXISTS invoice;
 
@@ -34,5 +36,7 @@ DROP TABLE IF EXISTS location;
 
 DROP TABLE IF EXISTS image;
 DROP TABLE IF EXISTS `user`;
+
+DROP TABLE IF EXISTS schema_migrations;
 
 SET FOREIGN_KEY_CHECKS = 1;

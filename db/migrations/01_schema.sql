@@ -111,7 +111,6 @@ CREATE TABLE IF NOT EXISTS page_section (
   'restaurant_card',
   'restaurants_card',
   'welcome_banner',
-  'welcome_banner_card'
   'welcome_banner_card',
   'gallery',
   'stories_hero',

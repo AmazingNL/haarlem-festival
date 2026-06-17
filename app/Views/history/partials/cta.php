@@ -19,13 +19,13 @@ $backgroundImage = htmlspecialchars((string) ($s['background_image'] ?? ''), ENT
 
             <div class="history-cta__actions">
                 <?php if (!empty($s['primary_button_text'])): ?>
-                    <a class="history-btn history-btn--gold" href="<?= $historyUrl($s['primary_button_link']) ?>">
+                    <a class="history-btn history-btn--gold" href="<?= $historyUrl($s['primary_button_link'], '/history/book-tour') ?>">
                         <span class="history-btn__label"><?= htmlspecialchars((string) $s['primary_button_text'], ENT_QUOTES, 'UTF-8') ?></span>
                         <span class="history-btn__arrow" aria-hidden="true">&rarr;</span>
                     </a>
                 <?php endif; ?>
                 <?php if (!empty($s['secondary_button_text'])): ?>
-                    <a class="history-btn history-btn--secondary-light" href="<?= $historyUrl($s['secondary_button_link']) ?>">
+                    <a class="history-btn history-btn--secondary-light" href="<?= $historyUrl($s['secondary_button_link'], '/history/route-map') ?>">
                         <span class="history-btn__label"><?= htmlspecialchars((string) $s['secondary_button_text'], ENT_QUOTES, 'UTF-8') ?></span>
                         <span class="history-btn__arrow" aria-hidden="true">&rarr;</span>
                     </a>

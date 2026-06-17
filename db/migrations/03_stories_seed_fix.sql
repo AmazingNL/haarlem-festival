@@ -13,33 +13,6 @@ WHERE p.slug = 'stories';
 
 DELETE FROM page WHERE slug = 'stories';
 
-DELETE FROM image WHERE file_path LIKE '/assets/images/stories/%'
-  AND uploaded_by_user_id = 1;
-
--- -------------------------
--- Images for Stories page
--- -------------------------
-INSERT INTO image (file_path, alt_text, uploaded_by_user_id) VALUES
-('/assets/images/stories/pexels-cottonbro-4911740.jpg',                    'Storytelling performance on stage',        1),
-('/assets/images/stories/antonio-molinari-22FwbFrPvpU-unsplash.jpg',       'Audience listening to a story',            1),
-('/assets/images/stories/Foto-Mister-Anansi-leert-de-wereld-lachen.jpeg',  'Mister Anansi performance',                1),
-('/assets/images/stories/MisterAnansiLeendertJansen-1.jpg',                'Mister Anansi performer Leendert Jansen',  1),
-('/assets/images/stories/pexels-cottonbro-7319358.jpg',                    'Performer on stage',                       1),
-('/assets/images/stories/pexels-jibarofoto-2774556.jpg',                   'Festival crowd',                           1),
-('/assets/images/stories/corrie.jpeg',                                      'Corrie ten Boom',                          1),
-('/assets/images/stories/tenboom.jpg',                                      'Ten Boom house',                           1),
-('/assets/images/stories/drama emotion.jpg',                                'Dramatic storytelling moment',             1);
-
-SET @img_hero     = LAST_INSERT_ID();     -- pexels-cottonbro-4911740 (hero)
-SET @img_audience = @img_hero + 1;
-SET @img_anansi1  = @img_hero + 2;
-SET @img_anansi2  = @img_hero + 3;
-SET @img_stage    = @img_hero + 4;
-SET @img_crowd    = @img_hero + 5;
-SET @img_corrie   = @img_hero + 6;
-SET @img_tenboom  = @img_hero + 7;
-SET @img_drama    = @img_hero + 8;
-
 -- -------------------------
 -- Landing page: /stories
 -- -------------------------

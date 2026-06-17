@@ -5,20 +5,12 @@ $programTotal = (float) ($programTotal ?? 0);
 $isLoggedIn = !empty($isLoggedIn);
 $lastOrderId = (int) ($lastOrderId ?? 0);
 $continueBrowsingUrl = trim((string) ($continueBrowsingUrl ?? '/home'));
-$eventCount = count($programItems);
+$cartCount = count($programItems);
 $paidOrderCount = count($paidOrders);
-$summaryEventCount = $eventCount > 0 ? $eventCount : $paidOrderCount;
 $latestPaidOrder = $paidOrders[0] ?? null;
 
 $formatMoney = static fn(float $amount): string => 'EUR ' . number_format($amount, 2, '.', ',');
-$formatPayment = static function (?string $provider): string {
-    return match (trim((string) $provider)) {
-        'ideal', 'stripe-ideal' => 'iDEAL',
-        'card', 'stripe-card' => 'Credit Card',
-        'card-ideal', 'stripe-ideal-card' => 'Credit Card / iDEAL',
-        default => 'Secure Payment',
-    };
-};
+$formatPayment = static fn(?string $provider): string => \App\Support\PaymentProvider::label($provider);
 $formatDate = static function (?string $dateTime): string {
     if ($dateTime === null || $dateTime === '') {
         return '-';
@@ -27,15 +19,35 @@ $formatDate = static function (?string $dateTime): string {
     $timestamp = strtotime($dateTime);
     return $timestamp ? date('D d M Y, H:i', $timestamp) : $dateTime;
 };
+$orderEmail = static function (array $order): string {
+    $email = trim((string) ($order['email'] ?? ''));
+    if ($email !== '') {
+        return $email;
+    }
+
+    return trim((string) ($_SESSION['user_email'] ?? ''));
+};
+$paidBookingCount = static function (array $order): int {
+    $items = is_array($order['items'] ?? null) ? $order['items'] : [];
+    $count = count($items);
+    if ($count > 0) {
+        return $count;
+    }
+
+    return (float) ($order['total_price'] ?? 0) > 0 ? 1 : 0;
+};
 $programCategory = static function (array $programItem): string {
     $type = trim((string) ($programItem['type'] ?? ''));
     if ($type === 'history-book-tour') {
         return 'History';
     }
+    if ($type === 'yummy-reservation') {
+        return 'Yummy';
+    }
 
     $label = trim((string) ($programItem['category_label'] ?? ''));
-        return $label !== '' ? $label : 'Festival';
-    };
+    return $label !== '' ? $label : 'Festival';
+};
 ?>
 
 <section class="program-page">
@@ -50,9 +62,14 @@ $programCategory = static function (array $programItem): string {
                 <section class="program-panel">
                     <div class="program-panel__header">
                         <h2>My Program</h2>
-                        <?php if ($summaryEventCount > 0): ?>
-                            <span class="program-count-pill"><?= $summaryEventCount ?> Event<?= $summaryEventCount === 1 ? '' : 's' ?></span>
-                        <?php endif; ?>
+                        <div class="program-panel__badges">
+                            <?php if ($cartCount > 0): ?>
+                                <span class="program-count-pill"><?= $cartCount ?> to pay</span>
+                            <?php endif; ?>
+                            <?php if ($paidOrderCount > 0): ?>
+                                <span class="program-count-pill program-count-pill--paid"><?= $paidOrderCount ?> paid</span>
+                            <?php endif; ?>
+                        </div>
                     </div>
 
                     <?php if ($programItems === [] && $paidOrders === []): ?>
@@ -138,12 +155,22 @@ $programCategory = static function (array $programItem): string {
                             </article>
                         <?php endforeach; ?>
 
-                        <?php if ($programItems === [] && $paidOrders !== []): ?>
+                        <?php if ($paidOrders !== []): ?>
+                            <?php if ($cartCount > 0): ?>
+                                <h3 class="program-paid-section-title">Paid bookings</h3>
+                            <?php endif; ?>
                             <?php foreach ($paidOrders as $paidOrder): ?>
                                 <?php
                                 $orderId = (int) ($paidOrder['order_id'] ?? 0);
                                 $orderItems = is_array($paidOrder['items'] ?? null) ? $paidOrder['items'] : [];
-                                $orderTitle = (string) (($orderItems[0]['title'] ?? '') !== '' ? $orderItems[0]['title'] : ('Order #' . $orderId));
+                                $primaryItem = $orderItems[0] ?? [];
+                                $orderTitle = trim((string) ($primaryItem['title'] ?? ''));
+                                if ($orderTitle === '') {
+                                    $orderTitle = 'Paid booking';
+                                }
+                                $bookingCount = $paidBookingCount($paidOrder);
+                                $displayEmail = $orderEmail($paidOrder);
+                                $isHistoryBooking = (string) ($primaryItem['type'] ?? '') === 'history-book-tour';
                                 ?>
                                 <article class="program-ticket-card program-ticket-card--paid">
                                     <div class="program-ticket-card__header">
@@ -153,15 +180,59 @@ $programCategory = static function (array $programItem): string {
                                         </div>
                                     </div>
 
-                                    <div class="program-ticket-card__details">
+                                    <?php if ($orderItems !== []): ?>
+                                        <?php foreach ($orderItems as $lineItem): ?>
+                                            <?php
+                                            $lineHistory = (string) ($lineItem['type'] ?? '') === 'history-book-tour';
+                                            $lineYummy = (string) ($lineItem['type'] ?? '') === 'yummy-reservation';
+                                            ?>
+                                            <div class="program-paid-line">
+                                                <?php if (trim((string) ($lineItem['title'] ?? '')) !== '' && count($orderItems) > 1): ?>
+                                                    <p class="program-paid-line__title"><?= htmlspecialchars((string) $lineItem['title'], ENT_QUOTES, 'UTF-8') ?></p>
+                                                <?php endif; ?>
+                                                <div class="program-ticket-card__details program-ticket-card__details--compact">
+                                                    <ul class="program-detail-list">
+                                                        <li>
+                                                            <span><?= $lineHistory ? 'Day' : 'Date' ?></span>
+                                                            <strong><?= htmlspecialchars((string) ($lineItem['day'] ?? ($lineItem['selection_text'] ?? '-')), ENT_QUOTES, 'UTF-8') ?></strong>
+                                                        </li>
+                                                        <li>
+                                                            <span>Ticket</span>
+                                                            <strong><?= htmlspecialchars((string) (($lineItem['ticket_title'] ?? '') !== '' ? $lineItem['ticket_title'] : '-'), ENT_QUOTES, 'UTF-8') ?></strong>
+                                                        </li>
+                                                        <li>
+                                                            <span>Guests</span>
+                                                            <strong><?= htmlspecialchars((string) (($lineItem['ticket_summary_text'] ?? '') !== '' ? $lineItem['ticket_summary_text'] : (string) ($lineItem['quantity'] ?? 1)), ENT_QUOTES, 'UTF-8') ?></strong>
+                                                        </li>
+                                                    </ul>
+                                                    <ul class="program-detail-list">
+                                                        <li>
+                                                            <span>Location</span>
+                                                            <strong><?= htmlspecialchars((string) (($lineItem['location_name'] ?? '') !== '' ? $lineItem['location_name'] : 'Haarlem'), ENT_QUOTES, 'UTF-8') ?></strong>
+                                                        </li>
+                                                        <li>
+                                                            <span>Price</span>
+                                                            <strong><?= htmlspecialchars($formatMoney((float) ($lineItem['line_total'] ?? $lineItem['total_price'] ?? 0)), ENT_QUOTES, 'UTF-8') ?></strong>
+                                                        </li>
+                                                        <li>
+                                                            <span>Details</span>
+                                                            <strong><?= htmlspecialchars((string) (($lineItem['selection_text'] ?? '') !== '' ? $lineItem['selection_text'] : '-'), ENT_QUOTES, 'UTF-8') ?></strong>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+
+                                    <div class="program-ticket-card__details program-ticket-card__details--summary">
                                         <ul class="program-detail-list">
                                             <li>
-                                                <span>Paid On</span>
+                                                <span>Paid on</span>
                                                 <strong><?= htmlspecialchars($formatDate($paidOrder['paid_at'] ?? null), ENT_QUOTES, 'UTF-8') ?></strong>
                                             </li>
                                             <li>
                                                 <span>Bookings</span>
-                                                <strong><?= count($orderItems) ?></strong>
+                                                <strong><?= $bookingCount ?></strong>
                                             </li>
                                             <li>
                                                 <span>Payment</span>
@@ -172,22 +243,22 @@ $programCategory = static function (array $programItem): string {
                                         <ul class="program-detail-list">
                                             <li>
                                                 <span>Email</span>
-                                                <strong><?= htmlspecialchars((string) ($paidOrder['email'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></strong>
+                                                <strong><?= htmlspecialchars($displayEmail !== '' ? $displayEmail : 'No email on account', ENT_QUOTES, 'UTF-8') ?></strong>
                                             </li>
                                             <li>
                                                 <span>Status</span>
                                                 <strong>Paid</strong>
                                             </li>
                                             <li>
-                                                <span>Location</span>
-                                                <strong><?= htmlspecialchars((string) (($orderItems[0]['location_name'] ?? '') !== '' ? $orderItems[0]['location_name'] : 'Bavo Church'), ENT_QUOTES, 'UTF-8') ?></strong>
+                                                <span>Order</span>
+                                                <strong>#<?= $orderId ?></strong>
                                             </li>
                                         </ul>
                                     </div>
 
                                     <div class="program-ticket-card__footer">
                                         <div class="program-ticket-card__links">
-                                            <a href="/orders/<?= $orderId ?>/success" class="program-inline-link">Confirmation</a>
+                                            <a href="/orders/<?= $orderId ?>/success" class="program-inline-link">Open confirmation</a>
                                         </div>
                                         <strong class="program-ticket-card__price"><?= htmlspecialchars($formatMoney((float) ($paidOrder['total_price'] ?? 0)), ENT_QUOTES, 'UTF-8') ?></strong>
                                     </div>
@@ -203,56 +274,32 @@ $programCategory = static function (array $programItem): string {
                     <h2>Program Summary</h2>
 
                     <div class="program-summary-line">
-                        <span>Total Events</span>
-                        <strong><?= $summaryEventCount ?></strong>
+                        <span><?= $cartCount > 0 ? 'Items to pay' : 'Paid bookings' ?></span>
+                        <strong><?= $cartCount > 0 ? $cartCount : $paidOrderCount ?></strong>
                     </div>
+
+                    <?php if ($cartCount > 0): ?>
+                        <div class="program-summary-line program-summary-line--secondary">
+                            <span>Cart total</span>
+                            <strong><?= htmlspecialchars($formatMoney($programTotal), ENT_QUOTES, 'UTF-8') ?></strong>
+                        </div>
+                    <?php endif; ?>
 
                     <div class="program-summary-divider" aria-hidden="true"></div>
 
                     <?php if ($programItems !== []): ?>
-                        <h3>Payment Overview</h3>
-                        <p class="program-summary-note">Choose a payment option below. Check Out opens the secure third-party payment page.</p>
-
-                        <form method="post" action="/checkout/pay" class="program-payment-form">
-                            <input type="hidden" name="_csrf" value="<?= htmlspecialchars((string) ($csrf ?? ''), ENT_QUOTES, 'UTF-8') ?>">
-
-                            <fieldset class="program-payment-options">
-                                <legend>Choose a payment method</legend>
-
-                                <label class="program-payment-option">
-                                    <input type="radio" name="payment_provider" value="card" required>
-                                    <span class="program-payment-option__card">
-                                        <span class="program-payment-option__badge">CC</span>
-                                        <span class="program-payment-option__content">
-                                            <strong>Credit Card</strong>
-                                            <small>Mastercard, Visa</small>
-                                        </span>
-                                        <span class="program-payment-option__indicator" aria-hidden="true"></span>
-                                    </span>
-                                </label>
-
-                                <label class="program-payment-option">
-                                    <input type="radio" name="payment_provider" value="ideal" required>
-                                    <span class="program-payment-option__card">
-                                        <span class="program-payment-option__badge">iD</span>
-                                        <span class="program-payment-option__content">
-                                            <strong>iDEAL</strong>
-                                            <small>Pay with your bank</small>
-                                        </span>
-                                        <span class="program-payment-option__indicator" aria-hidden="true"></span>
-                                    </span>
-                                </label>
-                            </fieldset>
-
-                            <div class="program-total-card">
-                                <span>Total to be paid</span>
-                                <strong><?= htmlspecialchars($formatMoney($programTotal), ENT_QUOTES, 'UTF-8') ?></strong>
+                        <?php if ($latestPaidOrder !== null && $isLoggedIn): ?>
+                            <div class="program-summary-line program-summary-line--secondary">
+                                <span>Paid bookings</span>
+                                <strong><?= $paidOrderCount ?></strong>
                             </div>
-
-                            <button type="submit" class="program-checkout-button">
-                                <?= $isLoggedIn ? 'Check Out' : 'Login to Check Out' ?>
-                            </button>
-                        </form>
+                            <div class="program-sidebar-actions program-sidebar-actions--compact">
+                                <a href="/orders/<?= (int) ($latestPaidOrder['order_id'] ?? 0) ?>/success" class="program-inline-link">Open latest confirmation</a>
+                            </div>
+                        <?php endif; ?>
+                        <?php
+        require __DIR__ . '/partials/payment_form.php';
+                        ?>
                     <?php else: ?>
                         <h3>Payment Overview</h3>
                         <p class="program-summary-note">

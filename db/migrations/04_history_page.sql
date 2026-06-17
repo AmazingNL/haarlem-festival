@@ -22,9 +22,9 @@ VALUES
     'title_line_two', 'Haarlem',
     'intro', 'Walk through 800 years of Dutch history in one unforgettable journey. From majestic churches to hidden courtyards, every step reveals a story.',
     'primary_button_text', 'Book Your Adventure',
-    'primary_button_link', '#history-cta',
+    'primary_button_link', '/history/book-tour',
     'secondary_button_text', 'Explore Route',
-    'secondary_button_link', '#history-route',
+    'secondary_button_link', '/history/route-map',
     'hero_image', '/assets/images/history/history-hero-banner.jpg'
   ),
   1,
@@ -97,7 +97,7 @@ VALUES
     'one_feature_three', 'Gothic Architecture',
     'one_feature_four', 'Frans Hals Tomb',
     'one_button_text', 'Explore This Location',
-    'one_button_link', '#history-route',
+    'one_button_link', '/history/st-bavos-church',
     'two_label', 'Iconic Landmark',
     'two_title', 'Molen de Adriaan',
     'two_text', 'This iconic Dutch windmill stands proudly on the banks of the Spaarne River. Originally built in 1779, it was reconstructed in 2002 and now serves as a working museum.',
@@ -108,7 +108,7 @@ VALUES
     'two_feature_three', 'Working Museum',
     'two_feature_four', 'Spaarne River',
     'two_button_text', 'Explore This Location',
-    'two_button_link', '#history-route'
+    'two_button_link', '/history/molen-de-adriaan'
   ),
   4,
   1
@@ -122,7 +122,7 @@ VALUES
     'intro', 'Each stop tells a unique chapter of Haarlem''s rich 800-year story.',
     'venue_one_title', 'Grote Kerk',
     'venue_one_text', '15th-century Gothic cathedral',
-    'venue_one_link', '#history-featured',
+    'venue_one_link', '/history/st-bavos-church',
     'venue_two_title', 'Grote Markt',
     'venue_two_text', 'Historic market square since medieval times',
     'venue_three_title', 'De Hallen',
@@ -136,12 +136,13 @@ VALUES
     'venue_six_text', '16th-century French Reformed church',
     'venue_seven_title', 'Molen de Adriaan',
     'venue_seven_text', 'Iconic windmill on the Spaarne River',
+    'venue_seven_link', '/history/molen-de-adriaan',
     'venue_eight_title', 'Amsterdamse Poort',
     'venue_eight_text', 'Last remaining medieval city gate',
     'venue_nine_title', 'Hof van Bakenes',
     'venue_nine_text', 'Oldest hofje in Haarlem, founded 1395',
     'button_text', 'Explore Route',
-    'button_link', '#history-cta'
+    'button_link', '/history/route-map'
   ),
   5,
   1
@@ -172,9 +173,9 @@ VALUES
     'body', 'Book your walking tour today and discover why Haarlem has been captivating visitors for centuries. Experience history come alive through our expert-guided tours.',
     'background_image', '/assets/images/history/history-ready-to-explore.jpg',
     'primary_button_text', 'Book Your Adventure',
-    'primary_button_link', '#',
+    'primary_button_link', '/history/book-tour',
     'secondary_button_text', 'Explore Route',
-    'secondary_button_link', '#history-route'
+    'secondary_button_link', '/history/route-map'
   ),
   7,
   1
