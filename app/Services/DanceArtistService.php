@@ -12,6 +12,7 @@ final class DanceArtistService
 
     public function __construct(private DanceArtistRepository $danceArtistRepository)
     {
+
     }
 
     public function getPublishedArtists(): array
@@ -90,7 +91,9 @@ final class DanceArtistService
                 $this->clean($row['latest_end_datetime'] ?? '')
             ),
             'latest_session_venue' => $this->clean($row['latest_location_name'] ?? ''),
-            'related_events' => $this->groupEventRows($this->danceArtistRepository->findPublishedArtistEventRows($artistId)),
+            'related_events' => DanceEventCardMapper::mapRows(
+                $this->danceArtistRepository->findPublishedArtistEventRows($artistId)
+            ),
         ];
     }
 
@@ -150,49 +153,6 @@ final class DanceArtistService
         }
 
         return $images;
-    }
-
-    private function groupEventRows(array $rows): array
-    {
-        $events = [];
-
-        foreach ($rows as $row) {
-            $eventId = (int) ($row['event_id'] ?? 0);
-            if ($eventId <= 0) {
-                continue;
-            }
-
-            if (!isset($events[$eventId])) {
-                $events[$eventId] = [
-                    'event_id' => $eventId,
-                    'title' => $this->clean($row['title'] ?? 'Dance Event'),
-                    'slug' => $this->clean($row['slug'] ?? ''),
-                    'description' => $this->clean($row['description'] ?? ''),
-                    'start_datetime' => $this->clean($row['start_datetime'] ?? ''),
-                    'end_datetime' => $this->clean($row['end_datetime'] ?? ''),
-                    'location_name' => $this->clean($row['location_name'] ?? 'Haarlem'),
-                    'location_address' => $this->clean($row['location_address'] ?? ''),
-                    'location_city' => $this->clean($row['location_city'] ?? 'Haarlem'),
-                    'image_path' => $this->clean($row['image_path'] ?? ''),
-                    'category_label' => 'Dance',
-                    'ticket_types' => [],
-                ];
-            }
-
-            $ticketTypeId = (int) ($row['ticket_type_id'] ?? 0);
-            if ($ticketTypeId <= 0) {
-                continue;
-            }
-
-            $events[$eventId]['ticket_types'][] = [
-                'ticket_type_id' => $ticketTypeId,
-                'name' => $this->clean($row['ticket_type_name'] ?? 'Ticket'),
-                'price' => round((float) ($row['ticket_price'] ?? 0), 2),
-                'max_quantity' => max(0, (int) ($row['max_quantity'] ?? 0)),
-            ];
-        }
-
-        return array_values($events);
     }
 
     private function formatDateTime(string $startDateTime, string $endDateTime): string

@@ -62,7 +62,7 @@ $welcomeBody = $text(
 
 $quickLinks = [
     ['label' => 'Artists', 'href' => '/dance#dance-artists', 'icon' => 'A'],
-    ['label' => 'Venues', 'href' => '/dance#dance-venues', 'icon' => 'V'],
+    ['label' => 'Filters', 'href' => '/dance#dance-filters', 'icon' => 'F'],
     ['label' => 'Tickets', 'href' => '/dance#dance-tickets', 'icon' => '+'],
 ];
 ?>

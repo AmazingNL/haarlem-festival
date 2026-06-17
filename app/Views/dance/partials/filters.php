@@ -11,7 +11,7 @@ $danceFilterSelected = static function (string $name, string $value) use ($selec
 };
 ?>
 
-<section class="dance-filters" aria-labelledby="dance-filters-title">
+<section class="dance-filters" id="dance-filters" aria-labelledby="dance-filters-title">
     <div class="dance-filters__header">
         <p class="dance-kicker">Find Your Session</p>
         <h2 id="dance-filters-title">Filter Dance Sessions</h2>

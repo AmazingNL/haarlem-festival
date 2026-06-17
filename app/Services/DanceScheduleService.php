@@ -121,7 +121,7 @@ final class DanceScheduleService
             $criteria['ticket_type_name'] = (string) $filters['ticket_type_name'];
         }
 
-        return $this->groupEventRows($this->danceScheduleRepository->findPublishedDanceEventRows($criteria));
+        return DanceEventCardMapper::mapRows($this->danceScheduleRepository->findPublishedDanceEventRows($criteria));
     }
 
     private function buildDateOptions(array $rows): array
@@ -210,52 +210,6 @@ final class DanceScheduleService
         }
 
         return $options;
-    }
-
-    private function groupEventRows(array $rows): array
-    {
-        $events = [];
-        $seenTickets = [];
-
-        foreach ($rows as $row) {
-            $eventId = (int) ($row['event_id'] ?? 0);
-            if ($eventId <= 0) {
-                continue;
-            }
-
-            if (!isset($events[$eventId])) {
-                $events[$eventId] = [
-                    'event_id' => $eventId,
-                    'title' => $this->clean($row['title'] ?? 'Dance Event'),
-                    'slug' => $this->clean($row['slug'] ?? ''),
-                    'description' => $this->clean($row['description'] ?? ''),
-                    'start_datetime' => $this->clean($row['start_datetime'] ?? ''),
-                    'end_datetime' => $this->clean($row['end_datetime'] ?? ''),
-                    'location_name' => $this->clean($row['location_name'] ?? 'Haarlem'),
-                    'location_address' => $this->clean($row['location_address'] ?? ''),
-                    'location_city' => $this->clean($row['location_city'] ?? 'Haarlem'),
-                    'image_path' => $this->clean($row['image_path'] ?? ''),
-                    'category_label' => 'Dance',
-                    'ticket_types' => [],
-                ];
-                $seenTickets[$eventId] = [];
-            }
-
-            $ticketTypeId = (int) ($row['ticket_type_id'] ?? 0);
-            if ($ticketTypeId <= 0 || isset($seenTickets[$eventId][$ticketTypeId])) {
-                continue;
-            }
-
-            $events[$eventId]['ticket_types'][] = [
-                'ticket_type_id' => $ticketTypeId,
-                'name' => $this->clean($row['ticket_type_name'] ?? 'Ticket'),
-                'price' => round((float) ($row['ticket_price'] ?? 0), 2),
-                'max_quantity' => max(0, (int) ($row['max_quantity'] ?? 0)),
-            ];
-            $seenTickets[$eventId][$ticketTypeId] = true;
-        }
-
-        return array_values($events);
     }
 
     private function findOptionByValue(array $options, string $value): ?array
