@@ -13,6 +13,7 @@ use App\Models\Enum\SectionType;
 use App\Models\Enum\UserRole;
 use App\Services\ICmsService;
 use App\Services\IPageSectionService;
+use App\Services\OrderService;
 use App\Services\IUserService;
 use App\Models\PageSection;
 use App\Models\Image;
@@ -27,17 +28,20 @@ final class CmsController extends BaseController
     private IPageSectionService $pageSectionService;
     private IUserService $userService;
     private IImageService $imageService;
+    private OrderService $orderService;
 
     public function __construct(
         ICmsService $cmsService,
         IPageSectionService $pageSectionService,
         IUserService $userService,
         IImageService $imageService,
+        OrderService $orderService,
     ) {
         $this->cmsService = $cmsService;
         $this->pageSectionService = $pageSectionService;
         $this->userService = $userService;
         $this->imageService = $imageService;
+        $this->orderService = $orderService;
     }
 
     public function index(): void
@@ -488,6 +492,107 @@ final class CmsController extends BaseController
         $sort = $this->str('sort', 'date_desc');
         $users = $this->userService->filterUsers($role, $search, $sort);
         $this->view('admin/manage_users', compact('users', 'role', 'search', 'sort') + ['title' => 'Manage Users'], 'admin_dashboard');
+    }
+
+    public function viewOrders(): void
+    {
+        $this->view(
+            'admin/orders',
+            [
+                'orders' => $this->orderService->findOrdersForAdmin(),
+                'title' => 'Orders',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function viewOrderDetail(int $order_id): void
+    {
+        $order = $this->orderService->findOrderForAdmin($order_id);
+        if ($order === null) {
+            $this->setFlash('error', 'Order not found.');
+            $this->redirect('/admin/orders');
+            return;
+        }
+
+        $this->view(
+            'admin/order_detail',
+            [
+                'order' => $order,
+                'title' => 'Order #' . $order_id,
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function exportOrders(): void
+    {
+        $rows = $this->orderService->getOrderExportRows();
+
+        if (ob_get_length()) {
+            ob_clean();
+        }
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="haarlem-orders.csv"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        echo "\xEF\xBB\xBF";
+        echo "sep=;\r\n";
+
+        $output = fopen('php://output', 'w');
+        if ($output === false) {
+            exit;
+        }
+
+        fputcsv($output, [
+            'order id',
+            'customer name',
+            'email',
+            'phone',
+            'order status',
+            'payment status',
+            'provider',
+            'total',
+            'paid at',
+            'item title',
+            'ticket type',
+            'quantity',
+            'unit price',
+            'line total',
+            'venue/location',
+            'event id',
+            'ticket type id',
+        ], ';');
+
+        foreach ($rows as $row) {
+            $firstName = trim((string) ($row['first_name'] ?? ''));
+            $lastName = trim((string) ($row['last_name'] ?? ''));
+
+            fputcsv($output, [
+                (int) ($row['order_id'] ?? 0),
+                trim($firstName . ' ' . $lastName),
+                (string) ($row['email'] ?? ''),
+                (string) ($row['phone'] ?? ''),
+                (string) ($row['order_status'] ?? ''),
+                (string) ($row['payment_status'] ?? ''),
+                (string) ($row['provider'] ?? ''),
+                number_format((float) ($row['total_price'] ?? 0), 2, '.', ''),
+                (string) ($row['paid_at'] ?? ''),
+                (string) ($row['item_title'] ?? ''),
+                (string) ($row['ticket_title'] ?? ''),
+                (int) ($row['quantity'] ?? 0),
+                number_format((float) ($row['unit_price'] ?? 0), 2, '.', ''),
+                number_format((float) ($row['line_total'] ?? 0), 2, '.', ''),
+                (string) ($row['location_name'] ?? ''),
+                (int) ($row['event_id'] ?? 0),
+                (int) ($row['ticket_type_id'] ?? 0),
+            ], ';');
+        }
+
+        fclose($output);
+        exit;
     }
 
     // minimal stubs for routes referenced in Router

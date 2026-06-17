@@ -39,7 +39,7 @@ $heroSection = $findSection(['hero', 'welcome_banner']);
 $welcomeSection = $findSection(['text_block', 'feature', 'welcome_banner']);
 
 $heroTitle = $text(
-    $heroSection['title'] ?? $heroSection['title_line_two'] ?? '',
+    $heroSection['heading'] ?? $heroSection['title'] ?? $heroSection['title_line_two'] ?? '',
     'Dance!'
 );
 $heroEyebrow = $text(
@@ -56,7 +56,7 @@ $welcomeTitle = $text(
     'Welcome to Dance!'
 );
 $welcomeBody = $text(
-    $welcomeSection['intro'] ?? $welcomeSection['introduction'] ?? $welcomeSection['text'] ?? '',
+    $welcomeSection['article'] ?? $welcomeSection['intro'] ?? $welcomeSection['introduction'] ?? $welcomeSection['text'] ?? $welcomeSection['sub_title'] ?? '',
     'The energy of Haarlem Festival comes alive with DJs, vibrant venues, and unforgettable nights full of music, movement, and atmosphere. Explore the artists, discover the venues, and get ready to plan your festival weekend.'
 );
 

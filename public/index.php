@@ -61,6 +61,9 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
 
     $r->get('/admin/users', [CmsController::class, 'manageUsersPage']);
+    $r->get('/admin/orders/export', [CmsController::class, 'exportOrders']);
+    $r->get('/admin/orders', [CmsController::class, 'viewOrders']);
+    $r->get('/admin/orders/{order_id:\d+}', [CmsController::class, 'viewOrderDetail']);
 
     $r->get('/admin/events/{event_id:\d+}', [CmsController::class, 'viewEventPage']);
     $r->get('/admin/events/{event_id:\d+}/edit', [CmsController::class, 'updateEventPage']);
@@ -268,7 +271,8 @@ function createController(string $controllerClass)
                 createPageService(),
                 createSectionService(),
                 $userService,
-                createImageService()
+                createImageService(),
+                createOrderService()
             );
 
         default:

@@ -175,6 +175,86 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
         return (int) $stmt->fetchColumn();
     }
 
+    public function findOrdersForAdmin(): array
+    {
+        $sql = 'SELECT o.*, p.stripe_session_id, p.paid_at AS payment_paid_at, p.status AS payment_status,
+            COALESCE(NULLIF(o.email, ""), u.email) AS email,
+            COALESCE(NULLIF(o.first_name, ""), u.first_name) AS first_name,
+            COALESCE(NULLIF(o.last_name, ""), u.last_name) AS last_name
+            FROM `order` o
+            LEFT JOIN payment p ON p.order_id = o.order_id
+            INNER JOIN `user` u ON u.user_id = o.user_id
+            ORDER BY o.order_id DESC';
+
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute();
+
+        $orders = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (is_array($row)) {
+                $orders[] = $this->hydrateOrder($row);
+            }
+        }
+
+        return $orders;
+    }
+
+    public function findOrderForAdmin(int $orderId): ?array
+    {
+        $sql = 'SELECT o.*, p.stripe_session_id, p.paid_at AS payment_paid_at, p.status AS payment_status,
+            COALESCE(NULLIF(o.email, ""), u.email) AS email,
+            COALESCE(NULLIF(o.first_name, ""), u.first_name) AS first_name,
+            COALESCE(NULLIF(o.last_name, ""), u.last_name) AS last_name
+            FROM `order` o
+            LEFT JOIN payment p ON p.order_id = o.order_id
+            INNER JOIN `user` u ON u.user_id = o.user_id
+            WHERE o.order_id = :order_id
+            LIMIT 1';
+
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute([':order_id' => $orderId]);
+
+        $order = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!is_array($order)) {
+            return null;
+        }
+
+        return $this->hydrateOrder($order);
+    }
+
+    public function findOrderExportRows(): array
+    {
+        $sql = 'SELECT
+                o.order_id,
+                COALESCE(NULLIF(o.first_name, ""), u.first_name) AS first_name,
+                COALESCE(NULLIF(o.last_name, ""), u.last_name) AS last_name,
+                COALESCE(NULLIF(o.email, ""), u.email) AS email,
+                o.phone,
+                o.status AS order_status,
+                p.status AS payment_status,
+                o.provider,
+                o.total_price,
+                p.paid_at,
+                ol.title AS item_title,
+                COALESCE(NULLIF(ol.ticket_title, ""), ol.ticket_summary_text) AS ticket_title,
+                ol.quantity,
+                ol.unit_price,
+                ol.line_total,
+                ol.location_name,
+                ol.event_id,
+                ol.ticket_type_id
+            FROM `order` o
+            INNER JOIN `user` u ON u.user_id = o.user_id
+            LEFT JOIN payment p ON p.order_id = o.order_id
+            LEFT JOIN order_line ol ON ol.order_id = o.order_id
+            ORDER BY o.order_id DESC, ol.order_line_id ASC';
+
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
     private function hydrateOrder(array $row): array
     {
         $orderId = (int) ($row['order_id'] ?? 0);

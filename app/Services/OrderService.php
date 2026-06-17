@@ -77,6 +77,25 @@ final class OrderService
         return $this->orderRepository->getLatestOrderIdForUser($userId);
     }
 
+    public function findOrdersForAdmin(): array
+    {
+        return $this->orderRepository->findOrdersForAdmin();
+    }
+
+    public function findOrderForAdmin(int $orderId): ?array
+    {
+        if ($orderId <= 0) {
+            return null;
+        }
+
+        return $this->orderRepository->findOrderForAdmin($orderId);
+    }
+
+    public function getOrderExportRows(): array
+    {
+        return $this->orderRepository->findOrderExportRows();
+    }
+
     private function rememberLastOrder(int $orderId): void
     {
         if ($orderId <= 0) {
