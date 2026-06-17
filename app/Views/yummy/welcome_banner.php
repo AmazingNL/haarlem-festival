@@ -52,7 +52,7 @@ if ($buttonLink !== '') {
 
         <?php if (!empty($s['introduction'])): ?>
             <article class="welcome-card-content">
-                <?= $s['introduction'] ?>
+                <?= \App\Support\Html::clean($s['introduction'] ?? '') ?>
             </article>
         <?php endif; ?>
 

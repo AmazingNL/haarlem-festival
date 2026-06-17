@@ -8,7 +8,7 @@ use FastRoute\Dispatcher;
 use function FastRoute\simpleDispatcher;
 
 use App\Controllers\AuthController;
-use App\Controllers\AdminPageController;
+use App\Controllers\CmsController;
 use App\Controllers\EventController;
 use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
@@ -33,41 +33,41 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/admin/logout', [AuthController::class, 'logout']);
 
 
-    $r->get('/admin', [AdminPageController::class, 'index']);
-    $r->get('/admin/dashboard', [AdminPageController::class, 'index']);
+    $r->get('/admin', [CmsController::class, 'index']);
+    $r->get('/admin/dashboard', [CmsController::class, 'index']);
 
-    $r->get('/admin/dashboard/{page_id:\d+}/delete', [AdminPageController::class, 'deletePage']);
-
-
-    $r->get('/admin/pages/createPage', [AdminPageController::class, 'createPageForm']);
-    $r->post('/admin/pages/create', [AdminPageController::class, 'createPage']);
-
-    $r->get('/admin/pages/{page_id:\d+}/editForm', [AdminPageController::class, 'editPageForm']);
-    $r->post('/admin/pages/{page_id:\d+}/edit', [AdminPageController::class, 'editPage']);
-
-    $r->get('/admin/pages/viewPage', [AdminPageController::class, 'viewPages']);
+    $r->get('/admin/dashboard/{page_id:\d+}/delete', [CmsController::class, 'deletePage']);
 
 
-    $r->get('/admin/pageSection/{page_id:\d+}/pageSectionForm', [AdminPageController::class, 'pageSectionForm']);
-    $r->post('/admin/pageSection/{page_id:\d+}/createPage', [AdminPageController::class, 'createPageSection']);
-    $r->get('/admin/pageSection/render-fields', [AdminPageController::class, 'renderSectionForm']);
+    $r->get('/admin/pages/createPage', [CmsController::class, 'createPageForm']);
+    $r->post('/admin/pages/create', [CmsController::class, 'createPage']);
 
-    $r->get('/admin/pageSection/{page_id:\d+}/editSectionForm', [AdminPageController::class, 'editSectionForm']);
-    $r->post('/admin/pageSection/{section_id:\d+}/editSection', [AdminPageController::class, 'editSection']);
+    $r->get('/admin/pages/{page_id:\d+}/editForm', [CmsController::class, 'editPageForm']);
+    $r->post('/admin/pages/{page_id:\d+}/edit', [CmsController::class, 'editPage']);
 
-    $r->get('/admin/pageSection/{page_id:\d+}/viewPageSections', [AdminPageController::class, 'viewPageSections']);
-    $r->get('/admin/pageSection/editPage', [AdminPageController::class, 'updatePageSection']);
-    $r->get('/admin/pageSection/{section_id:\d+}/deleteSection', [AdminPageController::class, 'deleteSection']);
+    $r->get('/admin/pages/viewPage', [CmsController::class, 'viewPages']);
 
 
-    $r->get('/admin/users', [AdminPageController::class, 'manageUsersPage']);
+    $r->get('/admin/pageSection/{page_id:\d+}/pageSectionForm', [CmsController::class, 'pageSectionForm']);
+    $r->post('/admin/pageSection/{page_id:\d+}/createPage', [CmsController::class, 'createPageSection']);
+    $r->get('/admin/pageSection/render-fields', [CmsController::class, 'renderSectionForm']);
 
-    $r->get('/admin/events/{event_id:\d+}', [AdminPageController::class, 'viewEventPage']);
-    $r->get('/admin/events/{event_id:\d+}/delete', [AdminPageController::class, 'deleteEventPage']);
-    $r->get('/admin/events/{event_id:\d+}/edit', [AdminPageController::class, 'updateEventPage']);
+    $r->get('/admin/pageSection/{page_id:\d+}/editSectionForm', [CmsController::class, 'editSectionForm']);
+    $r->post('/admin/pageSection/{section_id:\d+}/editSection', [CmsController::class, 'editSection']);
+
+    $r->get('/admin/pageSection/{page_id:\d+}/viewPageSections', [CmsController::class, 'viewPageSections']);
+    $r->get('/admin/pageSection/editPage', [CmsController::class, 'updatePageSection']);
+    $r->get('/admin/pageSection/{section_id:\d+}/deleteSection', [CmsController::class, 'deleteSection']);
 
 
-    $r->post('/admin/media/upload', [AdminPageController::class, 'uploadImage']);
+    $r->get('/admin/users', [CmsController::class, 'manageUsersPage']);
+
+    $r->get('/admin/events/{event_id:\d+}', [CmsController::class, 'viewEventPage']);
+    $r->get('/admin/events/{event_id:\d+}/delete', [CmsController::class, 'deleteEventPage']);
+    $r->get('/admin/events/{event_id:\d+}/edit', [CmsController::class, 'updateEventPage']);
+
+
+    $r->post('/admin/media/upload', [CmsController::class, 'uploadImage']);
 
 
     $r->get('/registerForm', [AuthController::class, 'showRegisterForm']);
@@ -172,9 +172,19 @@ function createImageService(): App\Services\ImageService
     return new App\Services\ImageService(new App\Repositories\ImageRepository());
 }
 
-function createPageService(): App\Services\AdminPageService
+function createMailer(): App\Services\IMailer
 {
-    return new App\Services\AdminPageService(new App\Repositories\AdminPageRepository());
+    return new App\Services\Mailer();
+}
+
+function createAccountEmailService(): App\Services\IAccountEmailService
+{
+    return new App\Services\AccountEmailService(createMailer());
+}
+
+function createPageService(): App\Services\CmsService
+{
+    return new App\Services\CmsService(new App\Repositories\CmsRepository());
 }
 
 function createSectionService(): App\Services\PageSectionService
@@ -188,6 +198,16 @@ function createSectionService(): App\Services\PageSectionService
 function createController(string $controllerClass)
 {
 
+    $pageRepo = new App\Repositories\CmsRepository();
+    $pageService = new App\Services\CmsService($pageRepo);
+
+    $imageRepo = new App\Repositories\ImageRepository();
+    $imageService = new App\Services\ImageService($imageRepo);
+
+    $sectionRepo = new App\Repositories\PageSectionRepository();
+    $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
+
+
     switch ($controllerClass) {
 
         case App\Controllers\HomeController::class:
@@ -200,19 +220,24 @@ function createController(string $controllerClass)
                 createPageService(),
                 createSectionService(),
                 new App\Services\ProgramService(),
-                new App\Services\ReservationEmailService(),
+                new App\Services\ReservationEmailService(createMailer()),
                 createYummyReservationCatalogService()
             );
 
 
         case App\Controllers\HistoryController::class:
 
-            return new App\Controllers\HistoryController(
-                createSectionService(),
-                createPageService(),
-                new App\Services\ProgramService(),
-                createHistoryBookingCatalogService()
-            );
+            $pageRepo = new App\Repositories\CmsRepository();
+            $pageService = new App\Services\CmsService($pageRepo);
+
+            $imageRepo = new App\Repositories\ImageRepository();
+            $imageService = new App\Services\ImageService($imageRepo);
+
+            $sectionRepo = new App\Repositories\PageSectionRepository();
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
+            $programService = new App\Services\ProgramService();
+
+            return new App\Controllers\HistoryController($sectionService, $pageService, $programService, createHistoryBookingCatalogService());
 
 
         case App\Controllers\AuthController::class:
@@ -220,7 +245,7 @@ function createController(string $controllerClass)
             $repo = new App\Repositories\UserRepository();
             $service = new App\Services\UserService($repo);
 
-            return new App\Controllers\AuthController($service);
+            return new App\Controllers\AuthController($service, createAccountEmailService());
 
 
         case App\Controllers\ShopController::class:
@@ -244,19 +269,23 @@ function createController(string $controllerClass)
             );
 
 
-        case App\Controllers\StoriesController::class:
+        case App\Controllers\CmsController::class:
 
-            return new App\Controllers\StoriesController(createStoriesService());
-
-
-        case App\Controllers\AdminPageController::class:
+            $pageRepo = new App\Repositories\CmsRepository();
+            $pageService = new App\Services\CmsService($pageRepo);
 
             $userRepo = new App\Repositories\UserRepository();
             $userService = new App\Services\UserService($userRepo);
 
-            return new App\Controllers\AdminPageController(
-                createPageService(),
-                createSectionService(),
+            $imageRepo = new App\Repositories\ImageRepository();
+            $imageService = new App\Services\ImageService($imageRepo);
+
+            $sectionRepo = new App\Repositories\PageSectionRepository();
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
+
+            return new App\Controllers\CmsController(
+                $pageService,
+                $sectionService,
                 $userService,
                 createImageService()
             );

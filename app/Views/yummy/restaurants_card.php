@@ -109,7 +109,7 @@
                 <section class="card-body">
                     <h3 class="card-title"><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h3>
                     <?php if ($introduction !== ''): ?>
-                        <p class="card-excerpt"><?= $introduction ?></p>
+                        <p class="card-excerpt"><?= \App\Support\Html::clean($introduction ?? '') ?></p>
                     <?php endif; ?>
 
                     <?php if ($cuisines !== []): ?>

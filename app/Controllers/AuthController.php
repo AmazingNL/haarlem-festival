@@ -7,16 +7,19 @@ namespace App\Controllers;
 use App\Core\BaseController;
 use App\Models\Enum\UserRole;
 use App\Models\User;
+use App\Services\IAccountEmailService;
 use App\Services\IUserService;
 use App\Support\SessionUser;
 
 final class AuthController extends BaseController
 {
     private IUserService $userService;
+    private IAccountEmailService $accountEmailService;
 
-    public function __construct(IUserService $userService)
+    public function __construct(IUserService $userService, IAccountEmailService $accountEmailService)
     {
         $this->userService = $userService;
+        $this->accountEmailService = $accountEmailService;
     }
 
     public function showRegisterForm(): void
@@ -55,6 +58,7 @@ final class AuthController extends BaseController
             }
 
             $this->userService->registerUser($user, $password);
+            $this->sendWelcomeEmail($user);
             $this->startUserSession($user, trim((string) $this->input('next', '')));
         } catch (\Throwable $e) {
             $this->setErrorMessage('Could not create your account right now.');
@@ -196,5 +200,18 @@ final class AuthController extends BaseController
     {
         $phone = trim((string) ($_POST['phone'] ?? ''));
         return $phone === '' ? null : $phone;
+    }
+
+    /**
+     * Send the welcome email as a best-effort side effect: a mail failure must
+     * never roll back an account that was already created successfully.
+     */
+    private function sendWelcomeEmail(User $user): void
+    {
+        try {
+            $this->accountEmailService->sendWelcome($user);
+        } catch (\Throwable $e) {
+            error_log('Welcome email failed for ' . $user->email . ': ' . $e->getMessage());
+        }
     }
 }

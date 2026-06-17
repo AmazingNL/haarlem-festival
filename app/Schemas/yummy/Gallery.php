@@ -10,16 +10,14 @@ final class Gallery extends BaseSection
     public string $images = '';
 
     public function __construct(
-        int $pageId = 0,
-        int $sectionId = 0,
+
         string $customClass = '',
         int $sortOrder = 0,
         string $title = '',
         string $images = ''
     ) {
             parent::__construct(
-        $pageId,
-        $sectionId,
+
         'gallery',
         $customClass,
         $sortOrder

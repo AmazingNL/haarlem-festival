@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\IAdminPageService;
+use App\Services\ICmsService;
 use App\Services\IPageSectionService;
 
 final class HomeController extends BaseController
 {
     private IPageSectionService $pageSectionService;
-    private IAdminPageService $adminPageService;
+    private ICmsService $adminPageService;
 
-    public function __construct(IPageSectionService $pageSectionService, IAdminPageService $adminPageService)
+    public function __construct(IPageSectionService $pageSectionService, ICmsService $adminPageService)
     {
         $this->pageSectionService = $pageSectionService;
         $this->adminPageService = $adminPageService;
