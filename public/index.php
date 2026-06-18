@@ -407,7 +407,7 @@ function createHistoryBookingService(): App\Services\Implementations\Booking\His
 
 function createRestaurantBookingService(): App\Services\Implementations\Booking\RestaurantBookingService
 {
-    return new App\Services\Implementations\Booking\RestaurantBookingService(createPageService(), createSectionService());
+    return new App\Services\Implementations\Booking\RestaurantBookingService(createPageService(), createSectionService(), createReservationService());
 }
 
 function createReservationService(): App\Services\Implementations\Booking\ReservationService
@@ -429,10 +429,11 @@ function createRestaurantAvailabilityService(): App\Services\Implementations\Boo
 function createCheckoutValidationService(): App\Services\Implementations\Booking\CheckoutValidationService
 {
     return new App\Services\Implementations\Booking\CheckoutValidationService(
-        createEventBookingService(),
-        createHistoryBookingService(),
-        createRestaurantBookingService(),
-        createReservationService()
+        [
+            createEventBookingService(),
+            createHistoryBookingService(),
+            createRestaurantBookingService(),
+        ]
     );
 }
 

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services\Implementations\Booking;
 
+use App\Services\Interfaces\IBookingStrategy;
 use App\Services\Interfaces\ICmsService;
 use App\Services\Interfaces\IPageSectionService;
 
-final class HistoryBookingService
+final class HistoryBookingService implements IBookingStrategy
 {
     private ICmsService $adminPageService;
     private IPageSectionService $pageSectionService;
@@ -16,6 +17,11 @@ final class HistoryBookingService
     {
         $this->adminPageService = $adminPageService;
         $this->pageSectionService = $pageSectionService;
+    }
+
+    public function handledType(): string
+    {
+        return 'history-book-tour';
     }
 
     public function buildProgramItem(

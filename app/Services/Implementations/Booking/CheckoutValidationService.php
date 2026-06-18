@@ -4,28 +4,23 @@ declare(strict_types=1);
 
 namespace App\Services\Implementations\Booking;
 
-use App\Services\Implementations\Booking\EventBookingService;
-use App\Services\Implementations\Booking\HistoryBookingService;
-use App\Services\Implementations\Booking\RestaurantBookingService;
+use App\Services\Interfaces\IBookingStrategy;
 
 final class CheckoutValidationService
 {
-    private EventBookingService $eventBookingService;
-    private HistoryBookingService $historyBookingService;
-    private RestaurantBookingService $restaurantBookingService;
-    private ReservationService $reservationService;
+    private const DEFAULT_TYPE = 'history-book-tour';
 
-    public function __construct(
-        EventBookingService $eventBookingService,
-        HistoryBookingService $historyBookingService,
-        RestaurantBookingService $restaurantBookingService,
-        ReservationService $reservationService
-    )
+    /** @var array<string, IBookingStrategy> indexed by handledType() */
+    private array $strategies = [];
+
+    /**
+     * @param iterable<IBookingStrategy> $strategies one per My-Program item type
+     */
+    public function __construct(iterable $strategies)
     {
-        $this->eventBookingService = $eventBookingService;
-        $this->historyBookingService = $historyBookingService;
-        $this->restaurantBookingService = $restaurantBookingService;
-        $this->reservationService = $reservationService;
+        foreach ($strategies as $strategy) {
+            $this->strategies[$strategy->handledType()] = $strategy;
+        }
     }
 
     /** @param list<array<string, mixed>> $items */
@@ -41,29 +36,19 @@ final class CheckoutValidationService
                 continue;
             }
 
-            $type = trim((string) ($item['type'] ?? 'history-book-tour'));
+            $type = trim((string) ($item['type'] ?? self::DEFAULT_TYPE));
             if ($type === '') {
-                $type = 'history-book-tour';
+                $type = self::DEFAULT_TYPE;
             }
 
-            $validated = match ($type) {
-                'event-ticket' => $this->eventBookingService->validateProgramItem($item),
-                'yummy-reservation' => $this->restaurantBookingService->validateProgramItem($item),
-                'history-book-tour' => $this->historyBookingService->validateProgramItem($item),
-                default => throw new \InvalidArgumentException('An item in My Program is not supported for checkout.'),
-            };
-
-            // Enforce restaurant capacity for reservations before payment is taken.
-            if ($type === 'yummy-reservation') {
-                $this->reservationService->assertCapacityAvailable(
-                    (string) ($validated['page_slug'] ?? ''),
-                    (string) ($validated['day'] ?? ''),
-                    (string) ($validated['time'] ?? ''),
-                    (int) ($validated['adult_count'] ?? 0) + (int) ($validated['child_count'] ?? 0)
-                );
+            $strategy = $this->strategies[$type] ?? null;
+            if ($strategy === null) {
+                throw new \InvalidArgumentException('An item in My Program is not supported for checkout.');
             }
 
-            $normalized[] = $this->ensureItemId($validated);
+            // Each strategy re-validates its own item type (and enforces its own
+            // rules, e.g. restaurant capacity) — the loop stays type-agnostic.
+            $normalized[] = $this->ensureItemId($strategy->validateProgramItem($item));
         }
 
         if ($normalized === []) {

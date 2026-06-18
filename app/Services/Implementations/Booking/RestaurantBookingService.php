@@ -4,20 +4,31 @@ declare(strict_types=1);
 
 namespace App\Services\Implementations\Booking;
 
+use App\Services\Interfaces\IBookingStrategy;
 use App\Services\Interfaces\ICmsService;
 use App\Services\Interfaces\IPageSectionService;
 
-final class RestaurantBookingService
+final class RestaurantBookingService implements IBookingStrategy
 {
     private const ALLOWED_SLUGS = ['ratatouille', 'bistro-toujours'];
 
     private ICmsService $adminPageService;
     private IPageSectionService $pageSectionService;
+    private ReservationService $reservationService;
 
-    public function __construct(ICmsService $adminPageService, IPageSectionService $pageSectionService)
-    {
+    public function __construct(
+        ICmsService $adminPageService,
+        IPageSectionService $pageSectionService,
+        ReservationService $reservationService
+    ) {
         $this->adminPageService = $adminPageService;
         $this->pageSectionService = $pageSectionService;
+        $this->reservationService = $reservationService;
+    }
+
+    public function handledType(): string
+    {
+        return 'yummy-reservation';
     }
 
     public function buildProgramItem(
@@ -126,6 +137,14 @@ final class RestaurantBookingService
         );
 
         $built['id'] = trim((string) ($item['id'] ?? ''));
+
+        // Enforce restaurant capacity at checkout before payment is taken.
+        $this->reservationService->assertCapacityAvailable(
+            (string) ($built['page_slug'] ?? ''),
+            (string) ($built['day'] ?? ''),
+            (string) ($built['time'] ?? ''),
+            (int) ($built['adult_count'] ?? 0) + (int) ($built['child_count'] ?? 0)
+        );
 
         return $built;
     }
