@@ -8,6 +8,7 @@ $infoText       = (string) ($s['info_text']      ?? '');
 $showTitle      = (string) ($s['show_title']     ?? '');
 $showDesc       = (string) ($s['show_description'] ?? '');
 $price          = (string) ($s['price']          ?? '');
+$priceRaw       = (string) ($s['price_raw']      ?? '0');
 $date           = (string) ($s['date']           ?? '');
 $time           = (string) ($s['time']           ?? '');
 $spotsAvail     = (string) ($s['spots_available'] ?? '');
@@ -19,7 +20,7 @@ $spotsLabel = ($spotsAvail !== '' && $spotsTotal !== '')
     : ($spotsAvail !== '' ? $he($spotsAvail) . ' spots left' : '—');
 ?>
 
-<section class="sbc-section">
+<section class="sbc-section" id="sd-booking">
     <div class="sbc-inner">
 
         <?php if ($title !== ''): ?>
@@ -46,9 +47,18 @@ $spotsLabel = ($spotsAvail !== '' && $spotsTotal !== '')
                         <p class="sbc-card-desc"><?= $he($showDesc) ?></p>
                     <?php endif; ?>
                 </div>
-                <?php if ($price !== ''): ?>
-                    <span class="sbc-price-badge"><?= $he($price) ?></span>
-                <?php endif; ?>
+                <div class="sbc-card-header-right">
+                    <?php if ($price !== ''): ?>
+                        <span class="sbc-price-badge"><?= $he($price) ?></span>
+                    <?php endif; ?>
+                    <?php if (empty($isDetailPage)): ?>
+                        <?php
+                        $detailSlug = (string) ($s['slug'] ?? '');
+                        $detailHref = $detailSlug !== '' ? '/stories/' . $he($detailSlug) : '/stories/' . $sectionId;
+                        ?>
+                        <a href="<?= $detailHref ?>" class="sbc-detail-link">View Full Story</a>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <div class="sbc-details">
@@ -89,15 +99,16 @@ $spotsLabel = ($spotsAvail !== '' && $spotsTotal !== '')
                 </div>
 
                 <form class="sbc-booking-form" method="post" action="/stories/add-to-program">
-                    <input type="hidden" name="_csrf"   value="<?= $he((string) ($csrf ?? '')) ?>">
-                    <input type="hidden" name="show_id" value="<?= $he((string) $sectionId) ?>">
+                    <input type="hidden" name="_csrf"      value="<?= $he((string) ($csrf ?? '')) ?>">
+                    <input type="hidden" name="show_id"    value="<?= $he((string) $sectionId) ?>">
+                    <input type="hidden" name="price_raw"  value="<?= $he($priceRaw) ?>">
 
                     <div class="sbc-stepper" role="group" aria-label="Quantity">
-                        <button type="button" class="sbc-stepper-btn" aria-label="Decrease quantity">−</button>
-                        <input  type="number" class="sbc-stepper-count"
+                        <button type="button" class="sbc-stepper-btn" id="sbc-minus-<?= $sectionId ?>" aria-label="Decrease quantity">−</button>
+                        <input  type="number" class="sbc-stepper-count" id="sbc-qty-<?= $sectionId ?>"
                                 name="quantity" value="1" min="1" max="20"
                                 readonly aria-live="polite">
-                        <button type="button" class="sbc-stepper-btn" aria-label="Increase quantity">+</button>
+                        <button type="button" class="sbc-stepper-btn" id="sbc-plus-<?= $sectionId ?>" aria-label="Increase quantity">+</button>
                     </div>
 
                     <button type="submit" class="sbc-add-btn">ADD TO PROGRAM</button>

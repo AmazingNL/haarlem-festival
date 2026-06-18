@@ -1,34 +1,38 @@
 <?php
-$bgStyle = '';
-if (!empty($s['image_path'])) {
-    $bg = htmlspecialchars((string) $s['image_path'], ENT_QUOTES, 'UTF-8');
-    $bgStyle = 'style="background-image: url(\'' . $bg . '\');"';
-}
+$he    = static fn(string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
+$bg    = !empty($s['image_path']) ? 'style="background-image: url(\'' . $he((string) $s['image_path']) . '\');"' : '';
+$title = (string) ($s['title']        ?? '');
+$btn   = (string) ($s['button_text']  ?? '');
+$link  = (string) ($s['button_link']  ?? '');
+$week  = (string) ($s['date_week']    ?? '');
+$range = (string) ($s['date_range']   ?? '');
+$days  = (string) ($s['date_days']    ?? '');
 ?>
-<section class="sh-banner" <?= $bgStyle ?>>
+<section class="sh-banner" <?= $bg ?>>
     <div class="sh-banner-inner">
-        <?php if (!empty($s['title'])):
-            $title    = (string) $s['title'];
-            $spacePos = strpos($title, ' ');
-            $first    = $spacePos !== false ? substr($title, 0, $spacePos) : $title;
-            $rest     = $spacePos !== false ? trim(substr($title, $spacePos)) : '';
-        ?>
-            <h1 class="sh-banner-title">
-                <span class="sh-title--accent"><?= htmlspecialchars($first, ENT_QUOTES, 'UTF-8') ?></span>
-                <?php if ($rest !== ''): ?>
-                    <span class="sh-title--main"><?= htmlspecialchars($rest, ENT_QUOTES, 'UTF-8') ?></span>
+        <div class="sh-banner-bottom">
+            <div class="sh-banner-left">
+                <?php if ($title !== ''): ?>
+                    <h1 class="sh-banner-title"><?= $he($title) ?></h1>
                 <?php endif; ?>
-            </h1>
-        <?php endif; ?>
+                <?php if ($btn !== '' && $link !== ''): ?>
+                    <a class="sh-banner-btn" href="<?= $he($link) ?>"><?= $he($btn) ?></a>
+                <?php endif; ?>
+            </div>
 
-        <?php if (!empty($s['content'])): ?>
-            <div class="sh-banner-content"><?= \App\Support\Html::clean($s['content'] ?? '') ?></div>
-        <?php endif; ?>
-
-        <?php if (!empty($s['button_text']) && !empty($s['button_link'])): ?>
-            <a class="sh-banner-btn" href="<?= htmlspecialchars((string) $s['button_link'], ENT_QUOTES, 'UTF-8') ?>">
-                <?= htmlspecialchars((string) $s['button_text'], ENT_QUOTES, 'UTF-8') ?> ›
-            </a>
-        <?php endif; ?>
+            <?php if ($week !== '' || $range !== ''): ?>
+                <div class="sh-date-box">
+                    <?php if ($week !== ''): ?>
+                        <span class="sh-date-label"><?= $he($week) ?></span>
+                    <?php endif; ?>
+                    <?php if ($range !== ''): ?>
+                        <span class="sh-date-value"><?= $he($range) ?></span>
+                    <?php endif; ?>
+                    <?php if ($days !== ''): ?>
+                        <span class="sh-date-sub"><?= $he($days) ?></span>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
 </section>

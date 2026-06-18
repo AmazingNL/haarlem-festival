@@ -118,6 +118,11 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/stories', [StoriesController::class, 'index']);
     $r->post('/stories/add-to-program', [StoriesController::class, 'addShowToProgram']);
+    // Payments
+    $r->get('/payments/checkout/{order_id:\d+}', [PaymentController::class, 'checkoutPage']);
+    $r->post('/payments/create-session', [PaymentController::class, 'createCheckoutSession']);
+    $r->post('/webhook/stripe', [PaymentController::class, 'webhook']);
+    $r->get('/stories/{slug}', [StoriesController::class, 'detail']);
     $r->get('/history', [HistoryController::class, 'index']);
     $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
     $r->post('/history/book-tour/add-to-program', [HistoryController::class, 'addTourToProgram']);
@@ -354,9 +359,23 @@ function createController(string $controllerClass)
                 createAdminDanceAvailabilityService()
             );
 
+        case App\Controllers\StoriesController::class:
+
+            return new App\Controllers\StoriesController(createStoriesService());
+
+
         default:
             return new $controllerClass();
     }
+}
+
+function createStoriesService(): App\Services\Implementations\StoriesService
+{
+    return new App\Services\Implementations\StoriesService(
+        createPageService(),
+        createSectionService(),
+        new App\Repositories\StoriesRepository()
+    );
 }
 
 function createOrderService(): App\Services\Implementations\OrderService
@@ -379,15 +398,6 @@ function createEventCatalogService(): App\Services\Implementations\Catalog\Event
 function createEventBookingService(): App\Services\Implementations\Booking\EventBookingService
 {
     return new App\Services\Implementations\Booking\EventBookingService(new App\Repositories\EventCatalogRepository());
-}
-
-function createStoriesService(): App\Services\Implementations\StoriesService
-{
-    return new App\Services\Implementations\StoriesService(
-        createPageService(),
-        createSectionService(),
-        new App\Repositories\StoriesRepository()
-    );
 }
 
 function createHistoryBookingService(): App\Services\Implementations\Booking\HistoryBookingService

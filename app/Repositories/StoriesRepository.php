@@ -43,6 +43,27 @@ final class StoriesRepository extends BaseRepository implements IStoriesReposito
     }
 
     /**
+     * Fetch a published stories_booking section row by the slug stored in its JSON content.
+     *
+     * @param  string     $slug The slug value inside the JSON content column.
+     * @return array|null       Merged row data, or null if not found / not published.
+     * @throws \RuntimeException On PDO failure.
+     */
+    public function getShowBySlug(string $slug): ?array
+    {
+        try {
+            $stmt = $this->getConnection()->prepare(
+                'SELECT * FROM ' . self::TABLE . ' WHERE JSON_UNQUOTE(JSON_EXTRACT(content, \'$.slug\')) = ? AND section_type = ? AND is_published = 1 LIMIT 1'
+            );
+            $stmt->execute([$slug, 'stories_booking']);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            return $row !== false ? $this->mergeJsonContent($row) : null;
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to retrieve show by slug. ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Decode and merge the JSON content column into the row array.
      *
      * @param  array $row Raw PDO row.
