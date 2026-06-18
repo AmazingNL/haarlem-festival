@@ -336,12 +336,21 @@ function createYummyReservationCatalogService(): App\Services\YummyReservationCa
     return new App\Services\YummyReservationCatalogService(createPageService(), createSectionService());
 }
 
+function createReservationService(): App\Services\ReservationService
+{
+    return new App\Services\ReservationService(
+        new App\Repositories\RestaurantRepository(),
+        new App\Repositories\ReservationRepository()
+    );
+}
+
 function createCheckoutValidationService(): App\Services\CheckoutValidationService
 {
     return new App\Services\CheckoutValidationService(
         createEventCatalogService(),
         createHistoryBookingCatalogService(),
-        createYummyReservationCatalogService()
+        createYummyReservationCatalogService(),
+        createReservationService()
     );
 }
 
