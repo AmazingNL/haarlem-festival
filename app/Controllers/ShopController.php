@@ -6,12 +6,12 @@ namespace App\Controllers;
 
 use App\Core\BaseController;
 use App\Repositories\PendingCheckoutRepository;
-use App\Services\CheckoutValidationService;
-use App\Services\InvoiceService;
-use App\Services\OrderEmailService;
-use App\Services\OrderService;
-use App\Services\ProgramService;
-use App\Services\StripePaymentService;
+use App\Services\Implementations\Booking\CheckoutValidationService;
+use App\Services\Implementations\InvoiceService;
+use App\Services\Implementations\OrderEmailService;
+use App\Services\Implementations\OrderService;
+use App\Services\Implementations\ProgramService;
+use App\Services\Implementations\StripePaymentService;
 use App\Support\PaymentProvider;
 use App\Support\SessionUser;
 use Stripe\Exception\ApiErrorException;

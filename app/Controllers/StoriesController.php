@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\IStoriesService;
+use App\Services\Interfaces\IStoriesService;
 
 /**
  * HTTP controller for the stories feature.

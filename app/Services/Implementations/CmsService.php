@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Implementations;
+
+use App\Services\Interfaces\ICmsService;
 
 use App\DTO\PageData;
 use App\Models\Page;

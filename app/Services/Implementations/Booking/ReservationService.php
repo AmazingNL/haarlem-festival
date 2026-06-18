@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Implementations\Booking;
 
 use App\Repositories\IRestaurantRepository;
 use App\Repositories\IReservationRepository;

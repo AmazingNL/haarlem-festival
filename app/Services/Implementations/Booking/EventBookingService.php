@@ -2,62 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Implementations\Booking;
 
+use App\Models\ProgramItem;
 use App\Repositories\EventCatalogRepository;
 
-final class EventCatalogService
+final class EventBookingService
 {
-    private EventCatalogRepository $eventCatalogRepository;
-
-    // Inject the repository that loads event and ticket data from the database.
-    public function __construct(EventCatalogRepository $eventCatalogRepository)
+    public function __construct(private EventCatalogRepository $eventCatalogRepository)
     {
-        $this->eventCatalogRepository = $eventCatalogRepository;
-    }
-
-    // Group published event rows into event cards with their available ticket types.
-    public function getPublishedEvents(string $tag = ''): array
-    {
-        $events = [];
-
-        foreach ($this->eventCatalogRepository->findPublishedEvents($tag) as $row) {
-            $eventId = (int) ($row['event_id'] ?? 0);
-            if ($eventId <= 0) {
-                continue;
-            }
-
-            if (!isset($events[$eventId])) {
-                $events[$eventId] = [
-                    'event_id' => $eventId,
-                    'title' => trim((string) ($row['title'] ?? 'Festival Event')),
-                    'slug' => trim((string) ($row['slug'] ?? '')),
-                    'description' => trim((string) ($row['description'] ?? '')),
-                    'start_datetime' => trim((string) ($row['start_datetime'] ?? '')),
-                    'end_datetime' => trim((string) ($row['end_datetime'] ?? '')),
-                    'location_name' => trim((string) ($row['location_name'] ?? 'Haarlem')),
-                    'location_address' => trim((string) ($row['location_address'] ?? '')),
-                    'location_city' => trim((string) ($row['location_city'] ?? 'Haarlem')),
-                    'image_path' => trim((string) ($row['image_path'] ?? '')),
-                    'category_label' => $this->categoryLabel($row),
-                    'ticket_types' => [],
-                ];
-            }
-
-            $ticketTypeId = (int) ($row['ticket_type_id'] ?? 0);
-            if ($ticketTypeId <= 0) {
-                continue;
-            }
-
-            $events[$eventId]['ticket_types'][] = [
-                'ticket_type_id' => $ticketTypeId,
-                'name' => trim((string) ($row['ticket_type_name'] ?? 'Ticket')),
-                'price' => round((float) ($row['ticket_price'] ?? 0), 2),
-                'max_quantity' => max(0, (int) ($row['max_quantity'] ?? 0)),
-            ];
-        }
-
-        return array_values($events);
     }
 
     public function buildProgramItem(int $eventId, int $ticketTypeId, int $requestedQuantity): array
@@ -81,7 +34,7 @@ final class EventCatalogService
         $startDateTime = (string) ($ticketSelection['start_datetime'] ?? '');
         $endDateTime = (string) ($ticketSelection['end_datetime'] ?? '');
 
-        return [
+        $item = [
             'type' => 'event-ticket',
             'event_id' => (int) ($ticketSelection['event_id'] ?? 0),
             'ticket_type_id' => (int) ($ticketSelection['ticket_type_id'] ?? 0),
@@ -100,6 +53,8 @@ final class EventCatalogService
             'starts_at' => $startDateTime,
             'ends_at' => $endDateTime,
         ];
+
+        return ProgramItem::fromArray($item)->toArray();
     }
 
     public function validateProgramItem(array $item): array
@@ -116,8 +71,7 @@ final class EventCatalogService
         return $built;
     }
 
-    // Return one ticket type only if it is still bookable for the selected event.
-    public function getBookableTicketType(int $eventId, int $ticketTypeId): ?array
+    private function getBookableTicketType(int $eventId, int $ticketTypeId): ?array
     {
         $row = $this->eventCatalogRepository->findBookableTicketType($eventId, $ticketTypeId);
         if ($row === null) {
@@ -142,13 +96,13 @@ final class EventCatalogService
         ];
     }
 
-    // Infer a simple category label from the event content for display in the UI.
     private function categoryLabel(array $row): string
     {
         $haystack = strtolower(implode(' ', [
             (string) ($row['title'] ?? ''),
             (string) ($row['slug'] ?? ''),
             (string) ($row['description'] ?? ''),
+            (string) ($row['event_type'] ?? ''),
         ]));
 
         if (str_contains($haystack, 'jazz')) {

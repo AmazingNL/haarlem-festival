@@ -17,4 +17,7 @@ interface IReservationRepository
 
     /** Total guests (adults + children) already booked for a restaurant date/session (excluding cancelled). */
     public function countGuestsForSlot(int $restaurantId, string $date, string $session): int;
+
+    /** Guests booked in the busiest single date/session slot for a restaurant (excluding cancelled). */
+    public function BookedGuestsForRestaurant(int $restaurantId): int;
 }

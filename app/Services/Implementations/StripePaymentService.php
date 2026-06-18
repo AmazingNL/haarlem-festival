@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Implementations;
 
 use App\Support\PaymentProvider;
 use App\Support\StripeConfig;

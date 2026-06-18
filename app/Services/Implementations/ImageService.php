@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
-namespace App\Services;
+namespace App\Services\Implementations;
 
 use App\Models\Image;
 use App\Repositories\IImageRepository;
+use App\Services\Interfaces\IImageService;
 use DateTime;
 use Exception;
 use Throwable;

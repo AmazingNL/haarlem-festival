@@ -14,28 +14,28 @@ final class EventCatalogRepository extends BaseRepository
             SELECT
                 e.event_id,
                 e.title,
-                e.slug,
-                e.description,
+                LOWER(REPLACE(e.title, ' ', '-')) AS slug,
+                '' AS description,
+                e.type AS event_type,
                 e.start_datetime,
                 e.end_datetime,
                 l.name AS location_name,
                 l.address AS location_address,
                 l.city AS location_city,
-                i.file_path AS image_path,
+                '' AS image_path,
                 tt.ticket_type_id,
                 tt.name AS ticket_type_name,
                 tt.price AS ticket_price,
                 tt.max_quantity
             FROM event e
             INNER JOIN location l ON l.location_id = e.location_id
-            LEFT JOIN image i ON i.image_id = e.image_id
             LEFT JOIN ticket_type tt ON tt.event_id = e.event_id
-            WHERE e.is_published = 1
+            WHERE 1 = 1
         SQL;
 
         $params = [];
         if ($tag !== '') {
-            $sql .= ' AND (LOWER(e.title) LIKE :tag OR LOWER(e.slug) LIKE :tag OR LOWER(e.description) LIKE :tag)';
+            $sql .= ' AND (LOWER(e.title) LIKE :tag OR LOWER(e.type) LIKE :tag)';
             $params[':tag'] = '%' . strtolower($tag) . '%';
         }
 
@@ -54,8 +54,9 @@ final class EventCatalogRepository extends BaseRepository
                 SELECT
                     e.event_id,
                     e.title,
-                    e.slug,
-                    e.description,
+                    LOWER(REPLACE(e.title, ' ', '-')) AS slug,
+                    '' AS description,
+                    e.type AS event_type,
                     e.start_datetime,
                     e.end_datetime,
                     l.name AS location_name,
@@ -68,8 +69,7 @@ final class EventCatalogRepository extends BaseRepository
                 FROM event e
                 INNER JOIN location l ON l.location_id = e.location_id
                 INNER JOIN ticket_type tt ON tt.event_id = e.event_id
-                WHERE e.is_published = 1
-                  AND e.event_id = :event_id
+                WHERE e.event_id = :event_id
                   AND tt.ticket_type_id = :ticket_type_id
                 LIMIT 1
             SQL

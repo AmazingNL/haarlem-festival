@@ -2,25 +2,29 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Implementations\Booking;
+
+use App\Services\Implementations\Booking\EventBookingService;
+use App\Services\Implementations\Booking\HistoryBookingService;
+use App\Services\Implementations\Booking\RestaurantBookingService;
 
 final class CheckoutValidationService
 {
-    private EventCatalogService $eventCatalogService;
-    private HistoryBookingCatalogService $historyBookingCatalogService;
-    private YummyReservationCatalogService $yummyReservationCatalogService;
+    private EventBookingService $eventBookingService;
+    private HistoryBookingService $historyBookingService;
+    private RestaurantBookingService $restaurantBookingService;
     private ReservationService $reservationService;
 
     public function __construct(
-        EventCatalogService $eventCatalogService,
-        HistoryBookingCatalogService $historyBookingCatalogService,
-        YummyReservationCatalogService $yummyReservationCatalogService,
+        EventBookingService $eventBookingService,
+        HistoryBookingService $historyBookingService,
+        RestaurantBookingService $restaurantBookingService,
         ReservationService $reservationService
     )
     {
-        $this->eventCatalogService = $eventCatalogService;
-        $this->historyBookingCatalogService = $historyBookingCatalogService;
-        $this->yummyReservationCatalogService = $yummyReservationCatalogService;
+        $this->eventBookingService = $eventBookingService;
+        $this->historyBookingService = $historyBookingService;
+        $this->restaurantBookingService = $restaurantBookingService;
         $this->reservationService = $reservationService;
     }
 
@@ -43,9 +47,9 @@ final class CheckoutValidationService
             }
 
             $validated = match ($type) {
-                'event-ticket' => $this->eventCatalogService->validateProgramItem($item),
-                'yummy-reservation' => $this->yummyReservationCatalogService->validateProgramItem($item),
-                'history-book-tour' => $this->historyBookingCatalogService->validateProgramItem($item),
+                'event-ticket' => $this->eventBookingService->validateProgramItem($item),
+                'yummy-reservation' => $this->restaurantBookingService->validateProgramItem($item),
+                'history-book-tour' => $this->historyBookingService->validateProgramItem($item),
                 default => throw new \InvalidArgumentException('An item in My Program is not supported for checkout.'),
             };
 

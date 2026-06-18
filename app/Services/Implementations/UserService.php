@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Implementations;
+
+use App\Services\Interfaces\IUserService;
 
 use App\Models\User;
 use App\Models\Enum\UserRole;

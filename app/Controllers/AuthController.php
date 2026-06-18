@@ -7,8 +7,8 @@ namespace App\Controllers;
 use App\Core\BaseController;
 use App\Models\Enum\UserRole;
 use App\Models\User;
-use App\Services\IAccountEmailService;
-use App\Services\IUserService;
+use App\Services\Interfaces\IAccountEmailService;
+use App\Services\Interfaces\IUserService;
 use App\Support\SessionUser;
 
 final class AuthController extends BaseController

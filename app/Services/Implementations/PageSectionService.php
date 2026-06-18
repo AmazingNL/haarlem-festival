@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Implementations;
+
+use App\Services\Interfaces\IImageService;
+use App\Services\Interfaces\IPageSectionService;
 use App\DTO\SectionInputDTO;
 use App\Models\Enum\SectionType;
 use App\Models\PageSection;

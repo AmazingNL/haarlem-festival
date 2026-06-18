@@ -5,19 +5,18 @@ namespace App\Controllers;
 
 use App\Core\BaseController;
 use App\DTO\PageData;
-use App\DTO\SectionInput;
 use App\DTO\SectionInputDTO;
 use App\Models\Page;
 use App\Models\User;
 use App\Models\Enum\PageStatus;
 use App\Models\Enum\SectionType;
 use App\Models\Enum\UserRole;
-use App\Services\ICmsService;
-use App\Services\IPageSectionService;
-use App\Services\IUserService;
+use App\Services\Interfaces\ICmsService;
+use App\Services\Interfaces\IPageSectionService;
+use App\Services\Interfaces\IUserService;
 use App\Models\PageSection;
 use App\Models\Image;
-use App\Services\IImageService;
+use App\Services\Interfaces\IImageService;
 use App\Schemas\SectionFactory;
 use Exception;
 use Throwable;
@@ -322,7 +321,6 @@ final class CmsController extends BaseController
             $sectionField = $this->pageSectionService->resolveSectionFormFields($sectionType);
             $sectionInput = $this->mapSectionInputDTO($pageId, $sectionField);
 
-            $pageSection = $this->pageSectionService->buildSectionFromDto($sectionInput);
             $updated = $this->pageSectionService->updateSection($pageSection);
             if ($updated === false) {
                 $this->setFlash('error', 'Section not saving');
@@ -337,10 +335,28 @@ final class CmsController extends BaseController
         }
     }
 
+    // private function syncRestaurantCapacity(SectionInputDTO $input): void
+    // {
+    //     if ($input->sectionType !== 'restaurant_card') {
+    //         return;
+    //     }
+
+    //     try {
+    //         $fields = $input->fields;
+    //         $this->restaurantAvailability->syncCapacityFromCard(
+    //             (string) ($fields['button_link'] ?? ''),
+    //             (int) ($fields['capacity'] ?? 0),
+    //             (string) ($fields['title'] ?? '')
+    //         );
+    //     } catch (Throwable $e) {
+    //         error_log('Restaurant capacity sync failed: ' . $e->getMessage());
+    //     }
+    // }
+
     /**
-     * 
+     *
      * @param PageSection $section
-     * 
+     *
      **/
     private function sectionFormData(PageSection $section, string $sectionType, array $sectionField): array
     {

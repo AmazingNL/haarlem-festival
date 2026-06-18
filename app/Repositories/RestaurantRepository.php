@@ -52,6 +52,32 @@ final class RestaurantRepository extends BaseRepository implements IRestaurantRe
         return (int) $this->getConnection()->lastInsertId();
     }
 
+    public function upsertCapacityBySlug(string $slug, int $capacity, string $name): void
+    {
+        $slug = trim($slug);
+        if ($slug === '') {
+            return;
+        }
+        $capacity = max(0, $capacity);
+
+        $update = $this->getConnection()->prepare('UPDATE restaurant SET capacity = :capacity WHERE slug = :slug');
+        $update->execute([':capacity' => $capacity, ':slug' => $slug]);
+        if ($update->rowCount() > 0) {
+            return;
+        }
+
+        // rowCount() is 0 either because no venue exists for this slug, or the capacity
+        // was already equal. Only insert when the row is genuinely missing.
+        $exists = $this->getConnection()->prepare('SELECT 1 FROM restaurant WHERE slug = :slug LIMIT 1');
+        $exists->execute([':slug' => $slug]);
+        if ($exists->fetchColumn() !== false) {
+            return;
+        }
+
+        $insert = $this->getConnection()->prepare('INSERT INTO restaurant (name, slug, capacity) VALUES (:name, :slug, :capacity)');
+        $insert->execute([':name' => $name !== '' ? $name : $slug, ':slug' => $slug, ':capacity' => $capacity]);
+    }
+
     /** @param array<string, mixed> $row */
     private function hydrate(array $row): Restaurant
     {

@@ -72,6 +72,23 @@ final class ReservationRepository extends BaseRepository implements IReservation
         return (int) $stmt->fetchColumn();
     }
 
+    public function BookedGuestsForRestaurant(int $restaurantId): int
+    {
+        $sql = 'SELECT COALESCE(MAX(slot_guests), 0) FROM (
+                    SELECT SUM(adult_count + child_count) AS slot_guests
+                    FROM reservation
+                    WHERE restaurant_id = :rid AND status <> :cancelled
+                    GROUP BY reservation_date, session
+                ) slots';
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute([
+            ':rid' => $restaurantId,
+            ':cancelled' => ReservationStatus::cancelled->value,
+        ]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
     /** @param array<string, mixed> $row */
     private function hydrate(array $row): Reservation
     {

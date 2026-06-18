@@ -2,29 +2,33 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Implementations;
+
+use App\Services\Interfaces\IPageSectionService;
+use App\Services\Interfaces\IStoriesService;
+use App\Services\Interfaces\ICmsService;
 
 use App\Repositories\IStoriesRepository;
 
 /**
  * Business logic for the stories feature.
  *
- * Coordinates page-section retrieval (via IAdminPageService + IPageSectionService)
+ * Coordinates page-section retrieval (via ICmsService + IPageSectionService)
  * and show lookups (via IStoriesRepository).
  */
 final class StoriesService implements IStoriesService
 {
-    private IAdminPageService $adminPageService;
+    private ICmsService $adminPageService;
     private IPageSectionService $pageSectionService;
     private IStoriesRepository $storiesRepository;
 
     /**
-     * @param IAdminPageService   $adminPageService   Resolves page by slug.
+     * @param ICmsService         $adminPageService   Resolves page by slug.
      * @param IPageSectionService $pageSectionService Fetches sections by page ID.
      * @param IStoriesRepository  $storiesRepository  Fetches individual show rows.
      */
     public function __construct(
-        IAdminPageService $adminPageService,
+        ICmsService $adminPageService,
         IPageSectionService $pageSectionService,
         IStoriesRepository $storiesRepository
     ) {

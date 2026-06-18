@@ -1,5 +1,5 @@
 <?php
-namespace App\Services;
+namespace App\Services\Interfaces;
 use App\DTO\SectionInputDTO;
 use App\Models\PageSection;
 interface IPageSectionService

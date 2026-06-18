@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Implementations;
+
+use App\Services\Interfaces\IMailer;
+use App\Services\Implementations\InvoiceService;
 
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
