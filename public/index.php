@@ -369,16 +369,16 @@ function createController(string $controllerClass)
     }
 }
 
-function createStoriesService(): App\Services\StoriesService
+function createStoriesService(): App\Services\Implementations\StoriesService
 {
-    return new App\Services\StoriesService(
+    return new App\Services\Implementations\StoriesService(
         createPageService(),
         createSectionService(),
         new App\Repositories\StoriesRepository()
     );
 }
 
-function createOrderService(): App\Services\OrderService
+function createOrderService(): App\Services\Implementations\OrderService
 {
     return new App\Services\Implementations\OrderService(new App\Repositories\OrderRepository());
 }
@@ -393,6 +393,11 @@ function createAdminDanceAvailabilityService(): App\Services\Implementations\Adm
 function createEventCatalogService(): App\Services\Implementations\Catalog\EventCatalogService
 {
     return new App\Services\Implementations\Catalog\EventCatalogService(new App\Repositories\EventCatalogRepository());
+}
+
+function createEventBookingService(): App\Services\Implementations\Booking\EventBookingService
+{
+    return new App\Services\Implementations\Booking\EventBookingService(new App\Repositories\EventCatalogRepository());
 }
 
 function createHistoryBookingService(): App\Services\Implementations\Booking\HistoryBookingService
