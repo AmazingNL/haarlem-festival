@@ -24,6 +24,9 @@ require_once __DIR__ . '/../app/config.php';
 
 $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
+    $r->get('/registerForm', [AuthController::class, 'showRegisterForm']);
+    $r->post('/register', [AuthController::class, 'register']);
+
     $r->get('/admin/register', [AuthController::class, 'showRegisterForm']);
     $r->post('/admin/register', [AuthController::class, 'register']);
 
@@ -37,7 +40,6 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/admin/dashboard', [AdminPageController::class, 'index']);
 
     $r->get('/admin/dashboard/{page_id:\d+}/delete', [AdminPageController::class, 'deletePage']);
-
 
     $r->get('/admin/pages/createPage', [AdminPageController::class, 'createPageForm']);
     $r->post('/admin/pages/create', [AdminPageController::class, 'createPage']);
@@ -70,8 +72,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->post('/admin/media/upload', [AdminPageController::class, 'uploadImage']);
 
 
-    $r->get('/registerForm', [AuthController::class, 'showRegisterForm']);
-    $r->post('/register', [AuthController::class, 'register']);
+
 
     $r->get('/loginForm', [AuthController::class, 'showLoginForm']);
     $r->post('/login', [AuthController::class, 'login']);
@@ -81,7 +82,9 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/', [HomeController::class, 'index']);
     $r->get('/home', [HomeController::class, 'index']);
+    // show events
     $r->get('/events', [EventController::class, 'index']);
+    // Add a selected ticket to the cart
     $r->post('/events/add-to-program', [EventController::class, 'addToProgram']);
     $r->get('/checkout', [ShopController::class, 'checkout']);
     $r->post('/checkout/pay', [ShopController::class, 'pay']);
@@ -91,6 +94,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/orders/{orderId:\d+}/success', [ShopController::class, 'success']);
     $r->get('/yummy', [YummyController::class, 'yummy']);
     $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
+    // add yummy ticket to my program
     $r->post('/yummy/ratatouille/book-reservation', [YummyController::class, 'bookReservation']);
     $r->get('/yummy/bistro-toujours', [YummyController::class, 'bistroToujours']);
     $r->post('/yummy/bistro-toujours/book-reservation', [YummyController::class, 'bookBistroToujoursReservation']);
@@ -99,10 +103,12 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
     $r->get('/history', [HistoryController::class, 'index']);
     $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
+    // add history ticket to my program
     $r->post('/history/book-tour/add-to-program', [HistoryController::class, 'addTourToProgram']);
     $r->get('/history/route-map', [HistoryController::class, 'routeMap']);
     $r->get('/history/st-bavos-church', [HistoryController::class, 'stBavosChurch']);
     $r->get('/history/molen-de-adriaan', [HistoryController::class, 'molenDeAdriaan']);
+    // Desplay programs
     $r->get('/program', [ProgramController::class, 'index']);
     $r->post('/program/remove', [ProgramController::class, 'removeItem']);
 });

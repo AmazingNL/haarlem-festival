@@ -8,6 +8,7 @@ use App\Core\BaseController;
 use App\Models\Enum\UserRole;
 use App\Models\User;
 use App\Services\IUserService;
+use App\Support\AuthRedirect;
 use App\Support\SessionUser;
 
 final class AuthController extends BaseController
@@ -22,11 +23,10 @@ final class AuthController extends BaseController
     public function showRegisterForm(): void
     {
         $this->ensureSession();
-        $next = $this->rememberAuthRedirect();
 
         $this->view('auth/register', [
             'title' => 'Registration',
-            'next' => $next,
+            'next' => AuthRedirect::remember($this->str('next')),
         ], 'auth');
     }
 
@@ -36,27 +36,25 @@ final class AuthController extends BaseController
             $this->verifyCsrf();
             $this->requireFields(['first_name', 'last_name', 'username', 'email', 'password']);
 
-            $email = $this->str('email');
-            $password = $this->str('password');
-            $this->validateRegistrationInput($email, $password);
-
-            $user = new User(
-                $this->str('username'),
-                $email,
-                $password,
+            $user = $this->userService->registerCustomer(
                 $this->str('first_name'),
                 $this->str('last_name'),
-                $this->readPhoneNumber(),
-                UserRole::customer
+                $this->str('username'),
+                $this->str('email'),
+                $this->str('password'),
+                $this->optionalPhone()
             );
 
-            if ($this->userService->userExists($user->email, $user->username)) {
-                $this->abort(409, 'Email or username already exists');
-            }
+            $this->loginUser($user, $this->str('next'));
 
-            $this->userService->registerUser($user, $password);
-            $this->startUserSession($user, trim((string) $this->input('next', '')));
-        } catch (\Throwable $e) {
+        }
+        catch (\InvalidArgumentException $e)
+        {
+            $this->setErrorMessage($e->getMessage());
+            $this->redirect('/registerForm');
+        }
+        catch (\Throwable $e)
+        {
             $this->setErrorMessage('Could not create your account right now.');
             $this->redirect('/registerForm');
         }
@@ -65,12 +63,11 @@ final class AuthController extends BaseController
     public function showLoginForm(): void
     {
         $this->ensureSession();
-        $next = $this->rememberAuthRedirect();
 
         $this->view('auth/login', [
             'title' => 'Login',
             'isAdminLogin' => $this->isAdminRoute(),
-            'next' => $next,
+            'next' => AuthRedirect::remember($this->str('next')),
         ], 'auth');
     }
 
@@ -83,18 +80,14 @@ final class AuthController extends BaseController
             $this->verifyCsrf();
             $this->requireFields(['login', 'password']);
 
-            $user = $this->userService->authenticate(
-                trim($this->str('login')),
-                $this->str('password')
-            );
-
+            $user = $this->userService->authenticate($this->str('login'), $this->str('password'));
             if ($user === null) {
                 $this->setErrorMessage('Invalid email/username or password.');
                 $this->redirect($loginForm);
                 return;
             }
 
-            $this->startUserSession($user, trim((string) $this->input('next', '')));
+            $this->loginUser($user, $this->str('next'));
         } catch (\Throwable $e) {
             $this->setErrorMessage('Something went wrong.');
             $this->redirect($loginForm);
@@ -106,95 +99,35 @@ final class AuthController extends BaseController
         $this->ensureSession();
         $wasAdmin = !empty($_SESSION['admin']);
 
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            session_unset();
-            session_destroy();
-        }
+        session_unset();
+        session_destroy();
 
         $this->redirect($wasAdmin ? '/admin/loginForm' : '/loginForm');
     }
 
-    private function startUserSession(User $user, string $requestedRedirect = ''): void
+    private function loginUser(User $user, string $requestedNext = ''): void
     {
         $this->ensureSession();
         session_regenerate_id(true);
 
         SessionUser::storeInSession($user);
 
-        $roleValue = $user->role instanceof UserRole
-            ? $user->role->value
-            : strtolower((string) $user->role);
-
-        if ($roleValue === UserRole::admin->value) {
+        $role = $user->role instanceof UserRole ? $user->role->value : strtolower((string) $user->role);
+        if ($role === UserRole::admin->value) {
             $_SESSION['admin'] = true;
-            unset($_SESSION['auth_redirect']);
-            $this->redirect('/admin/dashboard');
-            return;
         }
 
-        unset($_SESSION['admin']);
-
-        $redirectTarget = $this->cleanRedirectPath(
-            $requestedRedirect !== '' ? $requestedRedirect : (string) ($_SESSION['auth_redirect'] ?? '')
-        );
-
-        if ($redirectTarget !== '') {
-            unset($_SESSION['auth_redirect']);
-            $this->redirect($redirectTarget);
-            return;
-        }
-
-        if ($roleValue === UserRole::employee->value) {
-            $this->redirect('/employee/dashboard');
-            return;
-        }
-
-        $this->redirect('/');
+        $this->redirect(AuthRedirect::targetAfterLogin($role, $requestedNext));
     }
 
-    private function rememberAuthRedirect(): string
+    private function optionalPhone(): ?string
     {
-        $requested = trim((string) $this->input('next', ''));
-        if ($requested !== '') {
-            $clean = $this->cleanRedirectPath($requested);
-            if ($clean !== '') {
-                $_SESSION['auth_redirect'] = $clean;
-            }
-            return $clean;
-        }
-
-        return $this->cleanRedirectPath((string) ($_SESSION['auth_redirect'] ?? ''));
-    }
-
-    private function cleanRedirectPath(string $path): string
-    {
-        $path = trim($path);
-        if ($path === '' || !str_starts_with($path, '/')) {
-            return '';
-        }
-
-        return str_starts_with($path, '/admin') ? '' : $path;
+        $phone = trim($this->str('phone'));
+        return $phone === '' ? null : $phone;
     }
 
     private function isAdminRoute(): bool
     {
         return str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin');
-    }
-
-    private function validateRegistrationInput(string $email, string $password): void
-    {
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $this->abort(422, 'Invalid email address');
-        }
-
-        if (mb_strlen($password) < 8) {
-            $this->abort(422, 'Password must be at least 8 characters');
-        }
-    }
-
-    private function readPhoneNumber(): ?string
-    {
-        $phone = trim((string) ($_POST['phone'] ?? ''));
-        return $phone === '' ? null : $phone;
     }
 }

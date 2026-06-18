@@ -1,194 +1,185 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Core\BaseRepository;
 use App\Models\Enum\UserRole;
 use App\Models\User;
 
-class UserRepository extends BaseRepository implements IUserRepository
+final class UserRepository extends BaseRepository implements IUserRepository
 {
     private const TABLE = 'user';
-    private const PK = 'user_id';
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     public function findUserByLogin(string $login): ?User
     {
-        try {
-            $sql = "SELECT *
-                    FROM " . self::TABLE . "
-                    WHERE email = :value OR username = :value
-                    LIMIT 1";
-
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute([':value' => $login]);
-            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-            return is_array($row) ? $this->hydrateUser($row) : null;
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
-        }
+        return $this->findOne(
+            'email = :login OR username = :login',
+            [':login' => trim($login)]
+        );
     }
 
     public function findUserByEmail(string $email): ?User
     {
-        try {
-            $sql = "SELECT *
-                    FROM " . self::TABLE . "
-                    WHERE email = :email
-                    LIMIT 1";
-
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute([':email' => $email]);
-            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-            return is_array($row) ? $this->hydrateUser($row) : null;
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
-        }
+        return $this->findOne('email = :email', [':email' => trim($email)]);
     }
 
     public function findUserById(int $id): ?User
     {
-        try {
-            $sql = "SELECT *
-                    FROM " . self::TABLE . "
-                    WHERE " . self::PK . " = :id
-                    LIMIT 1";
-
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute([':id' => $id]);
-            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-            return is_array($row) ? $this->hydrateUser($row) : null;
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to retrieve user. ' . $e->getMessage());
+        if ($id <= 0) {
+            return null;
         }
+
+        return $this->findOne('user_id = :id', [':id' => $id]);
     }
 
     public function createUser(User $user): void
     {
-        try {
-            $sql = "INSERT INTO " . self::TABLE . "
-                    (email, username, password_hash, first_name, last_name, phone, role, created_at, updated_at)
-                    VALUES
-                    (:email, :username, :password_hash, :first_name, :last_name, :phone, :role, :created_at, :updated_at)";
+        $now = date('Y-m-d H:i:s');
 
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute([
-                'email' => $user->email,
-                'username' => $user->username,
-                'password_hash' => $user->password_hash,
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
-                'phone' => $user->phone,
-                'role' => $user->role instanceof UserRole ? $user->role->value : (string) $user->role,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ]);
-
-            $user->user_id = (int) $this->getConnection()->lastInsertId();
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to create user. ' . $e->getMessage());
-        }
-    }
-
-    public function updateUser(User $user): void
-    {
-        try {
-            $id = (int) ($user->user_id ?? 0);
-            if ($id <= 0) {
-                throw new \InvalidArgumentException('User id is required for update.');
-            }
-
-            $setPassword = ($user->password_hash !== '');
-
-            $sql = "UPDATE " . self::TABLE . "
-                    SET email = :email,
-                        username = :username,
-                        first_name = :first_name,
-                        last_name = :last_name,
-                        role = :role"
-                . ($setPassword ? ", password_hash = :password_hash" : "")
-                . ",
-                        updated_at = NOW()
-                    WHERE " . self::PK . " = :id";
-
-            $params = [
+        $this->execute(
+            <<<SQL
+                INSERT INTO `user` (
+                    email, username, password_hash,
+                    first_name, last_name, phone, role,
+                    created_at, updated_at
+                ) VALUES (
+                    :email, :username, :password_hash,
+                    :first_name, :last_name, :phone, :role,
+                    :created_at, :updated_at
+                )
+            SQL,
+            [
                 ':email' => $user->email,
                 ':username' => $user->username,
+                ':password_hash' => $user->password_hash,
                 ':first_name' => $user->first_name,
                 ':last_name' => $user->last_name,
-                ':role' => $user->role instanceof UserRole ? $user->role->value : (string) $user->role,
-                ':id' => $id,
-            ];
+                ':phone' => $user->phone,
+                ':role' => $this->roleValue($user->role),
+                ':created_at' => $now,
+                ':updated_at' => $now,
+            ]
+        );
 
-            if ($setPassword) {
-                $params[':password_hash'] = $user->password_hash;
-            }
-
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute($params);
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to update user. ' . $e->getMessage());
-        }
-    }
-
-    public function deleteUser(int $id): void
-    {
-        try {
-            $sql = "DELETE FROM " . self::TABLE . " WHERE " . self::PK . " = :id";
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute([':id' => $id]);
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to delete user. ' . $e->getMessage());
-        }
-    }
-
-    public function findAllUsers(): array
-    {
-        try {
-            $sql = "SELECT * FROM " . self::TABLE . " ORDER BY created_at DESC";
-            $stmt = $this->getConnection()->query($sql);
-            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            return array_map(fn(array $row): User => $this->hydrateUser($row), $rows);
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to retrieve users. ' . $e->getMessage());
-        }
+        $user->user_id = (int) $this->getConnection()->lastInsertId();
     }
 
     public function existsByEmailOrUsername(string $email, string $username): bool
     {
-        $sql = "SELECT 1
-                FROM " . self::TABLE . "
-                WHERE email = :email OR username = :username
-                LIMIT 1";
+        return $this->exists(
+            'email = :email OR username = :username',
+            [
+                ':email' => trim($email),
+                ':username' => trim($username),
+            ]
+        );
+    }
 
-        $stmt = $this->getConnection()->prepare($sql);
-        $stmt->execute([
-            ':email' => $email,
-            ':username' => $username,
-        ]);
+    public function updateUser(User $user): void
+    {
+        $id = (int) ($user->user_id ?? 0);
+        if ($id <= 0) {
+            throw new \InvalidArgumentException('User id is required for update.');
+        }
 
-        return (bool) $stmt->fetchColumn();
+        $params = [
+            ':email' => $user->email,
+            ':username' => $user->username,
+            ':first_name' => $user->first_name,
+            ':last_name' => $user->last_name,
+            ':role' => $this->roleValue($user->role),
+            ':id' => $id,
+        ];
+
+        $passwordSql = '';
+        if ($user->password_hash !== '') {
+            $passwordSql = ', password_hash = :password_hash';
+            $params[':password_hash'] = $user->password_hash;
+        }
+
+        $this->execute(
+            <<<SQL
+                UPDATE `user`
+                SET email = :email,
+                    username = :username,
+                    first_name = :first_name,
+                    last_name = :last_name,
+                    role = :role
+                    {$passwordSql},
+                    updated_at = NOW()
+                WHERE user_id = :id
+            SQL,
+            $params
+        );
+    }
+
+    public function deleteUser(int $id): void
+    {
+        if ($id <= 0) {
+            return;
+        }
+
+        $this->execute('DELETE FROM `user` WHERE user_id = :id', [':id' => $id]);
+    }
+
+    public function findAllUsers(): array
+    {
+        return $this->findMany('SELECT * FROM `user` ORDER BY created_at DESC');
     }
 
     public function findFiltered(string $role, string $search, string $sort): array
     {
-        [$where, $params] = $this->buildFilter($role, $search);
-        $sql = 'SELECT * FROM ' . self::TABLE . $where . ' ORDER BY ' . $this->resolveOrder($sort);
-        $stmt = $this->getConnection()->prepare($sql);
-        $stmt->execute($params);
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        [$whereSql, $params] = $this->buildFilter($role, $search);
+
+        return $this->findMany(
+            'SELECT * FROM `user`' . $whereSql . ' ORDER BY ' . $this->resolveOrder($sort),
+            $params
+        );
+    }
+
+    private function findOne(string $where, array $params): ?User
+    {
+        $sql = 'SELECT * FROM `' . self::TABLE . '` WHERE ' . $where . ' LIMIT 1';
+        $statement = $this->getConnection()->prepare($sql);
+        $statement->execute($params);
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        return is_array($row) ? $this->hydrateUser($row) : null;
+    }
+
+    /** @return list<User> */
+    private function findMany(string $sql, array $params = []): array
+    {
+        $statement = $this->getConnection()->prepare($sql);
+        $statement->execute($params);
+        $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         return array_map(fn(array $row): User => $this->hydrateUser($row), $rows);
     }
 
+    private function exists(string $where, array $params): bool
+    {
+        $sql = 'SELECT 1 FROM `' . self::TABLE . '` WHERE ' . $where . ' LIMIT 1';
+        $statement = $this->getConnection()->prepare($sql);
+        $statement->execute($params);
+
+        return (bool) $statement->fetchColumn();
+    }
+
+    private function execute(string $sql, array $params = []): void
+    {
+        $statement = $this->getConnection()->prepare($sql);
+        $statement->execute($params);
+    }
+
+    private function roleValue(UserRole|string $role): string
+    {
+        return $role instanceof UserRole ? $role->value : strtolower((string) $role);
+    }
+
+    /** @return array{0: string, 1: array<int|string, mixed>} */
     private function buildFilter(string $role, string $search): array
     {
         $clauses = [];
@@ -201,10 +192,13 @@ class UserRepository extends BaseRepository implements IUserRepository
 
         if ($search !== '') {
             $clauses[] = '(first_name LIKE ? OR last_name LIKE ? OR email LIKE ?)';
-            $params = array_merge($params, ["%$search%", "%$search%", "%$search%"]);
+            $like = '%' . $search . '%';
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
         }
 
-        return [$clauses ? ' WHERE ' . implode(' AND ', $clauses) : '', $params];
+        return [$clauses === [] ? '' : ' WHERE ' . implode(' AND ', $clauses), $params];
     }
 
     private function resolveOrder(string $sort): string
