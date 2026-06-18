@@ -187,6 +187,8 @@ $formatMoney = static fn(float $amount): string => 'EUR ' . number_format($amoun
 
                     <a href="/program" class="shop-button">Open My Program</a>
 
+                    <a href="/orders/<?= $orderId ?>/invoice" class="shop-link-button" target="_blank" rel="noopener">Download invoice (PDF)</a>
+
                     <a href="/home" class="shop-link-button">Back to home</a>
 
                 </div>

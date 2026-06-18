@@ -12,7 +12,7 @@ abstract class BaseController
     protected function view(string $template, array $data = [], ?string $layout = 'main', int $status = 200): void
     {
         $data['csrf'] ??= $this->csrfToken();
-        // Read one-time session messages and also expose simple view variables.
+        // Read one-time session messages 
         $data['flash'] = $data['flash'] ?? $this->getAllFlash();
         $data['errorMessage'] ??= is_string($data['flash']['error'] ?? null)
             ? (string) $data['flash']['error']
