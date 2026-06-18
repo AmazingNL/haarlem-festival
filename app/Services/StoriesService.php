@@ -62,6 +62,17 @@ final class StoriesService implements IStoriesService
     }
 
     /**
+     * Return merged show data for a published stories_booking section by URL slug.
+     *
+     * @param  string     $slug The slug stored in the JSON content field.
+     * @return array|null       Merged data, or null if not found / not published.
+     */
+    public function getShowBySlug(string $slug): ?array
+    {
+        return $this->storiesRepository->getShowBySlug($slug);
+    }
+
+    /**
      * Decode and merge the JSON content column into the section array.
      *
      * @param  array $section Raw section row from the repository.

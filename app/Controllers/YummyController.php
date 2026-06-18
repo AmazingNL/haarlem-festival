@@ -36,6 +36,7 @@ final class YummyController extends BaseController
 
     public function yummy(): void
     {
+        $this->rememberProgramReturnUrl($this->currentUrl());
         try {
             $page = $this->adminPageService->getPageBySlug('yummy');
             $page_id = $page->page_id ?? null;
@@ -77,6 +78,7 @@ final class YummyController extends BaseController
 
     private function restaurantDetail(string $slug, string $title, string $fallbackUrl, string $template): void
     {
+        $this->rememberProgramReturnUrl($this->currentUrl());
         try {
             $page = $this->adminPageService->getPageBySlug($slug);
             $page_id = $page->page_id ?? null;

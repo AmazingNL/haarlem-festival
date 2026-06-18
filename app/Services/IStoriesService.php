@@ -27,4 +27,13 @@ interface IStoriesService
      * @throws \RuntimeException On data-access failure.
      */
     public function getShowById(int $id): ?array;
+
+    /**
+     * Return the data for a single bookable show by its URL slug.
+     *
+     * @param  string     $slug The slug stored in the JSON content field.
+     * @return array|null       Merged show data, or null if not found.
+     * @throws \RuntimeException On data-access failure.
+     */
+    public function getShowBySlug(string $slug): ?array;
 }

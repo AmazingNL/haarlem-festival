@@ -104,7 +104,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/payments/checkout/{order_id:\d+}', [PaymentController::class, 'checkoutPage']);
     $r->post('/payments/create-session', [PaymentController::class, 'createCheckoutSession']);
     $r->post('/webhook/stripe', [PaymentController::class, 'webhook']);
-    $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
+    $r->get('/stories/{slug}', [StoriesController::class, 'detail']);
     $r->get('/history', [HistoryController::class, 'index']);
     $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
     $r->post('/history/book-tour/add-to-program', [HistoryController::class, 'addTourToProgram']);

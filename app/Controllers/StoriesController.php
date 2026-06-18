@@ -30,6 +30,7 @@ final class StoriesController extends BaseController
      */
     public function index(): void
     {
+        $this->rememberProgramReturnUrl($this->currentUrl());
         try {
             $section = $this->storiesService->getPageSections('stories');
             if (empty($section)) { $this->setFlash('error', 'Stories page is not available.'); $this->redirect('/'); return; }
@@ -37,6 +38,31 @@ final class StoriesController extends BaseController
         } catch (\Throwable $e) {
             $this->view('no_page/index', ['error' => 'Stories page not available.']);
         }
+    }
+
+    /**
+     * Render the story detail page for a single storytelling session.
+     *
+     * @param  string $slug URL slug or numeric section_id.
+     * @return void
+     */
+    public function detail(string $slug): void
+    {
+        $this->rememberProgramReturnUrl($this->currentUrl());
+        $slug = trim($slug);
+        if ($slug === '') { $this->redirect('/stories'); return; }
+        try {
+            $show = ctype_digit($slug)
+                ? $this->storiesService->getShowById((int) $slug)
+                : $this->storiesService->getShowBySlug($slug);
+        } catch (\Throwable $e) {
+            $show = null;
+        }
+        if ($show === null) { $this->abort(404, 'Story not found.'); }
+        $this->view('/stories/detail', [
+            'show'  => $show,
+            'title' => htmlspecialchars((string) ($show['show_title'] ?? 'Story'), ENT_QUOTES, 'UTF-8'),
+        ]);
     }
 
     /**
@@ -99,12 +125,14 @@ final class StoriesController extends BaseController
     private function buildProgramItem(array $show, int $showId, int $quantity): array
     {
         $unit = $this->parseMoney((string) ($show['price_raw'] ?? '0'));
+        $t    = trim((string) ($show['show_title'] ?? 'Stories Show'));
+        $loc  = trim((string) ($show['location']   ?? ''));
+        $date = trim((string) ($show['date']       ?? ''));
         return [
             'id' => bin2hex(random_bytes(8)), 'type' => 'stories-show', 'show_id' => $showId,
-            'title'    => trim((string) ($show['show_title'] ?? 'Stories Show')),
-            'date'     => trim((string) ($show['date']       ?? '')),
-            'time'     => trim((string) ($show['time']       ?? '')),
-            'location' => trim((string) ($show['location']   ?? '')),
+            'title' => $t, 'ticket_title' => $t, 'category_label' => 'Stories',
+            'date' => $date, 'day' => $date, 'time' => trim((string) ($show['time'] ?? '')),
+            'location' => $loc, 'location_name' => $loc,
             'price' => $unit, 'quantity' => $quantity, 'total_price' => round($unit * $quantity, 2),
         ];
     }

@@ -5,36 +5,42 @@ $stories = [
         'excerpt' => 'For centuries, locals have whispered about the hidden chambers beneath Haarlem\'s most iconic church. What secrets does it hold?',
         'tag'     => 'Legend',
         'image'   => '/assets/images/admin/bbeb1a36eb356048c6592f0c6551db54.jpg',
+        'slug'    => 'grote-kerk',
     ],
     [
         'title'   => 'The Golden Age Merchants',
         'excerpt' => 'During the 17th century, Haarlem\'s canal-side mansions were home to the wealthiest traders in the world. Discover their stories.',
         'tag'     => 'History',
         'image'   => '/assets/images/admin/c56d86a9ae0da6e0d4564358b6cb73f3.jpg',
+        'slug'    => 'golden-age-merchants',
     ],
     [
-        'title'   => 'Frans Hals & the Forgotten Portrait',
-        'excerpt' => 'A painting that vanished for 200 years resurfaced in an attic on the Spaarne. The story behind it is stranger than fiction.',
-        'tag'     => 'Art',
+        'title'   => 'Meet the Farmers: Stories from Buurderij Haarlem',
+        'excerpt' => 'Join local farmers as they share their journey, challenges, and vision for a sustainable food system in Haarlem and beyond.',
+        'tag'     => 'Community',
         'image'   => '/assets/images/admin/9b6d4a6e36ebd72fc86d1d10f2c39660.jpg',
+        'slug'    => 'buurderij-haarlem',
     ],
     [
         'title'   => 'The Tulip Fever of 1637',
         'excerpt' => 'Haarlem was the epicentre of the world\'s first speculative bubble. A single tulip bulb could cost more than a house.',
         'tag'     => 'History',
         'image'   => '/assets/images/admin/bbeb1a36eb356048c6592f0c6551db54.jpg',
+        'slug'    => 'tulip-fever',
     ],
     [
         'title'   => 'The River that Shaped a City',
         'excerpt' => 'The Spaarne is more than a waterway. It has been the lifeblood of Haarlem\'s trade, culture and identity for a thousand years.',
         'tag'     => 'Nature',
         'image'   => '/assets/images/admin/c56d86a9ae0da6e0d4564358b6cb73f3.jpg',
+        'slug'    => 'spaarne-river',
     ],
     [
         'title'   => 'Haunted Alley of the Begijnhof',
         'excerpt' => 'Hidden behind a narrow gate lies one of Haarlem\'s most atmospheric spots — and the ghost story that goes with it.',
         'tag'     => 'Legend',
         'image'   => '/assets/images/admin/9b6d4a6e36ebd72fc86d1d10f2c39660.jpg',
+        'slug'    => 'begijnhof',
     ],
 ];
 ?>
@@ -57,7 +63,7 @@ $stories = [
                     <div class="story-card-body">
                         <h3 class="story-card-title"><?= htmlspecialchars($story['title'], ENT_QUOTES, 'UTF-8') ?></h3>
                         <p class="story-card-excerpt"><?= htmlspecialchars($story['excerpt'], ENT_QUOTES, 'UTF-8') ?></p>
-                        <a href="#" class="story-card-link">
+                        <a href="/stories/<?= htmlspecialchars($story['slug'], ENT_QUOTES, 'UTF-8') ?>" class="story-card-link">
                             Read more
                             <svg class="icon-explore icon-fixed" viewBox="0 0 24 24">
                                 <path d="M8 4l8 8-8 8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
