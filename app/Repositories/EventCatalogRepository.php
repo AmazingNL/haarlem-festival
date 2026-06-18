@@ -14,9 +14,9 @@ final class EventCatalogRepository extends BaseRepository
             SELECT
                 e.event_id,
                 e.title,
-                LOWER(REPLACE(e.title, ' ', '-')) AS slug,
-                '' AS description,
-                e.type AS event_type,
+                e.slug,
+                e.description,
+                '' AS event_type,
                 e.start_datetime,
                 e.end_datetime,
                 l.name AS location_name,
@@ -30,13 +30,16 @@ final class EventCatalogRepository extends BaseRepository
             FROM event e
             INNER JOIN location l ON l.location_id = e.location_id
             LEFT JOIN ticket_type tt ON tt.event_id = e.event_id
-            WHERE 1 = 1
+            WHERE e.is_published = 1
         SQL;
 
         $params = [];
         if ($tag !== '') {
-            $sql .= ' AND (LOWER(e.title) LIKE :tag OR LOWER(e.type) LIKE :tag)';
-            $params[':tag'] = '%' . strtolower($tag) . '%';
+            $sql .= ' AND (LOWER(e.title) LIKE :tag_title OR LOWER(e.slug) LIKE :tag_slug OR LOWER(e.description) LIKE :tag_description)';
+            $tagFilter = '%' . strtolower($tag) . '%';
+            $params[':tag_title'] = $tagFilter;
+            $params[':tag_slug'] = $tagFilter;
+            $params[':tag_description'] = $tagFilter;
         }
 
         $sql .= ' ORDER BY e.start_datetime ASC, tt.price ASC, tt.name ASC';
@@ -54,9 +57,9 @@ final class EventCatalogRepository extends BaseRepository
                 SELECT
                     e.event_id,
                     e.title,
-                    LOWER(REPLACE(e.title, ' ', '-')) AS slug,
-                    '' AS description,
-                    e.type AS event_type,
+                    e.slug,
+                    e.description,
+                    '' AS event_type,
                     e.start_datetime,
                     e.end_datetime,
                     l.name AS location_name,
@@ -71,6 +74,7 @@ final class EventCatalogRepository extends BaseRepository
                 INNER JOIN ticket_type tt ON tt.event_id = e.event_id
                 WHERE e.event_id = :event_id
                   AND tt.ticket_type_id = :ticket_type_id
+                  AND e.is_published = 1
                 LIMIT 1
             SQL
         );

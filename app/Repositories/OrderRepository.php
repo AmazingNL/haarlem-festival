@@ -186,6 +186,86 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
         return (int) $stmt->fetchColumn();
     }
 
+    public function findOrdersForAdmin(): array
+    {
+        $sql = 'SELECT o.*, p.stripe_session_id, p.paid_at AS payment_paid_at, p.status AS payment_status,
+            COALESCE(NULLIF(o.email, ""), u.email) AS email,
+            COALESCE(NULLIF(o.first_name, ""), u.first_name) AS first_name,
+            COALESCE(NULLIF(o.last_name, ""), u.last_name) AS last_name
+            FROM `order` o
+            LEFT JOIN payment p ON p.order_id = o.order_id
+            INNER JOIN `user` u ON u.user_id = o.user_id
+            ORDER BY o.order_id DESC';
+
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute();
+
+        $orders = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (is_array($row)) {
+                $orders[] = $this->hydrateAdminOrderSummary($row);
+            }
+        }
+
+        return $orders;
+    }
+
+    public function findOrderForAdmin(int $orderId): ?array
+    {
+        $sql = 'SELECT o.*, p.stripe_session_id, p.paid_at AS payment_paid_at, p.status AS payment_status,
+            COALESCE(NULLIF(o.email, ""), u.email) AS email,
+            COALESCE(NULLIF(o.first_name, ""), u.first_name) AS first_name,
+            COALESCE(NULLIF(o.last_name, ""), u.last_name) AS last_name
+            FROM `order` o
+            LEFT JOIN payment p ON p.order_id = o.order_id
+            INNER JOIN `user` u ON u.user_id = o.user_id
+            WHERE o.order_id = :order_id
+            LIMIT 1';
+
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute([':order_id' => $orderId]);
+
+        $order = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!is_array($order)) {
+            return null;
+        }
+
+        return $this->hydrateOrder($order);
+    }
+
+    public function findOrderExportRows(): array
+    {
+        $sql = 'SELECT
+                o.order_id,
+                COALESCE(NULLIF(o.first_name, ""), u.first_name) AS first_name,
+                COALESCE(NULLIF(o.last_name, ""), u.last_name) AS last_name,
+                COALESCE(NULLIF(o.email, ""), u.email) AS email,
+                o.phone,
+                o.status AS order_status,
+                p.status AS payment_status,
+                o.provider,
+                o.total_price,
+                p.paid_at,
+                ol.title AS item_title,
+                COALESCE(NULLIF(ol.ticket_title, ""), ol.ticket_summary_text) AS ticket_title,
+                ol.quantity,
+                ol.unit_price,
+                ol.line_total,
+                ol.location_name,
+                ol.event_id,
+                ol.ticket_type_id
+            FROM `order` o
+            INNER JOIN `user` u ON u.user_id = o.user_id
+            LEFT JOIN payment p ON p.order_id = o.order_id
+            LEFT JOIN order_line ol ON ol.order_id = o.order_id
+            ORDER BY o.order_id DESC, ol.order_line_id ASC';
+
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
     private function hydrateOrder(array $row): array
     {
         $orderId = (int) ($row['order_id'] ?? 0);
@@ -208,6 +288,25 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
             'phone' => (string) ($row['phone'] ?? ''),
             'items' => $this->fetchOrderLines($orderId),
             'tickets' => $this->fetchTicketsForOrder($orderId),
+        ];
+    }
+
+    private function hydrateAdminOrderSummary(array $row): array
+    {
+        return [
+            'order_id' => (int) ($row['order_id'] ?? 0),
+            'user_id' => (int) ($row['user_id'] ?? 0),
+            'total_price' => round((float) ($row['total_price'] ?? 0), 2),
+            'status' => (string) ($row['status'] ?? 'paid'),
+            'created_at' => (string) ($row['created_at'] ?? ''),
+            'provider' => (string) ($row['provider'] ?? ''),
+            'payment_status' => (string) ($row['payment_status'] ?? ''),
+            'paid_at' => (string) ($row['payment_paid_at'] ?? ''),
+            'stripe_session_id' => (string) ($row['stripe_session_id'] ?? ''),
+            'first_name' => (string) ($row['first_name'] ?? ''),
+            'last_name' => (string) ($row['last_name'] ?? ''),
+            'email' => (string) ($row['email'] ?? ''),
+            'phone' => (string) ($row['phone'] ?? ''),
         ];
     }
 
@@ -255,11 +354,21 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
   /** @return list<array<string, mixed>> */
     private function fetchTicketsForOrder(int $orderId): array
     {
-        $sql = 'SELECT t.ticket_id, t.qr_token, t.status, ol.ticket_type_id
-            FROM order_line ol
-            INNER JOIN ticket t ON t.order_line_id = ol.order_line_id
-            WHERE ol.order_id = :order_id
-            ORDER BY t.ticket_id ASC';
+        if ($this->columnExists('ticket', 'order_line_id')) {
+            $sql = 'SELECT t.ticket_id, t.qr_token, t.status, ol.ticket_type_id
+                FROM order_line ol
+                INNER JOIN ticket t ON t.order_line_id = ol.order_line_id
+                WHERE ol.order_id = :order_id
+                ORDER BY t.ticket_id ASC';
+        } elseif ($this->columnExists('ticket', 'order_ticket_id')) {
+            $sql = 'SELECT t.ticket_id, t.qr_token, t.status, ot.ticket_type_id
+                FROM order_ticket ot
+                INNER JOIN ticket t ON t.order_ticket_id = ot.order_ticket_id
+                WHERE ot.order_id = :order_id
+                ORDER BY t.ticket_id ASC';
+        } else {
+            return [];
+        }
 
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([':order_id' => $orderId]);
@@ -279,6 +388,23 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
         }
 
         return $tickets;
+    }
+
+    private function columnExists(string $tableName, string $columnName): bool
+    {
+        $sql = 'SELECT COUNT(*)
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE()
+              AND table_name = :table_name
+              AND column_name = :column_name';
+
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute([
+            ':table_name' => $tableName,
+            ':column_name' => $columnName,
+        ]);
+
+        return (int) $stmt->fetchColumn() > 0;
     }
 
     private function insertOrderLine(int $orderId, array $item): int

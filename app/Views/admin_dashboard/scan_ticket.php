@@ -39,6 +39,7 @@
     var resultTitle  = document.getElementById('result-title');
     var resultMsg    = document.getElementById('result-message');
     var btnScanNext  = document.getElementById('btn-scan-next');
+    var scanBasePath = <?= json_encode((string) ($scanBasePath ?? '/admin/tickets'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
 
     var MESSAGES = {
         ok:              { cls: 'alert-success', title: 'Valid — entry granted',   msg: 'Ticket marked as used.' },
@@ -72,7 +73,7 @@
                 return;
             }
 
-            fetch('/admin/tickets/' + token + '/scan', {
+            fetch(scanBasePath + '/' + token + '/scan', {
                 method: 'POST',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
             })

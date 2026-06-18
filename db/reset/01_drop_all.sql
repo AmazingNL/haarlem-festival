@@ -20,7 +20,10 @@ DROP TABLE IF EXISTS page;
 
 DROP TABLE IF EXISTS program_item;
 
+DROP TABLE IF EXISTS dance_artist_event;
+DROP TABLE IF EXISTS reservation;
 DROP TABLE IF EXISTS pending_stripe_checkout;
+DROP TABLE IF EXISTS payments;
 DROP TABLE IF EXISTS order_line;
 DROP TABLE IF EXISTS invoice_line;
 DROP TABLE IF EXISTS invoice;
@@ -31,7 +34,9 @@ DROP TABLE IF EXISTS payment;
 DROP TABLE IF EXISTS `order`;
 
 DROP TABLE IF EXISTS ticket_type;
+DROP TABLE IF EXISTS dance_artist;
 DROP TABLE IF EXISTS event;
+DROP TABLE IF EXISTS restaurant;
 DROP TABLE IF EXISTS location;
 
 DROP TABLE IF EXISTS image;
