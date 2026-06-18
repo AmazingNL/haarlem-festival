@@ -13,15 +13,9 @@ use chillerlan\QRCode\QROptions;
 final class OrderEmailService
 {
     private IMailer $mailer;
-<<<<<<< HEAD:app/Services/OrderEmailService.php
-    private OrderInvoiceService $invoiceService;
-
-    public function __construct(IMailer $mailer, OrderInvoiceService $invoiceService)
-=======
     private InvoiceService $invoiceService;
 
     public function __construct(IMailer $mailer, InvoiceService $invoiceService)
->>>>>>> origin/dev:app/Services/Implementations/OrderEmailService.php
     {
         $this->mailer = $mailer;
         $this->invoiceService = $invoiceService;
