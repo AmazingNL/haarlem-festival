@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\BaseController;
 use App\Repositories\PendingCheckoutRepository;
 use App\Services\CheckoutValidationService;
+use App\Services\InvoiceService;
 use App\Services\OrderEmailService;
 use App\Services\OrderService;
 use App\Services\ProgramService;
@@ -23,6 +24,7 @@ final class ShopController extends BaseController
     private StripePaymentService $stripePaymentService;
     private PendingCheckoutRepository $pendingCheckoutRepository;
     private OrderEmailService $orderEmailService;
+    private InvoiceService $invoiceService;
 
     public function __construct(
         ProgramService $programService,
@@ -30,7 +32,8 @@ final class ShopController extends BaseController
         CheckoutValidationService $checkoutValidationService,
         StripePaymentService $stripePaymentService,
         PendingCheckoutRepository $pendingCheckoutRepository,
-        OrderEmailService $orderEmailService
+        OrderEmailService $orderEmailService,
+        InvoiceService $invoiceService
     )
     {
         $this->programService = $programService;
@@ -39,6 +42,7 @@ final class ShopController extends BaseController
         $this->stripePaymentService = $stripePaymentService;
         $this->pendingCheckoutRepository = $pendingCheckoutRepository;
         $this->orderEmailService = $orderEmailService;
+        $this->invoiceService = $invoiceService;
     }
 
     public function checkout(): void
@@ -178,6 +182,22 @@ final class ShopController extends BaseController
             'order' => $order,
             'orderItems' => is_array($order['items'] ?? null) ? $order['items'] : [],
         ]);
+    }
+
+    public function invoice(int $orderId): void
+    {
+        $order = $this->getOrderForSuccessPage($orderId, '/orders/' . $orderId . '/invoice');
+        if ($order === null) {
+            return;
+        }
+
+        $pdf = $this->invoiceService->renderPdf($order);
+        $fileName = $this->invoiceService->fileName($order);
+
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: inline; filename="' . $fileName . '"');
+        header('Content-Length: ' . strlen($pdf));
+        echo $pdf;
     }
 
     public function stripeWebhook(): void

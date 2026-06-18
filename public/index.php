@@ -92,6 +92,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/checkout/cancel', [ShopController::class, 'checkoutCancel']);
     $r->post('/stripe/webhook', [ShopController::class, 'stripeWebhook']);
     $r->get('/orders/{orderId:\d+}/success', [ShopController::class, 'success']);
+    $r->get('/orders/{orderId:\d+}/invoice', [ShopController::class, 'invoice']);
     $r->get('/yummy', [YummyController::class, 'yummy']);
     $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
     $r->post('/yummy/ratatouille/book-reservation', [YummyController::class, 'bookReservation']);
@@ -362,6 +363,7 @@ function createShopController(): App\Controllers\ShopController
         createCheckoutValidationService(),
         new App\Services\StripePaymentService(),
         new App\Repositories\PendingCheckoutRepository(),
-        new App\Services\OrderEmailService(createMailer(), new App\Services\InvoiceService())
+        new App\Services\OrderEmailService(createMailer(), new App\Services\InvoiceService()),
+        new App\Services\InvoiceService()
     );
 }
