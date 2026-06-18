@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
-final class SectionInput
+final class SectionInputDTO
 {
     public int $pageId;
     public int $sectionId;

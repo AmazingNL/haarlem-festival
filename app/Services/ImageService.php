@@ -43,6 +43,8 @@ final class ImageService implements IImageService
         $validatedFile = $this->validateUpload($file);
         return $this->saveToFilesystem($validatedFile, $options);
     }
+
+    
     public function validateUpload(array $file): array
     {
         if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {

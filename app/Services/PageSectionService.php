@@ -3,11 +3,12 @@
 declare(strict_types=1);
 
 namespace App\Services;
-use App\DTO\SectionInput;
+use App\DTO\SectionInputDTO;
 use App\Models\Enum\SectionType;
 use App\Models\PageSection;
 use App\Repositories\IPageSectionRepository;
 use App\Schemas\SectionFactory;
+use Exception;
 
 final class PageSectionService implements IPageSectionService
 {
@@ -45,6 +46,25 @@ final class PageSectionService implements IPageSectionService
         return $this->pageSectionRepository->getSectionById($sectionId);
     }
 
+    public function createSection(SectionInputDTO $input): bool
+    {
+        $section = $this->buildSectionFromDto($input);
+        $sectionId = $this->pageSectionRepository->createSection($section);
+        return $sectionId > 0;
+    }
+
+    // Update an existing section in the database.
+    public function updateSection(PageSection $section): bool
+    {
+        return $this->pageSectionRepository->updateSection($section);
+    }
+
+    // Delete a section by id.
+    public function deleteSection(int $sectionId): bool
+    {
+        return $this->pageSectionRepository->deleteSection($sectionId);
+    }
+
     // Build the admin form field list for a given section type by using its Admin UI schemas.
     public function resolveSectionFormFields(string $sectionType): array
     {
@@ -72,7 +92,7 @@ final class PageSectionService implements IPageSectionService
 
 
     // Using sectionDTO to build PageSection object and returning it.
-    public function buildSectionFromDto(SectionInput $input): PageSection
+    private function buildSectionFromDto(SectionInputDTO $input): PageSection
     {
         if ($input->pageId === 0) {
             throw new \InvalidArgumentException('Invalid PageId');
@@ -99,7 +119,7 @@ final class PageSectionService implements IPageSectionService
     }
 
     // Build the JSON content for a section, including uploaded or embedded images.
-    private function buildSectionContent(array $sectionField, array $post, array $files): array
+    private function buildSectionContent(array $sectionField, array $fields, array $files): array
     {
         // Start with empty accumulators: $content is the field data, 
         // $galleryImages 
@@ -116,7 +136,7 @@ final class PageSectionService implements IPageSectionService
 
             // A single uploaded image is stored as a string path by normalizeImageField().
             if ($fieldType === 'image') {
-                $this->normalizeImageField($fieldName, $post, $files, $content, $galleryImages);
+                $this->normalizeImageField($fieldName, $fields, $files, $content, $galleryImages);
                 if ($fieldName === 'section_image') {
                     $hasSingleSectionImage = true;
                 }
@@ -161,8 +181,8 @@ final class PageSectionService implements IPageSectionService
         $dom = new \DOMDocument();
         // The <meta charset> tells libxml the bytes are UTF-8; without it loadHTML()
         // assumes ISO-8859-1 and corrupts non-ASCII alt/caption text (e.g. "Café", "Eén").
-        $dom->loadHTML('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' . 
-        $html . '</body></html>', LIBXML_NOERROR | LIBXML_NOWARNING);
+        $dom->loadHTML('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' .
+            $html . '</body></html>', LIBXML_NOERROR | LIBXML_NOWARNING);
 
         foreach ($dom->getElementsByTagName('img') as $img) {
             if (!($img instanceof \DOMElement)) {
@@ -229,9 +249,9 @@ final class PageSectionService implements IPageSectionService
         return $unique;
     }
 
-    private function normalizeImageField(string $fieldName, array $post, array $files, array &$content, array &$sectionImages): void
+    private function normalizeImageField(string $fieldName, array $fields, array $files, array &$content, array &$sectionImages): void
     {
-        $content[$fieldName] = (string) ($post[$fieldName] ?? '');
+        $content[$fieldName] = (string) ($fields[$fieldName] ?? '');
         $content[$fieldName . '_alt_text'] = trim((string) ($post[$fieldName . '_alt_text'] ?? ''));
         $content[$fieldName . '_caption'] = trim((string) ($post[$fieldName . '_caption'] ?? ''));
 
@@ -247,27 +267,10 @@ final class PageSectionService implements IPageSectionService
         $parts = preg_split('/[\r\n,]+/', $fieldValue) ?: [];
 
         return array_values(array_unique(array_filter(array_map(
-            static fn (string $item): string => trim($item),
+            static fn(string $item): string => trim($item),
             $parts
         ))));
     }
 
-    // Save a new section in the database.
-    public function createSection(PageSection $section): bool
-    {
-        $sectionId = $this->pageSectionRepository->createSection($section);
-        return $sectionId > 0;
-    }
 
-    // Update an existing section in the database.
-    public function updateSection(PageSection $section): bool
-    {
-        return $this->pageSectionRepository->updateSection($section);
-    }
-
-    // Delete a section by id.
-    public function deleteSection(int $sectionId): bool
-    {
-        return $this->pageSectionRepository->deleteSection($sectionId);
-    }
 }

@@ -6,10 +6,6 @@ namespace App\Models;
 
 use App\Models\Enum\ReservationStatus;
 
-/**
- * A restaurant booking (date, session, party size) tied to a user and,
- * once paid, to an order.
- */
 final class Reservation
 {
     public function __construct(

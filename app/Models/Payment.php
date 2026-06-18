@@ -6,9 +6,6 @@ namespace App\Models;
 
 use App\Models\Enum\PaymentStatus;
 
-/**
- * A payment against an order (Stripe), including provider references.
- */
 final class Payment
 {
     public function __construct(

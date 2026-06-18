@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-/**
- * A single line of an order (an event ticket or a reservation), with a
- * per-line VAT rate. Replaces the old item_data JSON blob.
- */
+
 final class OrderLine
 {
     public function __construct(

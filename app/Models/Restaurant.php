@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-/**
- * A restaurant venue that can be booked via reservations.
- */
 final class Restaurant
 {
     public function __construct(
