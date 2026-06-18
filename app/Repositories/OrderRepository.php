@@ -45,6 +45,17 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
 
             $orderId = (int) $this->getConnection()->lastInsertId();
 
+            // Sequential, human-readable invoice number derived from the order id, e.g. HF-2026-000042.
+            $invoiceNumber = sprintf('HF-%s-%06d', date('Y'), $orderId);
+            $invoiceStmt = $this->getConnection()->prepare(
+                'UPDATE `order` SET invoice_number = :invoice_number, invoice_issued_at = :issued_at WHERE order_id = :order_id'
+            );
+            $invoiceStmt->execute([
+                ':invoice_number' => $invoiceNumber,
+                ':issued_at' => $timestamp,
+                ':order_id' => $orderId,
+            ]);
+
             foreach ($items as $item) {
                 $orderLineId = $this->insertOrderLine($orderId, $item);
                 $this->insertTicketsForItem($orderLineId, $item);
@@ -185,6 +196,8 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
             'total_price' => round((float) ($row['total_price'] ?? 0), 2),
             'status' => (string) ($row['status'] ?? 'paid'),
             'created_at' => (string) ($row['created_at'] ?? ''),
+            'invoice_number' => (string) ($row['invoice_number'] ?? ''),
+            'invoice_issued_at' => (string) ($row['invoice_issued_at'] ?? ''),
             'provider' => (string) ($row['provider'] ?? ''),
             'payment_status' => (string) ($row['payment_status'] ?? 'paid'),
             'paid_at' => (string) ($row['payment_paid_at'] ?? $row['created_at'] ?? ''),
@@ -227,6 +240,7 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
                 'quantity' => (int) ($row['quantity'] ?? 1),
                 'unit_price' => round((float) ($row['unit_price'] ?? 0), 2),
                 'line_total' => round((float) ($row['line_total'] ?? 0), 2),
+                'vat_rate' => round((float) ($row['vat_rate'] ?? 21), 2),
                 'location_name' => (string) ($row['location_name'] ?? ''),
                 'special_requests' => (string) ($row['special_requests'] ?? ''),
                 'type' => (string) ($row['item_type'] ?? 'booking'),
