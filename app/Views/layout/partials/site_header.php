@@ -43,8 +43,8 @@ $mainNavigation = [
     ],
     [
         'label' => 'Jazz',
-        'href' => '/events?tag=jazz',
-        'active' => $currentPath === '/events' && $currentTag === 'jazz',
+        'href' => '/jazz',
+        'active' => $isSectionActive('/jazz') !== '',
     ],
 ];
 

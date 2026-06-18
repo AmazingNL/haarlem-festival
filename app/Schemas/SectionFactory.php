@@ -50,6 +50,15 @@ use App\Schemas\stories\WhatIsStories;
 use App\Schemas\stories\StoriesPreview;
 use App\Schemas\stories\StorytellingSchedule;
 use App\Schemas\stories\StoriesBooking;
+use App\Schemas\jazz\JazzHero;
+use App\Schemas\jazz\JazzIntro;
+use App\Schemas\jazz\JazzWhatToExpect;
+use App\Schemas\jazz\JazzFeaturedArtists;
+use App\Schemas\jazz\JazzMoreArtists;
+use App\Schemas\jazz\JazzAgendaIntro;
+use App\Schemas\jazz\JazzAgendaEvent;
+use App\Schemas\jazz\JazzPasses;
+use App\Schemas\jazz\JazzLocationContact;
 
 // Map a section type string to the ViewModel class that defines its CMS fields.
 class SectionFactory
@@ -106,6 +115,15 @@ class SectionFactory
             'stories_preview'       => StoriesPreview::class,
             'storytelling_schedule' => StorytellingSchedule::class,
             'stories_booking'       => StoriesBooking::class,
+            'jazz_hero'              => JazzHero::class,
+            'jazz_intro'             => JazzIntro::class,
+            'jazz_what_to_expect'    => JazzWhatToExpect::class,
+            'jazz_featured_artists'  => JazzFeaturedArtists::class,
+            'jazz_more_artists'      => JazzMoreArtists::class,
+            'jazz_agenda_intro'      => JazzAgendaIntro::class,
+            'jazz_agenda_event'      => JazzAgendaEvent::class,
+            'jazz_passes'            => JazzPasses::class,
+            'jazz_location_contact'  => JazzLocationContact::class,
         ];
 
         return $map[$type] ?? null;

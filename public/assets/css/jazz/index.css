@@ -1,0 +1,425 @@
+/* ===== JAZZ LANDING PAGE ===== */
+
+.jazz-page {
+    background: #ffffff;
+    color: #2a1414;
+    font-family: var(--font-primary, Arimo, sans-serif);
+}
+
+.jazz-container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.jazz-section {
+    padding: 72px 0;
+}
+
+/* Alternating soft-pink sections to match the design */
+.jazz-featured,
+.jazz-expect,
+.jazz-agenda,
+.jazz-passes {
+    background: #fce8ea;
+}
+
+.jazz-section__title {
+    margin: 0 0 18px;
+    font-family: "Bebas Neue", var(--font-primary), sans-serif;
+    font-size: 2.15rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #410606;
+    line-height: 1.15;
+}
+
+.jazz-section__intro {
+    max-width: 880px;
+    margin: 0 0 32px;
+    font-size: 1rem;
+    color: #5b3a3a;
+}
+
+.jazz-rich-text {
+    max-width: 880px;
+    color: #5b3a3a;
+}
+
+.jazz-rich-text p {
+    margin: 0 0 14px;
+}
+
+/* ===== Buttons ===== */
+.jazz-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 10px;
+    background: #7f1414;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition, all 0.3s ease);
+}
+
+.jazz-button:hover {
+    background: #5c0d0d;
+}
+
+.jazz-button--small {
+    padding: 9px 16px;
+    font-size: 0.85rem;
+}
+
+.jazz-button--add {
+    background: #3f7d4f;
+}
+
+.jazz-button--add:hover {
+    background: #2f6b3f;
+}
+
+.jazz-button--ghost {
+    background: #7f1414;
+}
+
+/* ===== Hero ===== */
+.jazz-hero {
+    position: relative;
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+    background-color: #1a0808;
+    background-size: cover;
+    background-position: center;
+}
+
+.jazz-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.25) 100%);
+}
+
+.jazz-hero__inner {
+    position: relative;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px;
+    width: 100%;
+}
+
+.jazz-hero__title {
+    margin: 0;
+    color: #ffffff;
+    font-family: "Bebas Neue", var(--font-primary), sans-serif;
+    font-size: clamp(3.25rem, 8.5vw, 6.75rem);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+
+.jazz-hero__title-line {
+    display: block;
+    line-height: 0.9;
+}
+
+/* ===== Intro ===== */
+.jazz-intro .jazz-rich-text {
+    font-size: 1.05rem;
+}
+
+/* ===== What to expect ===== */
+.jazz-expect__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.jazz-expect__media img {
+    width: 100%;
+    height: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+/* ===== Featured artists ===== */
+.jazz-featured__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+}
+
+.jazz-card {
+    display: flex;
+    flex-direction: column;
+    background: #f7c9cf;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(95, 13, 13, 0.08);
+}
+
+.jazz-card__media img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.jazz-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 22px 24px;
+}
+
+.jazz-card__title {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #410606;
+}
+
+.jazz-card__text {
+    margin: 0;
+    color: #5b3a3a;
+    font-size: 0.92rem;
+}
+
+.jazz-card .jazz-button {
+    align-self: flex-start;
+}
+
+/* ===== More artists chips ===== */
+.jazz-more-artists__intro {
+    margin: 0 0 22px;
+    color: #5b3a3a;
+}
+
+.jazz-chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.jazz-chip {
+    padding: 8px 16px;
+    border: 1px solid #d98a92;
+    border-radius: 999px;
+    background: #fff;
+    font-size: 0.9rem;
+    color: #5c0d0d;
+}
+
+/* ===== Agenda ===== */
+.jazz-agenda__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.jazz-agenda__tab {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 10px;
+    background: #d98a92;
+    color: #410606;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition, all 0.3s ease);
+}
+
+.jazz-agenda__tab.is-active {
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(95, 13, 13, 0.15);
+}
+
+.jazz-agenda__panel {
+    display: none;
+}
+
+.jazz-agenda__panel.is-active {
+    display: block;
+}
+
+.jazz-agenda__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.jazz-event {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 22px 24px;
+    background: #f7c9cf;
+    border-radius: 14px;
+}
+
+/* Cards with a background photo: cover the card, then lay a light overlay on top
+   so the existing dark text and buttons stay readable. */
+.jazz-event--has-image {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+.jazz-event--has-image::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(252, 232, 234, 0.86), rgba(247, 201, 207, 0.9));
+}
+
+/* Keep the card content above the overlay. */
+.jazz-event--has-image > * {
+    position: relative;
+    z-index: 1;
+}
+
+.jazz-event__venue {
+    margin: 0;
+    font-weight: 700;
+    color: #410606;
+}
+
+.jazz-event__title {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0;
+    font-size: 1.15rem;
+    color: #410606;
+}
+
+.jazz-event__time {
+    font-weight: 600;
+    color: #7f1414;
+}
+
+.jazz-event__text {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #5b3a3a;
+}
+
+.jazz-event__price {
+    margin: 4px 0 0;
+    font-weight: 800;
+    color: #410606;
+}
+
+.jazz-event__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.jazz-event__form {
+    margin: 0;
+}
+
+/* ===== All-access passes ===== */
+.jazz-passes__list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.jazz-pass {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin: 0;
+    padding: 16px 22px;
+    background: #f7c9cf;
+    border-radius: 12px;
+}
+
+.jazz-pass__info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1 1 280px;
+}
+
+.jazz-pass__name {
+    font-weight: 700;
+    color: #410606;
+}
+
+.jazz-pass__price {
+    font-weight: 800;
+    color: #7f1414;
+}
+
+.jazz-pass__choose select {
+    padding: 10px 14px;
+    border: 1px solid #d98a92;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.95rem;
+}
+
+/* ===== Location and contact ===== */
+.jazz-contact__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 8px;
+}
+
+.jazz-contact__place {
+    font-weight: 800;
+    color: #410606;
+}
+
+.jazz-contact__address p,
+.jazz-contact__details p {
+    margin: 0 0 6px;
+    color: #5b3a3a;
+}
+
+.jazz-contact__email a {
+    color: #7f1414;
+    font-weight: 700;
+}
+
+.jazz-contact__hours {
+    display: block;
+    font-size: 0.85rem;
+    color: #8a6a6a;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 860px) {
+
+    .jazz-expect__grid,
+    .jazz-featured__grid,
+    .jazz-agenda__grid,
+    .jazz-contact__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .jazz-section {
+        padding: 52px 0;
+    }
+}

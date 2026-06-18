@@ -96,4 +96,13 @@ enum SectionType: string
     case HISTORY_MOLEN_SIDEBAR = 'history_molen_sidebar';
     case HISTORY_MOLEN_ROUTE_CTA = 'history_molen_route_cta';
     case RESERVATION = 'reservation';
+    case JAZZ_HERO = 'jazz_hero';
+    case JAZZ_INTRO = 'jazz_intro';
+    case JAZZ_WHAT_TO_EXPECT = 'jazz_what_to_expect';
+    case JAZZ_FEATURED_ARTISTS = 'jazz_featured_artists';
+    case JAZZ_MORE_ARTISTS = 'jazz_more_artists';
+    case JAZZ_AGENDA_INTRO = 'jazz_agenda_intro';
+    case JAZZ_AGENDA_EVENT = 'jazz_agenda_event';
+    case JAZZ_PASSES = 'jazz_passes';
+    case JAZZ_LOCATION_CONTACT = 'jazz_location_contact';
 }

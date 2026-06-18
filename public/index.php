@@ -17,6 +17,7 @@ use App\Controllers\PaymentController;
 use App\Controllers\ShopController;
 use App\Controllers\ProgramController;
 use App\Controllers\TicketController;
+use App\Controllers\JazzController;
 
 require __DIR__ . '/../app/bootstrap.php';
 require __DIR__ . '/../vendor/autoload.php';
@@ -92,6 +93,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/checkout/cancel', [ShopController::class, 'checkoutCancel']);
     $r->post('/stripe/webhook', [ShopController::class, 'stripeWebhook']);
     $r->get('/orders/{orderId:\d+}/success', [ShopController::class, 'success']);
+    $r->get('/jazz', [JazzController::class, 'loadLandingPage']);
     $r->get('/yummy', [YummyController::class, 'yummy']);
     $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
     $r->post('/yummy/ratatouille/book-reservation', [YummyController::class, 'bookReservation']);
@@ -219,6 +221,10 @@ function createController(string $controllerClass)
         case App\Controllers\HomeController::class:
 
             return new App\Controllers\HomeController(createSectionService(), createPageService());
+
+        case App\Controllers\JazzController::class:
+
+            return new App\Controllers\JazzController(createSectionService(), createPageService());
 
         case App\Controllers\YummyController::class:
 
