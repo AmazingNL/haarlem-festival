@@ -1,9 +1,9 @@
 <?php
-// src/Domain/User.php
 
 declare(strict_types=1);
 
 namespace App\Models;
+
 use App\Models\Enum\UserRole;
 
 final class User
@@ -15,11 +15,9 @@ final class User
     public string $first_name = '';
     public string $last_name = '';
     public UserRole|string $role = UserRole::customer;
-
     public ?string $phone = null;
     public ?int $profile_image_id = null;
     public bool $is_active = true;
-
     public ?string $created_at = null;
     public ?string $updated_at = null;
 
@@ -31,8 +29,7 @@ final class User
         string $last_name = '',
         ?string $phone = null,
         UserRole|string $role = UserRole::customer
-    )
-    {
+    ) {
         $this->username = $username;
         $this->email = $email;
         $this->password_hash = $password_hash;
