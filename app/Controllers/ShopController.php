@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\BaseController;
 use App\Repositories\PendingCheckoutRepository;
 use App\Services\CheckoutValidationService;
+use App\Services\OrderEmailService;
 use App\Services\OrderService;
 use App\Services\ProgramService;
 use App\Services\StripePaymentService;
@@ -21,13 +22,15 @@ final class ShopController extends BaseController
     private CheckoutValidationService $checkoutValidationService;
     private StripePaymentService $stripePaymentService;
     private PendingCheckoutRepository $pendingCheckoutRepository;
+    private OrderEmailService $orderEmailService;
 
     public function __construct(
         ProgramService $programService,
         OrderService $orderService,
         CheckoutValidationService $checkoutValidationService,
         StripePaymentService $stripePaymentService,
-        PendingCheckoutRepository $pendingCheckoutRepository
+        PendingCheckoutRepository $pendingCheckoutRepository,
+        OrderEmailService $orderEmailService
     )
     {
         $this->programService = $programService;
@@ -35,6 +38,7 @@ final class ShopController extends BaseController
         $this->checkoutValidationService = $checkoutValidationService;
         $this->stripePaymentService = $stripePaymentService;
         $this->pendingCheckoutRepository = $pendingCheckoutRepository;
+        $this->orderEmailService = $orderEmailService;
     }
 
     public function checkout(): void
@@ -264,6 +268,11 @@ final class ShopController extends BaseController
 
         if ($clearCart) {
             $this->programService->removeItemsByIds(array_column($items, 'id'));
+        }
+
+        $order = $this->orderService->findOrderForUser($orderId, $userId);
+        if ($order !== null) {
+            $this->orderEmailService->sendOrderConfirmation($customer, $order);
         }
 
         return $orderId;
