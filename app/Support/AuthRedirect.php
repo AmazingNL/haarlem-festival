@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support;
 
-/**
- * Remembers and resolves where to send the user after login or registration.
- */
+/** Remembers and resolves where to send the user after login or registration. */
 final class AuthRedirect
 {
     private const SESSION_KEY = 'auth_redirect';
@@ -18,10 +16,9 @@ final class AuthRedirect
         $path = self::sanitize($requestedPath ?? '');
         if ($path !== '') {
             $_SESSION[self::SESSION_KEY] = $path;
-            return $path;
         }
 
-        return self::sanitize((string) ($_SESSION[self::SESSION_KEY] ?? ''));
+        return $path !== '' ? $path : self::sanitize((string) ($_SESSION[self::SESSION_KEY] ?? ''));
     }
 
     public static function targetAfterLogin(string $role, string $requestedNext = ''): string
@@ -45,11 +42,10 @@ final class AuthRedirect
             return $saved;
         }
 
-        if ($role === 'employee') {
-            return '/employee/dashboard';
-        }
-
-        return '/';
+        return match ($role) {
+            'employee' => '/employee/dashboard',
+            default => '/',
+        };
     }
 
     public static function sanitize(string $path): string

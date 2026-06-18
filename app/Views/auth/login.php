@@ -19,7 +19,7 @@
                 <div class="error-msg"><?= htmlspecialchars((string) $errorMessage, ENT_QUOTES, 'UTF-8') ?></div>
             <?php endif; ?>
 
-            <form action="<?= !empty($isAdminLogin) ? '/admin/login' : '/login' ?>" method="POST">
+            <form action="<?= htmlspecialchars((string) ($formAction ?? '/login'), ENT_QUOTES, 'UTF-8') ?>" method="POST">
                 <input type="hidden" name="_csrf" value="<?= htmlspecialchars((string) ($csrf ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                 <input type="hidden" name="next" value="<?= htmlspecialchars((string) ($next ?? ''), ENT_QUOTES, 'UTF-8') ?>">
 
@@ -44,7 +44,7 @@
 
                 <button type="submit" class="btn-signin">Sign In</button>
 
-                <p class="signup-prompt">Don't have an account? <a href="/registerForm<?= !empty($next) ? '?next=' . urlencode((string) $next) : '' ?>">Create one</a></p>
+                <p class="signup-prompt">Don't have an account? <a href="<?= htmlspecialchars((string) ($registerPath ?? '/registerForm'), ENT_QUOTES, 'UTF-8') ?>">Create one</a></p>
             </form>
         </div>
     </div>

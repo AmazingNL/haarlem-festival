@@ -34,7 +34,7 @@ final class StoriesController extends BaseController
         try {
             $section = $this->storiesService->getPageSections('stories');
             if (empty($section)) { $this->setFlash('error', 'Stories page is not available.'); $this->redirect('/'); return; }
-            $this->view('/stories/index', ['section' => $section, 'title' => 'Stories']);
+            $this->view('stories/index', ['section' => $section, 'title' => 'Stories']);
         } catch (\Throwable $e) {
             $this->view('no_page/index', ['error' => 'Stories page not available.']);
         }

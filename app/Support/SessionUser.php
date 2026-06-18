@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use App\Models\Enum\UserRole;
 use App\Models\User;
 use App\Repositories\UserRepository;
 
@@ -26,11 +27,22 @@ final class SessionUser
         }
     }
 
+    /** Start a secure session after login or registration. */
+    public static function beginAuthenticatedSession(User $user): string
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        session_regenerate_id(true);
+        self::storeInSession($user);
+
+        return self::roleValue($user);
+    }
+
     public static function storeInSession(User $user): void
     {
-        $role = $user->role instanceof \App\Models\Enum\UserRole
-            ? $user->role->value
-            : strtolower((string) $user->role);
+        $role = self::roleValue($user);
 
         $_SESSION['user_id'] = $user->user_id;
         $_SESSION['user_role'] = $role;
@@ -40,6 +52,12 @@ final class SessionUser
         $_SESSION['user_name'] = self::fullName($user->first_name, $user->last_name, $user->username, $user->email);
         $_SESSION['user_email'] = trim($user->email);
         $_SESSION['user_phone'] = $user->phone;
+
+        if ($role === UserRole::admin->value) {
+            $_SESSION['admin'] = true;
+        } else {
+            unset($_SESSION['admin']);
+        }
     }
 
     public static function isLoggedIn(): bool
@@ -83,6 +101,13 @@ final class SessionUser
             'email' => self::email(),
             'phone' => trim((string) ($_SESSION['user_phone'] ?? '')),
         ];
+    }
+
+    private static function roleValue(User $user): string
+    {
+        return $user->role instanceof UserRole
+            ? $user->role->value
+            : strtolower((string) $user->role);
     }
 
     private static function fullName(string $firstName, string $lastName, string $fallback = '', string $email = ''): string

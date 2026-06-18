@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Models\Enum\UserRole;
 use App\Models\User;
 use App\Services\Interfaces\IUserService;
 use App\Support\AuthRedirect;
@@ -22,12 +21,7 @@ final class AuthController extends BaseController
 
     public function showRegisterForm(): void
     {
-        $this->ensureSession();
-
-        $this->view('auth/register', [
-            'title' => 'Registration',
-            'next' => AuthRedirect::remember($this->str('next')),
-        ], 'auth');
+        $this->showAuthForm('auth/register', 'Registration');
     }
 
     public function register(): void
@@ -42,7 +36,7 @@ final class AuthController extends BaseController
                 $this->str('username'),
                 $this->str('email'),
                 $this->str('password'),
-                $this->optionalPhone()
+                $this->str('phone')
             );
 
             $this->loginUser($user, $this->str('next'));
@@ -50,6 +44,7 @@ final class AuthController extends BaseController
             $this->setErrorMessage($e->getMessage());
             $this->redirect('/registerForm');
         } catch (\Throwable $e) {
+            error_log('Registration failed: ' . $e->getMessage());
             $this->setErrorMessage('Could not create your account right now.');
             $this->redirect('/registerForm');
         }
@@ -57,18 +52,12 @@ final class AuthController extends BaseController
 
     public function showLoginForm(): void
     {
-        $this->ensureSession();
-
-        $this->view('auth/login', [
-            'title' => 'Login',
-            'isAdminLogin' => $this->isAdminRoute(),
-            'next' => AuthRedirect::remember($this->str('next')),
-        ], 'auth');
+        $this->showAuthForm('auth/login', 'Login');
     }
 
     public function login(): void
     {
-        $loginForm = $this->isAdminRoute() ? '/admin/loginForm' : '/loginForm';
+        $loginForm = $this->loginFormPath();
 
         try {
             $this->ensureSession();
@@ -84,6 +73,7 @@ final class AuthController extends BaseController
 
             $this->loginUser($user, $this->str('next'));
         } catch (\Throwable $e) {
+            error_log('Login failed: ' . $e->getMessage());
             $this->setErrorMessage('Something went wrong.');
             $this->redirect($loginForm);
         }
@@ -102,23 +92,31 @@ final class AuthController extends BaseController
 
     private function loginUser(User $user, string $requestedNext = ''): void
     {
-        $this->ensureSession();
-        session_regenerate_id(true);
-
-        SessionUser::storeInSession($user);
-
-        $role = $user->role instanceof UserRole ? $user->role->value : strtolower((string) $user->role);
-        if ($role === UserRole::admin->value) {
-            $_SESSION['admin'] = true;
-        }
-
+        $role = SessionUser::beginAuthenticatedSession($user);
         $this->redirect(AuthRedirect::targetAfterLogin($role, $requestedNext));
     }
 
-    private function optionalPhone(): ?string
+    private function showAuthForm(string $view, string $title): void
     {
-        $phone = trim($this->str('phone'));
-        return $phone === '' ? null : $phone;
+        $this->ensureSession();
+
+        $this->view($view, [
+            'title' => $title,
+            'next' => AuthRedirect::remember($this->str('next')),
+            'formAction' => $this->authAction($view === 'auth/login' ? 'login' : 'register'),
+            'loginPath' => '/loginForm',
+            'registerPath' => '/registerForm',
+        ], 'auth');
+    }
+
+    private function authAction(string $action): string
+    {
+        return ($this->isAdminRoute() ? '/admin' : '') . '/' . $action;
+    }
+
+    private function loginFormPath(): string
+    {
+        return $this->isAdminRoute() ? '/admin/loginForm' : '/loginForm';
     }
 
     private function isAdminRoute(): bool
