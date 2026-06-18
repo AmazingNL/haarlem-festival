@@ -5,18 +5,20 @@ namespace App\Controllers;
 
 use App\Core\BaseController;
 use App\DTO\PageData;
-use App\DTO\SectionInput;
+use App\DTO\SectionInputDTO;
 use App\Models\Page;
 use App\Models\User;
 use App\Models\Enum\PageStatus;
 use App\Models\Enum\SectionType;
 use App\Models\Enum\UserRole;
-use App\Services\ICmsService;
-use App\Services\IPageSectionService;
-use App\Services\IUserService;
+use App\Services\Interfaces\ICmsService;
+use App\Services\Interfaces\IPageSectionService;
+use App\Services\Interfaces\IUserService;
+use App\Services\Implementations\AdminDanceAvailabilityService;
+use App\Services\Implementations\OrderService;
 use App\Models\PageSection;
 use App\Models\Image;
-use App\Services\IImageService;
+use App\Services\Interfaces\IImageService;
 use App\Schemas\SectionFactory;
 use Exception;
 use Throwable;
@@ -27,17 +29,23 @@ final class CmsController extends BaseController
     private IPageSectionService $pageSectionService;
     private IUserService $userService;
     private IImageService $imageService;
+    private OrderService $orderService;
+    private AdminDanceAvailabilityService $adminDanceAvailabilityService;
 
     public function __construct(
         ICmsService $cmsService,
         IPageSectionService $pageSectionService,
         IUserService $userService,
         IImageService $imageService,
+        OrderService $orderService,
+        AdminDanceAvailabilityService $adminDanceAvailabilityService,
     ) {
         $this->cmsService = $cmsService;
         $this->pageSectionService = $pageSectionService;
         $this->userService = $userService;
         $this->imageService = $imageService;
+        $this->orderService = $orderService;
+        $this->adminDanceAvailabilityService = $adminDanceAvailabilityService;
     }
 
     public function index(): void
@@ -179,8 +187,7 @@ final class CmsController extends BaseController
             $this->redirect('/admin/pages/viewPage');
 
         } catch (Throwable $e) {
-            error_log('Delete page failed: ' . $e->getMessage());
-            $this->setFlash('error', 'Something went wrong.');
+            $this->setFlash('error', 'Something went wrong  ' . $e);
             $this->redirect('/admin/pages/viewPage');
         }
     }
@@ -202,11 +209,12 @@ final class CmsController extends BaseController
                 'admin_dashboard'
             );
         } catch (Throwable $e) {
-            error_log('Page section form failed: ' . $e->getMessage());
-            $this->setFlash('error', 'Something went wrong.');
+            $this->setFlash('error', 'Something went wrong' . $e);
             $this->redirect('/admin/pages/createPage');
         }
     }
+
+    // Create the page section and save to DB
     public function createPageSection($page_id): void
     {
         $this->ensureSession();
@@ -219,22 +227,23 @@ final class CmsController extends BaseController
         try {
             $this->verifyCsrf();
             $sectionType = $this->str('section_type');
+            // returns the section form field and elements from the service with it's section type
             $sectionField = $this->pageSectionService->resolveSectionFormFields($sectionType);
-            $sectionInput = $this->mapSectionInput($pageId, $sectionField);
+            // map the section form input field to the DTO
+            $sectionInput = $this->mapSectionInputDTO($pageId, $sectionField);
 
-            $section = $this->pageSectionService->buildSectionFromDto($sectionInput);
-            $this->pageSectionService->createSection($section);
+            // Build the PageSection content and save to DB
+            $this->pageSectionService->createSection($sectionInput);
 
-            $this->setFlash('success', 'Section created successfully.');
+            $this->setFlash('success', 'Section created successful');
             $this->redirect('/admin/pageSection/'. $pageId . '/viewPageSections');
         } catch (Throwable $e) {
-            error_log('Section creation error: ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
-            error_log('Stack trace: ' . $e->getTraceAsString());
-            $this->setFlash('error', 'Something went wrong.');
+            $this->setFlash('error', 'Something went wrong: ' );
             $this->redirect('/admin/dashboard');
         }
     }
 
+    // Render a dynamic section from with Ajax fetch call
     public function renderSectionForm(): void
     {
         $this->ensureSession();
@@ -266,8 +275,7 @@ final class CmsController extends BaseController
                 'admin_dashboard'
             );
         } catch (Throwable $e) {
-            error_log('View page sections failed: ' . $e->getMessage());
-            $this->setFlash('error', 'Something went wrong.');
+            $this->setFlash('error', 'Something went wrong' . $e);
             $this->redirect('/admin/pages/' . $page_id . '/editForm');
         }
     }
@@ -284,7 +292,7 @@ final class CmsController extends BaseController
                 return;
             }
             $sectionTypeValue = $pageSection->section_type instanceof SectionType
-                ? $pageSection->section_type->value : (string) $pageSection->section_type;
+                ? $pageSection->section_type->value : (string)  $pageSection->section_type;
             if ($sectionTypeValue === '') {
                 $this->setFlash('error', 'No Section Type found');
                 $this->redirect('/admin/pageSection/' . $section_id . '/editSectionForm');
@@ -305,9 +313,8 @@ final class CmsController extends BaseController
                 'admin_dashboard'
             );
         } catch (Throwable $e) {
-            error_log('Edit section form failed: ' . $e->getMessage());
-            $this->setFlash('error', 'Something went wrong.');
-            $this->redirect('/admin/dashboard');
+            $this->setFlash('error', 'Something went wrong: ' . $e->getMessage());
+            $this->redirect('/admin/page_section');
         }
     }
     //------------- POST Edit section -----------------//
@@ -320,9 +327,8 @@ final class CmsController extends BaseController
             $pageId = (int) $existingSection->page_id;
             $sectionType = $this->str('section_type');
             $sectionField = $this->pageSectionService->resolveSectionFormFields($sectionType);
-            $sectionInput = $this->mapSectionInput($pageId, $sectionField);
+            $sectionInput = $this->mapSectionInputDTO($pageId, $sectionField);
 
-            $pageSection = $this->pageSectionService->buildSectionFromDto($sectionInput);
             $updated = $this->pageSectionService->updateSection($pageSection);
             if ($updated === false) {
                 $this->setFlash('error', 'Section not saving');
@@ -332,15 +338,33 @@ final class CmsController extends BaseController
             $this->setFlash('success', 'Section updated successfully');
             $this->redirect('/admin/pageSection/' . $pageSection->page_id . '/viewPageSections');
         } catch (Throwable $e) {
-            $this->setFlash('error', 'Something went wrong while saving.');
+            $this->setFlash('error', 'Something went wrong while saving  ' . $e);
             $this->redirect('/admin/pageSection/' . $sectionId . '/editSectionForm');
         }
     }
 
+    // private function syncRestaurantCapacity(SectionInputDTO $input): void
+    // {
+    //     if ($input->sectionType !== 'restaurant_card') {
+    //         return;
+    //     }
+
+    //     try {
+    //         $fields = $input->fields;
+    //         $this->restaurantAvailability->syncCapacityFromCard(
+    //             (string) ($fields['button_link'] ?? ''),
+    //             (int) ($fields['capacity'] ?? 0),
+    //             (string) ($fields['title'] ?? '')
+    //         );
+    //     } catch (Throwable $e) {
+    //         error_log('Restaurant capacity sync failed: ' . $e->getMessage());
+    //     }
+    // }
+
     /**
-     * 
+     *
      * @param PageSection $section
-     * 
+     *
      **/
     private function sectionFormData(PageSection $section, string $sectionType, array $sectionField): array
     {
@@ -373,8 +397,24 @@ final class CmsController extends BaseController
     /**
      * Map section form input through BaseController helpers so services don't read raw $_POST.
      */
-    private function mapSectionInput(int $pageId, array $sectionField): SectionInput
+    private function mapSectionInputDTO(int $pageId, array $sectionField): SectionInputDTO
     {
+
+        $fields = $this->mapFields($sectionField);
+        $files = $this->mapFiles($sectionField);
+
+        return new SectionInputDTO(
+            $pageId,
+            $this->int('section_id'),
+            $this->str('section_type'),
+            $this->int('sort_order'),
+            $this->int('is_published') === 1,
+            $fields,
+            $files
+        );
+    }
+
+    private function mapFields(array $sectionField): array{
         $fields = [];
 
         foreach ($sectionField as $fieldName => $config) {
@@ -395,7 +435,11 @@ final class CmsController extends BaseController
 
             $fields[$fieldName] = trim((string) $value);
         }
+        return $fields;
+    }
 
+    private function mapFiles(array $sectionField): array
+    {
         $files = [];
 
         foreach ($sectionField as $fieldName => $config) {
@@ -409,16 +453,7 @@ final class CmsController extends BaseController
                 $files[$fieldName] = $file;
             }
         }
-
-        return new SectionInput(
-            $pageId,
-            $this->int('section_id'),
-            $this->str('section_type'),
-            $this->int('sort_order'),
-            $this->int('is_published') === 1,
-            $fields,
-            $files
-        );
+        return $files;
     }
     //------- Delete Section --------------//
 
@@ -492,6 +527,162 @@ final class CmsController extends BaseController
         $sort = $this->str('sort', 'date_desc');
         $users = $this->userService->filterUsers($role, $search, $sort);
         $this->view('admin/manage_users', compact('users', 'role', 'search', 'sort') + ['title' => 'Manage Users'], 'admin_dashboard');
+    }
+
+    public function viewOrders(): void
+    {
+        $this->view(
+            'admin/orders',
+            [
+                'orders' => $this->orderService->findOrdersForAdmin(),
+                'title' => 'Orders',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function viewOrderDetail(int $order_id): void
+    {
+        $order = $this->orderService->findOrderForAdmin($order_id);
+        if ($order === null) {
+            $this->setFlash('error', 'Order not found.');
+            $this->redirect('/admin/orders');
+            return;
+        }
+
+        $this->view(
+            'admin/order_detail',
+            [
+                'order' => $order,
+                'title' => 'Order #' . $order_id,
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function exportOrders(): void
+    {
+        $rows = $this->orderService->getOrderExportRows();
+
+        if (ob_get_length()) {
+            ob_clean();
+        }
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="haarlem-orders.csv"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        echo "\xEF\xBB\xBF";
+        echo "sep=;\r\n";
+
+        $output = fopen('php://output', 'w');
+        if ($output === false) {
+            exit;
+        }
+
+        fputcsv($output, [
+            'order id',
+            'customer name',
+            'email',
+            'phone',
+            'order status',
+            'payment status',
+            'provider',
+            'total',
+            'paid at',
+            'item title',
+            'ticket type',
+            'quantity',
+            'unit price',
+            'line total',
+            'venue/location',
+            'event id',
+            'ticket type id',
+        ], ';');
+
+        foreach ($rows as $row) {
+            $firstName = trim((string) ($row['first_name'] ?? ''));
+            $lastName = trim((string) ($row['last_name'] ?? ''));
+
+            fputcsv($output, [
+                (int) ($row['order_id'] ?? 0),
+                trim($firstName . ' ' . $lastName),
+                (string) ($row['email'] ?? ''),
+                (string) ($row['phone'] ?? ''),
+                (string) ($row['order_status'] ?? ''),
+                (string) ($row['payment_status'] ?? ''),
+                (string) ($row['provider'] ?? ''),
+                number_format((float) ($row['total_price'] ?? 0), 2, '.', ''),
+                (string) ($row['paid_at'] ?? ''),
+                (string) ($row['item_title'] ?? ''),
+                (string) ($row['ticket_title'] ?? ''),
+                (int) ($row['quantity'] ?? 0),
+                number_format((float) ($row['unit_price'] ?? 0), 2, '.', ''),
+                number_format((float) ($row['line_total'] ?? 0), 2, '.', ''),
+                (string) ($row['location_name'] ?? ''),
+                (int) ($row['event_id'] ?? 0),
+                (int) ($row['ticket_type_id'] ?? 0),
+            ], ';');
+        }
+
+        fclose($output);
+        exit;
+    }
+
+    public function viewSeatsOverview(): void
+    {
+        $this->view(
+            'admin/seats',
+            [
+                'title' => 'Seats Management',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function viewDanceSeatOverview(): void
+    {
+        $this->view(
+            'admin/dance_seats',
+            [
+                'events' => $this->adminDanceAvailabilityService->getDanceEventsWithTicketTypes(),
+                'title' => 'Dance Ticket Availability',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function viewDanceEventSeats(int $event_id): void
+    {
+        $event = $this->adminDanceAvailabilityService->getDanceEventWithTicketTypes($event_id);
+        if ($event === null) {
+            $this->setFlash('error', 'Dance event not found.');
+            $this->redirect('/admin/dance/seats');
+            return;
+        }
+
+        $this->view(
+            'admin/dance_event_seats',
+            [
+                'event' => $event,
+                'title' => 'Dance Ticket Availability',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function updateDanceEventSeats(int $event_id): void
+    {
+        try {
+            $this->verifyCsrf();
+            $this->adminDanceAvailabilityService->updateTicketQuantities($event_id, $_POST);
+            $this->setFlash('success', 'Dance ticket availability updated.');
+        } catch (Throwable $e) {
+            $this->setFlash('error', $e->getMessage());
+        }
+
+        $this->redirect('/admin/dance/seats/' . $event_id);
     }
 
     // minimal stubs for routes referenced in Router

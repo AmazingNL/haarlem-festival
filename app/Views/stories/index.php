@@ -21,9 +21,7 @@
             require __DIR__ . '/storytelling_schedule.php';
             break;
 
-        case 'stories_booking':
-            require __DIR__ . '/booking_card.php';
-            break;
+        // stories_booking is shown only on the detail page, not the landing page
 
         default:
             break;

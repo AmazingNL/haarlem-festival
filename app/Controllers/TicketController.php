@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\ITicketService;
+use App\Services\Interfaces\ITicketService;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 
@@ -59,7 +59,13 @@ final class TicketController extends BaseController
      */
     public function scanPage(): void
     {
-        $this->view('admin_dashboard/scan_ticket', ['title' => 'Scan Ticket'], layout: 'admin_dashboard');
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        $scanBasePath = str_starts_with($uri, '/employee') ? '/employee/tickets' : '/admin/tickets';
+
+        $this->view('admin_dashboard/scan_ticket', [
+            'title' => 'Scan Ticket',
+            'scanBasePath' => $scanBasePath,
+        ], layout: 'admin_dashboard');
     }
 
     /**

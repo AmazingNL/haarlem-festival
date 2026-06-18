@@ -1,4 +1,3 @@
--- migrate:up
 USE haarlem_festival;
 
 CREATE TABLE IF NOT EXISTS payments (
@@ -12,6 +11,3 @@ CREATE TABLE IF NOT EXISTS payments (
   created_at       DATETIME     DEFAULT CURRENT_TIMESTAMP,
   paid_at          DATETIME     DEFAULT NULL
 );
-
--- migrate:down
-DROP TABLE IF EXISTS payments;

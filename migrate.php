@@ -138,19 +138,7 @@ try {
         return (int) $stmt->fetchColumn() > 0;
     };
 
-    $extractUpSection = static function (string $sql): string {
-    $upMarker   = '-- migrate:up';
-    $downMarker = '-- migrate:down';
-    $upPos = strpos($sql, $upMarker);
-    if ($upPos === false) {
-        return $sql;
-    }
-    $content = substr($sql, $upPos + strlen($upMarker));
-    $downPos = strpos($content, $downMarker);
-    return $downPos !== false ? substr($content, 0, $downPos) : $content;
-};
-
-$executeSqlBatch = static function (string $sql) use ($pdo): void {
+    $executeSqlBatch = static function (string $sql) use ($pdo): void {
         if (trim($sql) === '') {
             return;
         }
@@ -163,7 +151,7 @@ $executeSqlBatch = static function (string $sql) use ($pdo): void {
         }
     };
 
-    $runSqlFiles = function (string $pattern, string $label) use ($executeSqlBatch, $extractUpSection): void {
+    $runSqlFiles = function (string $pattern, string $label) use ($executeSqlBatch): void {
         $files = glob($pattern);
         sort($files);
 
@@ -178,15 +166,13 @@ $executeSqlBatch = static function (string $sql) use ($pdo): void {
             if ($sql === false) {
                 throw new RuntimeException("Unable to read {$label} file: {$file}");
             }
-            $executeSqlBatch($extractUpSection($sql));
+            $executeSqlBatch($sql);
         }
     };
 
     $applyMigrations = static function (array $files, bool $allowBaselineForExistingSchema) use (
         $pdo,
-        $db,
         $executeSqlBatch,
-        $extractUpSection,
         $ensureMigrationTable,
         $getAppliedMigrations,
         $markMigrationApplied,
@@ -255,8 +241,7 @@ $executeSqlBatch = static function (string $sql) use ($pdo): void {
                 throw new RuntimeException("Unable to read migration file: {$file}");
             }
 
-            $pdo->exec("USE `{$db}`");
-            $executeSqlBatch($extractUpSection($sql));
+            $executeSqlBatch($sql);
             $markMigrationApplied($name, $checksum);
             $applied[$name] = $checksum;
         }

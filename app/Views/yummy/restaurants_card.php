@@ -72,6 +72,7 @@
             $buttonText = $normalizeText($card['button_text'] ?? 'View');
             $buttonLink = $normalizeText($card['button_link'] ?? '#');
             $capacity = $normalizeText($card['capacity'] ?? '', '0');
+            $capacityTotal = $normalizeText($card['capacity_total'] ?? '', '');
             $cuisines = $normalizeCuisines($card['cuisine'] ?? []);
             $image = $getImage($card);
             $searchData = trim(strip_tags($title . ' ' . implode(' ', $cuisines)));
@@ -123,7 +124,7 @@
                     <section class="card-footer">
                         <p>Available Seats</p>
                         <section class="strong">
-                            <strong><?= htmlspecialchars($capacity, ENT_QUOTES, 'UTF-8') ?></strong>
+                            <strong><?= htmlspecialchars($capacityTotal !== '' ? $capacity . ' / ' . $capacityTotal : $capacity, ENT_QUOTES, 'UTF-8') ?></strong>
                             <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M3.75 15V21.25M3.75 21.25H6.25C8.01776 21.25 8.90165 21.25 9.45082 21.7991C10 22.3484 10 23.2323 10 25V26.25M3.75 21.25V26.25"

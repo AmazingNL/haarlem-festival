@@ -18,4 +18,12 @@ interface IStoriesRepository
      * @return array|null     Associative row with JSON content merged, or null if not found.
      */
     public function getShowById(int $id): ?array;
+
+    /**
+     * Fetch a published stories_booking section row by the slug stored in its JSON content.
+     *
+     * @param  string     $slug The slug field inside the JSON content column.
+     * @return array|null       Associative row with JSON content merged, or null if not found.
+     */
+    public function getShowBySlug(string $slug): ?array;
 }
