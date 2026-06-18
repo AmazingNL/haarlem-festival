@@ -8,7 +8,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 final class Mailer implements IMailer
 {
-    public function send(string $toEmail, string $toName, string $subject, string $htmlBody, string $textBody = ''): void
+    public function send(string $toEmail, string $toName, string $subject, string $htmlBody, string $textBody = '', array $attachments = []): void
     {
         $toEmail = trim($toEmail);
         if ($toEmail === '' || !filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
@@ -40,6 +40,21 @@ final class Mailer implements IMailer
         $mail->isHTML(true);
         $mail->Body = $htmlBody;
         $mail->AltBody = $textBody;
+
+        foreach ($attachments as $attachment) {
+            $content = (string) ($attachment['content'] ?? '');
+            $filename = trim((string) ($attachment['filename'] ?? ''));
+            if ($content === '' || $filename === '') {
+                continue;
+            }
+            $mail->addStringAttachment(
+                $content,
+                $filename,
+                PHPMailer::ENCODING_BASE64,
+                (string) ($attachment['mime'] ?? 'application/octet-stream')
+            );
+        }
+
         $mail->send();
     }
 

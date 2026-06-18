@@ -362,6 +362,6 @@ function createShopController(): App\Controllers\ShopController
         createCheckoutValidationService(),
         new App\Services\StripePaymentService(),
         new App\Repositories\PendingCheckoutRepository(),
-        new App\Services\OrderEmailService(createMailer())
+        new App\Services\OrderEmailService(createMailer(), new App\Services\InvoiceService())
     );
 }

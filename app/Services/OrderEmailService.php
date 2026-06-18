@@ -10,11 +10,12 @@ use chillerlan\QRCode\QROptions;
 final class OrderEmailService
 {
     private IMailer $mailer;
+    private InvoiceService $invoiceService;
 
-    /** @param IMailer $mailer */
-    public function __construct(IMailer $mailer)
+    public function __construct(IMailer $mailer, InvoiceService $invoiceService)
     {
         $this->mailer = $mailer;
+        $this->invoiceService = $invoiceService;
     }
 
     /**
@@ -36,12 +37,25 @@ final class OrderEmailService
         $name      = trim($firstName . ' ' . $lastName) ?: 'Festival guest';
         $orderId   = (int) ($order['order_id'] ?? 0);
 
+        $attachments = [];
+        try {
+            $attachments[] = [
+                'content' => $this->invoiceService->renderPdf($order),
+                'filename' => $this->invoiceService->fileName($order),
+                'mime' => 'application/pdf',
+            ];
+        } catch (\Throwable $e) {
+            // A failed invoice render must not block the confirmation email.
+            $attachments = [];
+        }
+
         $this->mailer->send(
             $email,
             $name,
             'Haarlem Festival 2026 — Order #' . $orderId . ' confirmed',
             $this->buildHtml($name, $order),
-            $this->buildText($name, $order)
+            $this->buildText($name, $order),
+            $attachments
         );
     }
 
@@ -61,6 +75,7 @@ final class OrderEmailService
         $html .= '<p>Hello ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . ',</p>';
         $html .= '<p>Your payment for order <strong>#' . $orderId . '</strong> is confirmed.</p>';
         $html .= '<p><strong>Total paid: EUR ' . htmlspecialchars($total, ENT_QUOTES, 'UTF-8') . '</strong></p>';
+        $html .= '<p>Your invoice (PDF) is attached to this email.</p>';
 
         if ($tickets !== []) {
             $html .= '<p style="margin-top:24px;">Show the QR code(s) below at the venue entrance:</p>';
@@ -104,6 +119,7 @@ final class OrderEmailService
 
         return "Hello {$name},\n\n"
             . "Your payment for order #{$orderId} is confirmed. Total paid: EUR {$total}.\n\n"
+            . "Your invoice (PDF) is attached to this email.\n\n"
             . ($count > 0 ? "You have {$count} ticket(s). Log in to view your QR codes:\n/orders/{$orderId}/success\n\n" : '')
             . "Haarlem Festival 2026";
     }
