@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\ITicketService;
+use App\Services\Interfaces\ITicketService;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 

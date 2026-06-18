@@ -5,20 +5,20 @@ namespace App\Controllers;
 
 use App\Core\BaseController;
 use App\DTO\PageData;
-use App\DTO\SectionInput;
+use App\DTO\SectionInputDTO;
 use App\Models\Page;
 use App\Models\User;
 use App\Models\Enum\PageStatus;
 use App\Models\Enum\SectionType;
 use App\Models\Enum\UserRole;
-use App\Services\AdminDanceAvailabilityService;
-use App\Services\ICmsService;
-use App\Services\IPageSectionService;
-use App\Services\OrderService;
-use App\Services\IUserService;
+use App\Services\Interfaces\ICmsService;
+use App\Services\Interfaces\IPageSectionService;
+use App\Services\Interfaces\IUserService;
+use App\Services\Implementations\AdminDanceAvailabilityService;
+use App\Services\Implementations\OrderService;
 use App\Models\PageSection;
 use App\Models\Image;
-use App\Services\IImageService;
+use App\Services\Interfaces\IImageService;
 use App\Schemas\SectionFactory;
 use Exception;
 use Throwable;
@@ -213,6 +213,8 @@ final class CmsController extends BaseController
             $this->redirect('/admin/pages/createPage');
         }
     }
+
+    // Create the page section and save to DB
     public function createPageSection($page_id): void
     {
         $this->ensureSession();
@@ -225,22 +227,23 @@ final class CmsController extends BaseController
         try {
             $this->verifyCsrf();
             $sectionType = $this->str('section_type');
+            // returns the section form field and elements from the service with it's section type
             $sectionField = $this->pageSectionService->resolveSectionFormFields($sectionType);
-            $sectionInput = $this->mapSectionInput($pageId, $sectionField);
+            // map the section form input field to the DTO
+            $sectionInput = $this->mapSectionInputDTO($pageId, $sectionField);
 
-            $section = $this->pageSectionService->buildSectionFromDto($sectionInput);
-            $this->pageSectionService->createSection($section);
+            // Build the PageSection content and save to DB
+            $this->pageSectionService->createSection($sectionInput);
 
             $this->setFlash('success', 'Section created successful');
             $this->redirect('/admin/pageSection/'. $pageId . '/viewPageSections');
         } catch (Throwable $e) {
-            error_log('Section creation error: ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
-            error_log('Stack trace: ' . $e->getTraceAsString());
-            $this->setFlash('error', 'Something went wrong: ' . $e);
+            $this->setFlash('error', 'Something went wrong: ' );
             $this->redirect('/admin/dashboard');
         }
     }
 
+    // Render a dynamic section from with Ajax fetch call
     public function renderSectionForm(): void
     {
         $this->ensureSession();
@@ -324,9 +327,8 @@ final class CmsController extends BaseController
             $pageId = (int) $existingSection->page_id;
             $sectionType = $this->str('section_type');
             $sectionField = $this->pageSectionService->resolveSectionFormFields($sectionType);
-            $sectionInput = $this->mapSectionInput($pageId, $sectionField);
+            $sectionInput = $this->mapSectionInputDTO($pageId, $sectionField);
 
-            $pageSection = $this->pageSectionService->buildSectionFromDto($sectionInput);
             $updated = $this->pageSectionService->updateSection($pageSection);
             if ($updated === false) {
                 $this->setFlash('error', 'Section not saving');
@@ -341,10 +343,28 @@ final class CmsController extends BaseController
         }
     }
 
+    // private function syncRestaurantCapacity(SectionInputDTO $input): void
+    // {
+    //     if ($input->sectionType !== 'restaurant_card') {
+    //         return;
+    //     }
+
+    //     try {
+    //         $fields = $input->fields;
+    //         $this->restaurantAvailability->syncCapacityFromCard(
+    //             (string) ($fields['button_link'] ?? ''),
+    //             (int) ($fields['capacity'] ?? 0),
+    //             (string) ($fields['title'] ?? '')
+    //         );
+    //     } catch (Throwable $e) {
+    //         error_log('Restaurant capacity sync failed: ' . $e->getMessage());
+    //     }
+    // }
+
     /**
-     * 
+     *
      * @param PageSection $section
-     * 
+     *
      **/
     private function sectionFormData(PageSection $section, string $sectionType, array $sectionField): array
     {
@@ -377,8 +397,24 @@ final class CmsController extends BaseController
     /**
      * Map section form input through BaseController helpers so services don't read raw $_POST.
      */
-    private function mapSectionInput(int $pageId, array $sectionField): SectionInput
+    private function mapSectionInputDTO(int $pageId, array $sectionField): SectionInputDTO
     {
+
+        $fields = $this->mapFields($sectionField);
+        $files = $this->mapFiles($sectionField);
+
+        return new SectionInputDTO(
+            $pageId,
+            $this->int('section_id'),
+            $this->str('section_type'),
+            $this->int('sort_order'),
+            $this->int('is_published') === 1,
+            $fields,
+            $files
+        );
+    }
+
+    private function mapFields(array $sectionField): array{
         $fields = [];
 
         foreach ($sectionField as $fieldName => $config) {
@@ -399,7 +435,11 @@ final class CmsController extends BaseController
 
             $fields[$fieldName] = trim((string) $value);
         }
+        return $fields;
+    }
 
+    private function mapFiles(array $sectionField): array
+    {
         $files = [];
 
         foreach ($sectionField as $fieldName => $config) {
@@ -413,16 +453,7 @@ final class CmsController extends BaseController
                 $files[$fieldName] = $file;
             }
         }
-
-        return new SectionInput(
-            $pageId,
-            $this->int('section_id'),
-            $this->str('section_type'),
-            $this->int('sort_order'),
-            $this->int('is_published') === 1,
-            $fields,
-            $files
-        );
+        return $files;
     }
     //------- Delete Section --------------//
 

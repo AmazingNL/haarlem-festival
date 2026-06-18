@@ -1,32 +1,24 @@
 <?php
-// src/Domain/Event.php
 
 declare(strict_types=1);
 
 namespace App\Models;
 
+/**
+ * A festival event held at a location, offering one or more ticket types.
+ */
 final class Event
 {
-    public ?int $eventId = null;
-    public string $title = '';
-    public string $type = '';
-    public string $startTime = '';
-    public string $endTime = '';
-    public int $locationId = 0;
-    public int $capacity = 0;
-
     public function __construct(
-        int $eventid, string $title, string $type, int $location, int $capacity
-    ){
-        $currentDateTime = date('Y-m-d H:i:s');
-
-        $this->eventId = $eventid;
-        $this->title = $title;
-        $this->type = $type;
-        $this->startTime = $currentDateTime;
-        $this->endTime = $currentDateTime;
-        $this->locationId = $location;
-        $this->capacity = $capacity;
+        public ?int $event_id = null,
+        public string $title = '',
+        public string $slug = '',
+        public string $description = '',
+        public ?string $start_datetime = null,
+        public ?string $end_datetime = null,
+        public int $location_id = 0,
+        public ?int $image_id = null,
+        public bool $is_published = false,
+    ) {
     }
-
 }

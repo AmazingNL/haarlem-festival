@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\OrderService;
-use App\Services\ProgramService;
+use App\Services\Implementations\OrderService;
+use App\Services\Implementations\ProgramService;
 
 final class ProgramController extends BaseController
 {

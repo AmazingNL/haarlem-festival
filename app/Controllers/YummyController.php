@@ -3,11 +3,12 @@
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\ICmsService;
-use App\Services\IPageSectionService;
-use App\Services\ProgramService;
-use App\Services\ReservationEmailService;
-use App\Services\YummyReservationCatalogService;
+use App\Services\Interfaces\ICmsService;
+use App\Services\Interfaces\IPageSectionService;
+use App\Services\Implementations\ProgramService;
+use App\Services\Implementations\ReservationEmailService;
+use App\Services\Implementations\Booking\RestaurantAvailabilityService;
+use App\Services\Implementations\Booking\RestaurantBookingService;
 use App\Support\SessionUser;
 
 final class YummyController extends BaseController
@@ -17,21 +18,24 @@ final class YummyController extends BaseController
     private IPageSectionService $pageSectionService;
     private ProgramService $programService;
     private ReservationEmailService $reservationEmailService;
-    private YummyReservationCatalogService $yummyReservationCatalogService;
+    private RestaurantBookingService $restaurantBookingService;
+    private RestaurantAvailabilityService $restaurantAvailability;
 
     public function __construct(
         ICmsService $adminPageService,
         IPageSectionService $pageSectionService,
         ProgramService $programService,
         ReservationEmailService $reservationEmailService,
-        YummyReservationCatalogService $yummyReservationCatalogService
+        RestaurantBookingService $restaurantBookingService,
+        RestaurantAvailabilityService $restaurantAvailability
     )
     {
         $this->adminPageService = $adminPageService;
         $this->pageSectionService = $pageSectionService;
         $this->programService = $programService;
         $this->reservationEmailService = $reservationEmailService;
-        $this->yummyReservationCatalogService = $yummyReservationCatalogService;
+        $this->restaurantBookingService = $restaurantBookingService;
+        $this->restaurantAvailability = $restaurantAvailability;
     }
 
     public function yummy(): void
@@ -54,7 +58,7 @@ final class YummyController extends BaseController
             }
             $this->view(
                 'yummy/index',
-                ['section' => $pageSection, 'title' => 'Yummy']
+                ['section' => $this->withLiveCapacity($pageSection), 'title' => 'Yummy']
             );
 
         } catch (\Throwable $e) {
@@ -63,6 +67,31 @@ final class YummyController extends BaseController
                 ['error' => 'Something went wrong' . $e]
             );
         }
+    }
+
+    /**
+     * Replace each restaurant card's static "Available Seats" with the live remaining
+     * count (real venue capacity minus the busiest booked slot), keeping the total for display.
+     *
+     * @param array<int, array<string, mixed>> $sections
+     * @return array<int, array<string, mixed>>
+     */
+    private function withLiveCapacity(array $sections): array
+    {
+        foreach ($sections as &$section) {
+            if (($section['section_type'] ?? '') !== 'restaurant_card') {
+                continue;
+            }
+
+            $availability = $this->restaurantAvailability->availabilityForLink((string) ($section['button_link'] ?? ''));
+            if ($availability['has_venue']) {
+                $section['capacity'] = (string) $availability['remaining'];
+                $section['capacity_total'] = (string) $availability['capacity'];
+            }
+        }
+        unset($section);
+
+        return $sections;
     }
 
     public function ratatouille(): void
@@ -136,7 +165,7 @@ final class YummyController extends BaseController
             }
 
             $customer = SessionUser::customerData();
-            $item = $this->yummyReservationCatalogService->buildProgramItem(
+            $item = $this->restaurantBookingService->buildProgramItem(
                 $pageSlug,
                 $locationName,
                 $this->str('date'),

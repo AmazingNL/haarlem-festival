@@ -32,6 +32,13 @@ enum TicketStatus: string
     case cancelled = 'cancelled';
 }
 
+enum ReservationStatus: string
+{
+    case pending = 'pending';
+    case confirmed = 'confirmed';
+    case cancelled = 'cancelled';
+}
+
 enum PageStatus: string
 {
     case draft = 'draft';
