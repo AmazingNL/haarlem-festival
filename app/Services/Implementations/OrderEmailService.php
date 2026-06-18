@@ -49,22 +49,12 @@ final class OrderEmailService
         $attachments = [];
         try {
             $attachments[] = [
-<<<<<<< HEAD:app/Services/OrderEmailService.php
-                'filename' => $this->invoiceService->filename($orderId),
-                'content' => $this->invoiceService->generatePdf($order),
-                'mime' => 'application/pdf',
-            ];
-        } catch (\Throwable $e) {
-            error_log('Invoice PDF failed: ' . $e->getMessage());
-=======
                 'content' => $this->invoiceService->renderPdf($order),
                 'filename' => $this->invoiceService->fileName($order),
                 'mime' => 'application/pdf',
             ];
         } catch (\Throwable $e) {
-            // A failed invoice render must not block the confirmation email.
             $attachments = [];
->>>>>>> origin/dev:app/Services/Implementations/OrderEmailService.php
         }
 
         $this->mailer->send(
