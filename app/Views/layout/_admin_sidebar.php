@@ -5,6 +5,7 @@ $current = $_SERVER['REQUEST_URI'] ?? '/';
 $isDashboard = ($current === '/admin' || $current === '/admin/dashboard');
 $isPages     = str_starts_with($current, '/admin/pages') || str_starts_with($current, '/admin/pageSection');
 $isUsers     = str_starts_with($current, '/admin/users');
+$isScan      = str_starts_with($current, '/admin/tickets');
 ?>
 <aside class="col-md-3 mb-4">
     <div class="admin-sidebar">
@@ -30,6 +31,11 @@ $isUsers     = str_starts_with($current, '/admin/users');
                 <li>
                     <a class="sidebar-link <?= $isUsers ? 'active' : '' ?>" href="/admin/users">
                         Users
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-link <?= $isScan ? 'active' : '' ?>" href="/admin/tickets/scan">
+                        Scan Ticket
                     </a>
                 </li>
             </ul>

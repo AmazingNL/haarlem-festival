@@ -27,6 +27,7 @@ MODIFY section_type ENUM(
   'storytelling_schedule',
   'haarlem_unique',
   'haarlem_taste',
+  'reservation',
   'history_hero',
   'history_timeline',
   'history_gallery',

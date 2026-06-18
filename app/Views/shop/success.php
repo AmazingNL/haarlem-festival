@@ -1,6 +1,7 @@
 <?php
 
-$order = is_array($order ?? null) ? $order : [];
+$order   = is_array($order ?? null) ? $order : [];
+$tickets = is_array($order['tickets'] ?? null) ? $order['tickets'] : [];
 
 $orderItems = is_array($orderItems ?? null) ? $orderItems : [];
 
@@ -154,6 +155,33 @@ $formatMoney = static fn(float $amount): string => 'EUR ' . number_format($amoun
                 <?php endif; ?>
 
 
+
+                <?php if ($tickets !== []): ?>
+                    <div class="ticket-qr-section">
+                        <h2 class="ticket-qr-section__heading">Your Tickets</h2>
+                        <p class="ticket-qr-section__note">Show this QR code at the venue entrance.</p>
+                        <div class="ticket-qr-grid">
+                            <?php foreach ($tickets as $index => $ticket): ?>
+                                <figure class="ticket-qr-card">
+                                    <img
+                                        src="/qr/<?= htmlspecialchars((string) $ticket['qr_token'], ENT_QUOTES, 'UTF-8') ?>"
+                                        alt="QR code for ticket <?= $index + 1 ?>"
+                                        class="ticket-qr-card__image"
+                                        width="200"
+                                        height="200"
+                                    >
+                                    <figcaption class="ticket-qr-card__label">
+                                        Ticket <?= $index + 1 ?>
+                                        &mdash;
+                                        <span class="ticket-qr-card__status ticket-qr-card__status--<?= htmlspecialchars((string) $ticket['status'], ENT_QUOTES, 'UTF-8') ?>">
+                                            <?= htmlspecialchars(ucfirst((string) $ticket['status']), ENT_QUOTES, 'UTF-8') ?>
+                                        </span>
+                                    </figcaption>
+                                </figure>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
 
                 <div class="shop-total-card__actions">
 

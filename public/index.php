@@ -14,6 +14,9 @@ use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
 use App\Controllers\StoriesController;
 use App\Controllers\PaymentController;
+use App\Controllers\ShopController;
+use App\Controllers\ProgramController;
+use App\Controllers\TicketController;
 
 require __DIR__ . '/../app/bootstrap.php';
 require __DIR__ . '/../vendor/autoload.php';
@@ -110,6 +113,9 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/history/molen-de-adriaan', [HistoryController::class, 'molenDeAdriaan']);
     $r->get('/program', [ProgramController::class, 'index']);
     $r->post('/program/remove', [ProgramController::class, 'removeItem']);
+    $r->get('/qr/{token:[a-f0-9]{64}}', [TicketController::class, 'qrImage']);
+    $r->get('/admin/tickets/scan', [TicketController::class, 'scanPage']);
+    $r->post('/admin/tickets/{token:[a-f0-9]{64}}/scan', [TicketController::class, 'scan']);
 });
 
 
@@ -269,6 +275,12 @@ function createController(string $controllerClass)
                 createOrderService()
             );
 
+        case App\Controllers\TicketController::class:
+
+            return new App\Controllers\TicketController(
+                new App\Services\TicketService(new App\Repositories\TicketRepository())
+            );
+
 
         case App\Controllers\CmsController::class:
 
@@ -346,6 +358,7 @@ function createShopController(): App\Controllers\ShopController
         createOrderService(),
         createCheckoutValidationService(),
         new App\Services\StripePaymentService(),
-        new App\Repositories\PendingCheckoutRepository()
+        new App\Repositories\PendingCheckoutRepository(),
+        new App\Services\OrderEmailService(createMailer())
     );
 }
