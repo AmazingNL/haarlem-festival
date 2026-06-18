@@ -38,9 +38,9 @@ final class EventController extends BaseController
             $this->verifyCsrf();
 
             $item = $this->eventBookingService->buildProgramItem(
-                max(0, $this->int('event_id')),
-                max(0, $this->int('ticket_type_id')),
-                max(1, $this->int('quantity', 1))
+                $this->int('event_id'),
+                $this->int('ticket_type_id'),
+                $this->int('quantity', 1)
             );
 
             $this->programService->addItem($item);
