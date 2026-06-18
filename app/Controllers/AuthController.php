@@ -8,6 +8,7 @@ use App\Core\BaseController;
 use App\Models\Enum\UserRole;
 use App\Models\User;
 use App\Services\Interfaces\IUserService;
+use App\Support\AuthRedirect;
 use App\Support\SessionUser;
 
 final class AuthController extends BaseController
