@@ -58,7 +58,7 @@ final class YummyController extends BaseController
             }
             $this->view(
                 'yummy/index',
-                ['section' => $this->withLiveCapacity($pageSection), 'title' => 'Yummy']
+                ['section' => $this->LiveCapacity($pageSection), 'title' => 'Yummy']
             );
 
         } catch (\Throwable $e) {
@@ -69,14 +69,14 @@ final class YummyController extends BaseController
         }
     }
 
-    /**
-     * Replace each restaurant card's static "Available Seats" with the live remaining
-     * count (real venue capacity minus the busiest booked slot), keeping the total for display.
-     *
+    
+    //Replace each restaurant card's static "Available Seats" with the live remaining
+    // count (real venue capacity minus the busiest booked slot), keeping the total for display.
+    /** 
      * @param array<int, array<string, mixed>> $sections
      * @return array<int, array<string, mixed>>
      */
-    private function withLiveCapacity(array $sections): array
+    private function LiveCapacity(array $sections): array
     {
         foreach ($sections as &$section) {
             if (($section['section_type'] ?? '') !== 'restaurant_card') {
@@ -96,15 +96,23 @@ final class YummyController extends BaseController
 
     public function ratatouille(): void
     {
-        $this->restaurantDetail('ratatouille', 'Ratatouille', '/yummy', 'yummy/ratatouille/index');
+        $this->restaurantDetail(
+            'ratatouille', 
+            '/yummy', 
+            'yummy/ratatouille/index'
+        );
     }
 
     public function bistroToujours(): void
     {
-        $this->restaurantDetail('bistro-toujours', 'Bistro Toujours', '/yummy', 'yummy/bistro_toujours/index');
+        $this->restaurantDetail(
+            'bistro-toujours',
+            '/yummy', 
+            'yummy/bistro_toujours/index'
+        );
     }
 
-    private function restaurantDetail(string $slug, string $title, string $fallbackUrl, string $template): void
+    private function restaurantDetail(string $slug, string $fallbackUrl, string $template): void
     {
         try {
             $page = $this->adminPageService->getPageBySlug($slug);
@@ -116,13 +124,13 @@ final class YummyController extends BaseController
             }
             $this->view(
                 $template,
-                ['section' => $sections, 'page' => $page, 'title' => $title]
+                ['section' => $sections, 'page' => $page, 'title' => $page->title]
             );
 
         } catch (\Exception $e) {
             $this->view(
                 template: 'no_page/index',
-                data: ['error' => $title . ' page not available']
+                data: ['error' => $page->title . ' page not available']
             );
 
         }
@@ -133,7 +141,11 @@ final class YummyController extends BaseController
         $this->ensureSession();
 
         if ($this->isPost()) {
-            $this->addReservationToProgram('bistro-toujours', '/yummy/bistro-toujours', 'Bistro Toujours');
+            $this->addReservationToProgram(
+                'bistro-toujours', 
+                '/yummy/bistro-toujours', 
+                'Bistro Toujours'
+            );
             return;
         }
 
@@ -145,7 +157,10 @@ final class YummyController extends BaseController
         $this->ensureSession();
 
         if ($this->isPost()) {
-            $this->addReservationToProgram('ratatouille', '/yummy/ratatouille', 'Ratatouille Food & Wine');
+            $this->addReservationToProgram(
+                'ratatouille', 
+                '/yummy/ratatouille', 
+                'Ratatouille Food & Wine');
             return;
         }
 
@@ -204,7 +219,6 @@ final class YummyController extends BaseController
             $this->reservationEmailService->sendReservationAdded($customer, $item);
             return true;
         } catch (\Throwable $e) {
-            error_log('Reservation email failed: ' . $e->getMessage());
             return false;
         }
     }
