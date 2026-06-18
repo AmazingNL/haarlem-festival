@@ -59,7 +59,7 @@
       <?php if (!empty($errorMessage)): ?>
         <div class="error-msg"><?= htmlspecialchars((string) $errorMessage, ENT_QUOTES, 'UTF-8') ?></div>
       <?php endif; ?>
-      // Form submits here
+
       <form action="/register" method="POST" autocomplete="on">
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars((string) ($csrf ?? ''), ENT_QUOTES, 'UTF-8') ?>">
         <input type="hidden" name="next" value="<?= htmlspecialchars((string) ($next ?? ''), ENT_QUOTES, 'UTF-8') ?>">

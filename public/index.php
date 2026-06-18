@@ -189,11 +189,6 @@ function createMailer(): App\Services\IMailer
     return new App\Services\Mailer();
 }
 
-function createAccountEmailService(): App\Services\IAccountEmailService
-{
-    return new App\Services\AccountEmailService(createMailer());
-}
-
 function createPageService(): App\Services\CmsService
 {
     return new App\Services\CmsService(new App\Repositories\CmsRepository());
@@ -257,7 +252,7 @@ function createController(string $controllerClass)
             $repo = new App\Repositories\UserRepository();
             $service = new App\Services\UserService($repo);
 
-            return new App\Controllers\AuthController($service, createAccountEmailService());
+            return new App\Controllers\AuthController($service);
 
 
         case App\Controllers\ShopController::class:
