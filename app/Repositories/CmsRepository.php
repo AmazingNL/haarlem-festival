@@ -111,10 +111,11 @@ final class CmsRepository extends BaseRepository implements ICmsRepository
 
     private function hydratePage(array $data): Page
     {
-        $statusRaw = $data['status'] ?? PageStatus::draft;
+        $statusRaw = $data['status'] ?? PageStatus::draft ->value;
+
         $status = $statusRaw instanceof PageStatus
             ? $statusRaw
-            : PageStatus::draft;
+            : (PageStatus::tryFrom((string) $statusRaw) ?? PageStatus::draft);
 
         return new Page(
             isset($data['page_id']) ? (int) $data['page_id'] : null,

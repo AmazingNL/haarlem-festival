@@ -9,6 +9,7 @@
         "ezyang/htmlpurifier": "^4.19",
         "chillerlan/php-qrcode": "^6.0",
         "doctrine/instantiator": "^1.5",
+        "ext-mbstring": "*",
         "dompdf/dompdf": "^3.1"
     },
     "require-dev": {
@@ -20,7 +21,7 @@
         },
         "files": [
             "app/Models/Enum.php"
-     
+
         ]
     }
     ,

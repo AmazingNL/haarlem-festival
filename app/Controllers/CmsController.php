@@ -14,6 +14,8 @@ use App\Models\Enum\UserRole;
 use App\Services\Interfaces\ICmsService;
 use App\Services\Interfaces\IPageSectionService;
 use App\Services\Interfaces\IUserService;
+use App\Services\Implementations\AdminDanceAvailabilityService;
+use App\Services\Implementations\OrderService;
 use App\Models\PageSection;
 use App\Models\Image;
 use App\Services\Interfaces\IImageService;
@@ -27,17 +29,23 @@ final class CmsController extends BaseController
     private IPageSectionService $pageSectionService;
     private IUserService $userService;
     private IImageService $imageService;
+    private OrderService $orderService;
+    private AdminDanceAvailabilityService $adminDanceAvailabilityService;
 
     public function __construct(
         ICmsService $cmsService,
         IPageSectionService $pageSectionService,
         IUserService $userService,
         IImageService $imageService,
+        OrderService $orderService,
+        AdminDanceAvailabilityService $adminDanceAvailabilityService,
     ) {
         $this->cmsService = $cmsService;
         $this->pageSectionService = $pageSectionService;
         $this->userService = $userService;
         $this->imageService = $imageService;
+        $this->orderService = $orderService;
+        $this->adminDanceAvailabilityService = $adminDanceAvailabilityService;
     }
 
     public function index(): void
@@ -284,7 +292,7 @@ final class CmsController extends BaseController
                 return;
             }
             $sectionTypeValue = $pageSection->section_type instanceof SectionType
-                ? $pageSection->section_type->value : (string) $pageSection->section_type;
+                ? $pageSection->section_type->value : (string)  $pageSection->section_type;
             if ($sectionTypeValue === '') {
                 $this->setFlash('error', 'No Section Type found');
                 $this->redirect('/admin/pageSection/' . $section_id . '/editSectionForm');
@@ -519,6 +527,162 @@ final class CmsController extends BaseController
         $sort = $this->str('sort', 'date_desc');
         $users = $this->userService->filterUsers($role, $search, $sort);
         $this->view('admin/manage_users', compact('users', 'role', 'search', 'sort') + ['title' => 'Manage Users'], 'admin_dashboard');
+    }
+
+    public function viewOrders(): void
+    {
+        $this->view(
+            'admin/orders',
+            [
+                'orders' => $this->orderService->findOrdersForAdmin(),
+                'title' => 'Orders',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function viewOrderDetail(int $order_id): void
+    {
+        $order = $this->orderService->findOrderForAdmin($order_id);
+        if ($order === null) {
+            $this->setFlash('error', 'Order not found.');
+            $this->redirect('/admin/orders');
+            return;
+        }
+
+        $this->view(
+            'admin/order_detail',
+            [
+                'order' => $order,
+                'title' => 'Order #' . $order_id,
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function exportOrders(): void
+    {
+        $rows = $this->orderService->getOrderExportRows();
+
+        if (ob_get_length()) {
+            ob_clean();
+        }
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="haarlem-orders.csv"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        echo "\xEF\xBB\xBF";
+        echo "sep=;\r\n";
+
+        $output = fopen('php://output', 'w');
+        if ($output === false) {
+            exit;
+        }
+
+        fputcsv($output, [
+            'order id',
+            'customer name',
+            'email',
+            'phone',
+            'order status',
+            'payment status',
+            'provider',
+            'total',
+            'paid at',
+            'item title',
+            'ticket type',
+            'quantity',
+            'unit price',
+            'line total',
+            'venue/location',
+            'event id',
+            'ticket type id',
+        ], ';');
+
+        foreach ($rows as $row) {
+            $firstName = trim((string) ($row['first_name'] ?? ''));
+            $lastName = trim((string) ($row['last_name'] ?? ''));
+
+            fputcsv($output, [
+                (int) ($row['order_id'] ?? 0),
+                trim($firstName . ' ' . $lastName),
+                (string) ($row['email'] ?? ''),
+                (string) ($row['phone'] ?? ''),
+                (string) ($row['order_status'] ?? ''),
+                (string) ($row['payment_status'] ?? ''),
+                (string) ($row['provider'] ?? ''),
+                number_format((float) ($row['total_price'] ?? 0), 2, '.', ''),
+                (string) ($row['paid_at'] ?? ''),
+                (string) ($row['item_title'] ?? ''),
+                (string) ($row['ticket_title'] ?? ''),
+                (int) ($row['quantity'] ?? 0),
+                number_format((float) ($row['unit_price'] ?? 0), 2, '.', ''),
+                number_format((float) ($row['line_total'] ?? 0), 2, '.', ''),
+                (string) ($row['location_name'] ?? ''),
+                (int) ($row['event_id'] ?? 0),
+                (int) ($row['ticket_type_id'] ?? 0),
+            ], ';');
+        }
+
+        fclose($output);
+        exit;
+    }
+
+    public function viewSeatsOverview(): void
+    {
+        $this->view(
+            'admin/seats',
+            [
+                'title' => 'Seats Management',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function viewDanceSeatOverview(): void
+    {
+        $this->view(
+            'admin/dance_seats',
+            [
+                'events' => $this->adminDanceAvailabilityService->getDanceEventsWithTicketTypes(),
+                'title' => 'Dance Ticket Availability',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function viewDanceEventSeats(int $event_id): void
+    {
+        $event = $this->adminDanceAvailabilityService->getDanceEventWithTicketTypes($event_id);
+        if ($event === null) {
+            $this->setFlash('error', 'Dance event not found.');
+            $this->redirect('/admin/dance/seats');
+            return;
+        }
+
+        $this->view(
+            'admin/dance_event_seats',
+            [
+                'event' => $event,
+                'title' => 'Dance Ticket Availability',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function updateDanceEventSeats(int $event_id): void
+    {
+        try {
+            $this->verifyCsrf();
+            $this->adminDanceAvailabilityService->updateTicketQuantities($event_id, $_POST);
+            $this->setFlash('success', 'Dance ticket availability updated.');
+        } catch (Throwable $e) {
+            $this->setFlash('error', $e->getMessage());
+        }
+
+        $this->redirect('/admin/dance/seats/' . $event_id);
     }
 
     // minimal stubs for routes referenced in Router

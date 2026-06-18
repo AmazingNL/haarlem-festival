@@ -5,6 +5,8 @@ $current = $_SERVER['REQUEST_URI'] ?? '/';
 $isDashboard = ($current === '/admin' || $current === '/admin/dashboard');
 $isPages     = str_starts_with($current, '/admin/pages') || str_starts_with($current, '/admin/pageSection');
 $isUsers     = str_starts_with($current, '/admin/users');
+$isOrders    = str_starts_with($current, '/admin/orders');
+$isSeats     = str_starts_with($current, '/admin/seats') || str_starts_with($current, '/admin/dance/seats');
 $isScan      = str_starts_with($current, '/admin/tickets');
 ?>
 <aside class="col-md-3 mb-4">
@@ -24,7 +26,7 @@ $isScan      = str_starts_with($current, '/admin/tickets');
                     </a>
                 </li>
                 <li>
-                    <a class="sidebar-link <?= $isPages ? 'active' : '' ?>" href="/admin/pages/viewPage">
+                    <a class="sidebar-link <?= $isPages ? 'active' : '' ?>" href="/admin/pages">
                         Pages
                     </a>
                 </li>
@@ -34,8 +36,13 @@ $isScan      = str_starts_with($current, '/admin/tickets');
                     </a>
                 </li>
                 <li>
-                    <a class="sidebar-link <?= $isScan ? 'active' : '' ?>" href="/admin/tickets/scan">
-                        Scan Ticket
+                    <a class="sidebar-link <?= $isOrders ? 'active' : '' ?>" href="/admin/orders">
+                        Orders
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-link <?= $isSeats ? 'active' : '' ?>" href="/admin/seats">
+                        Seats
                     </a>
                 </li>
             </ul>

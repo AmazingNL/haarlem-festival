@@ -9,6 +9,7 @@ use function FastRoute\simpleDispatcher;
 
 use App\Controllers\AuthController;
 use App\Controllers\CmsController;
+use App\Controllers\DanceController;
 use App\Controllers\EventController;
 use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
@@ -21,14 +22,11 @@ use App\Controllers\TicketController;
 require __DIR__ . '/../app/bootstrap.php';
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
-require_once __DIR__ . '/../app/config.php';
+require_once __DIR__ . '/../app/Config.php';
 
 \App\Support\SessionUser::hydrateFromDatabaseIfNeeded();
 
 $dispatcher = simpleDispatcher(function (RouteCollector $r) {
-
-    $r->get('/registerForm', [AuthController::class, 'showRegisterForm']);
-    $r->post('/register', [AuthController::class, 'register']);
 
     $r->get('/admin/register', [AuthController::class, 'showRegisterForm']);
     $r->post('/admin/register', [AuthController::class, 'register']);
@@ -44,6 +42,8 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/admin/dashboard/{page_id:\d+}/delete', [CmsController::class, 'deletePage']);
 
+
+    $r->get('/admin/pages', [CmsController::class, 'viewPages']);
     $r->get('/admin/pages/createPage', [CmsController::class, 'createPageForm']);
     $r->post('/admin/pages/create', [CmsController::class, 'createPage']);
 
@@ -61,21 +61,29 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->post('/admin/pageSection/{section_id:\d+}/editSection', [CmsController::class, 'editSection']);
 
     $r->get('/admin/pageSection/{page_id:\d+}/viewPageSections', [CmsController::class, 'viewPageSections']);
-    $r->get('/admin/pageSection/editPage', [CmsController::class, 'updatePageSection']);
     $r->get('/admin/pageSection/{section_id:\d+}/deleteSection', [CmsController::class, 'deleteSection']);
 
 
     $r->get('/admin/users', [CmsController::class, 'manageUsersPage']);
-
-    $r->get('/admin/events/{event_id:\d+}', [CmsController::class, 'viewEventPage']);
-    $r->get('/admin/events/{event_id:\d+}/delete', [CmsController::class, 'deleteEventPage']);
-    $r->get('/admin/events/{event_id:\d+}/edit', [CmsController::class, 'updateEventPage']);
+    $r->get('/admin/users/create', [CmsController::class, 'createUserForm']);
+    $r->post('/admin/users/create', [CmsController::class, 'createUser']);
+    $r->get('/admin/users/{user_id:\d+}/edit', [CmsController::class, 'editUserForm']);
+    $r->post('/admin/users/{user_id:\d+}/edit', [CmsController::class, 'editUser']);
+    $r->get('/admin/users/{user_id:\d+}/delete', [CmsController::class, 'deleteUser']);
+    $r->get('/admin/orders/export', [CmsController::class, 'exportOrders']);
+    $r->get('/admin/orders', [CmsController::class, 'viewOrders']);
+    $r->get('/admin/orders/{order_id:\d+}', [CmsController::class, 'viewOrderDetail']);
+    $r->get('/admin/seats', [CmsController::class, 'viewSeatsOverview']);
+    $r->get('/admin/dance/seats', [CmsController::class, 'viewDanceSeatOverview']);
+    $r->get('/admin/dance/seats/{event_id:\d+}', [CmsController::class, 'viewDanceEventSeats']);
+    $r->post('/admin/dance/seats/{event_id:\d+}', [CmsController::class, 'updateDanceEventSeats']);
 
 
     $r->post('/admin/media/upload', [CmsController::class, 'uploadImage']);
 
 
-
+    $r->get('/registerForm', [AuthController::class, 'showRegisterForm']);
+    $r->post('/register', [AuthController::class, 'register']);
 
     $r->get('/loginForm', [AuthController::class, 'showLoginForm']);
     $r->post('/login', [AuthController::class, 'login']);
@@ -85,9 +93,9 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/', [HomeController::class, 'index']);
     $r->get('/home', [HomeController::class, 'index']);
-    // show events
+    $r->get('/dance', [DanceController::class, 'index']);
+    $r->get('/dance/artists/{slug:[a-z0-9-]+}', [DanceController::class, 'artistDetail']);
     $r->get('/events', [EventController::class, 'index']);
-    // Add a selected ticket to the cart
     $r->post('/events/add-to-program', [EventController::class, 'addToProgram']);
     $r->get('/checkout', [ShopController::class, 'checkout']);
     $r->post('/checkout/pay', [ShopController::class, 'pay']);
@@ -98,30 +106,20 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/orders/{orderId:\d+}/invoice', [ShopController::class, 'invoice']);
     $r->get('/yummy', [YummyController::class, 'yummy']);
     $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
-    // add yummy ticket to my program
     $r->post('/yummy/ratatouille/book-reservation', [YummyController::class, 'bookReservation']);
     $r->get('/yummy/bistro-toujours', [YummyController::class, 'bistroToujours']);
     $r->post('/yummy/bistro-toujours/book-reservation', [YummyController::class, 'bookBistroToujoursReservation']);
 
     $r->get('/stories', [StoriesController::class, 'index']);
     $r->post('/stories/add-to-program', [StoriesController::class, 'addShowToProgram']);
-    // Payments
-    $r->get('/payments/checkout/{order_id:\d+}', [PaymentController::class, 'checkoutPage']);
-    $r->post('/payments/create-session', [PaymentController::class, 'createCheckoutSession']);
-    $r->post('/webhook/stripe', [PaymentController::class, 'webhook']);
     $r->get('/history', [HistoryController::class, 'index']);
     $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
-    // add history ticket to my program
     $r->post('/history/book-tour/add-to-program', [HistoryController::class, 'addTourToProgram']);
     $r->get('/history/route-map', [HistoryController::class, 'routeMap']);
     $r->get('/history/st-bavos-church', [HistoryController::class, 'stBavosChurch']);
     $r->get('/history/molen-de-adriaan', [HistoryController::class, 'molenDeAdriaan']);
-    // Desplay programs
     $r->get('/program', [ProgramController::class, 'index']);
     $r->post('/program/remove', [ProgramController::class, 'removeItem']);
-    $r->get('/qr/{token:[a-f0-9]{64}}', [TicketController::class, 'qrImage']);
-    $r->get('/admin/tickets/scan', [TicketController::class, 'scanPage']);
-    $r->post('/admin/tickets/{token:[a-f0-9]{64}}/scan', [TicketController::class, 'scan']);
 });
 
 
@@ -208,6 +206,16 @@ function createSectionService(): App\Services\Implementations\PageSectionService
     );
 }
 
+function createDanceArtistService(): App\Services\Implementations\DanceArtistService
+{
+    return new App\Services\Implementations\DanceArtistService(new App\Repositories\DanceArtistRepository());
+}
+
+function createDanceScheduleService(): App\Services\Implementations\DanceScheduleService
+{
+    return new App\Services\Implementations\DanceScheduleService(new App\Repositories\DanceScheduleRepository());
+}
+
 function createController(string $controllerClass)
 {
 
@@ -275,6 +283,15 @@ function createController(string $controllerClass)
                 new App\Services\Implementations\ProgramService()
             );
 
+        case App\Controllers\DanceController::class:
+
+            return new App\Controllers\DanceController(
+                createPageService(),
+                createSectionService(),
+                createDanceArtistService(),
+                createDanceScheduleService()
+            );
+
         case App\Controllers\StoriesController::class:
 
             return new App\Controllers\StoriesController(createStoriesService());
@@ -313,7 +330,8 @@ function createController(string $controllerClass)
                 $sectionService,
                 $userService,
                 createImageService(),
-                createRestaurantAvailabilityService()
+                createOrderService(),
+                createAdminDanceAvailabilityService()
             );
 
         default:
@@ -324,6 +342,13 @@ function createController(string $controllerClass)
 function createOrderService(): App\Services\Implementations\OrderService
 {
     return new App\Services\Implementations\OrderService(new App\Repositories\OrderRepository());
+}
+
+function createAdminDanceAvailabilityService(): App\Services\Implementations\AdminDanceAvailabilityService
+{
+    return new App\Services\Implementations\AdminDanceAvailabilityService(
+        new App\Repositories\AdminDanceAvailabilityRepository()
+    );
 }
 
 function createEventCatalogService(): App\Services\Implementations\Catalog\EventCatalogService
