@@ -43,6 +43,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/admin/dashboard/{page_id:\d+}/delete', [CmsController::class, 'deletePage']);
 
 
+    $r->get('/admin/pages', [CmsController::class, 'viewPages']);
     $r->get('/admin/pages/createPage', [CmsController::class, 'createPageForm']);
     $r->post('/admin/pages/create', [CmsController::class, 'createPage']);
 
@@ -60,15 +61,22 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->post('/admin/pageSection/{section_id:\d+}/editSection', [CmsController::class, 'editSection']);
 
     $r->get('/admin/pageSection/{page_id:\d+}/viewPageSections', [CmsController::class, 'viewPageSections']);
-    $r->get('/admin/pageSection/editPage', [CmsController::class, 'updatePageSection']);
     $r->get('/admin/pageSection/{section_id:\d+}/deleteSection', [CmsController::class, 'deleteSection']);
 
 
     $r->get('/admin/users', [CmsController::class, 'manageUsersPage']);
-
-    $r->get('/admin/events/{event_id:\d+}', [CmsController::class, 'viewEventPage']);
-    $r->get('/admin/events/{event_id:\d+}/delete', [CmsController::class, 'deleteEventPage']);
-    $r->get('/admin/events/{event_id:\d+}/edit', [CmsController::class, 'updateEventPage']);
+    $r->get('/admin/users/create', [CmsController::class, 'createUserForm']);
+    $r->post('/admin/users/create', [CmsController::class, 'createUser']);
+    $r->get('/admin/users/{user_id:\d+}/edit', [CmsController::class, 'editUserForm']);
+    $r->post('/admin/users/{user_id:\d+}/edit', [CmsController::class, 'editUser']);
+    $r->get('/admin/users/{user_id:\d+}/delete', [CmsController::class, 'deleteUser']);
+    $r->get('/admin/orders/export', [CmsController::class, 'exportOrders']);
+    $r->get('/admin/orders', [CmsController::class, 'viewOrders']);
+    $r->get('/admin/orders/{order_id:\d+}', [CmsController::class, 'viewOrderDetail']);
+    $r->get('/admin/seats', [CmsController::class, 'viewSeatsOverview']);
+    $r->get('/admin/dance/seats', [CmsController::class, 'viewDanceSeatOverview']);
+    $r->get('/admin/dance/seats/{event_id:\d+}', [CmsController::class, 'viewDanceEventSeats']);
+    $r->post('/admin/dance/seats/{event_id:\d+}', [CmsController::class, 'updateDanceEventSeats']);
 
 
     $r->post('/admin/media/upload', [CmsController::class, 'uploadImage']);
@@ -85,6 +93,8 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/', [HomeController::class, 'index']);
     $r->get('/home', [HomeController::class, 'index']);
+    $r->get('/dance', [DanceController::class, 'index']);
+    $r->get('/dance/artists/{slug:[a-z0-9-]+}', [DanceController::class, 'artistDetail']);
     $r->get('/events', [EventController::class, 'index']);
     $r->post('/events/add-to-program', [EventController::class, 'addToProgram']);
     $r->get('/checkout', [ShopController::class, 'checkout']);
@@ -99,8 +109,8 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/yummy/bistro-toujours', [YummyController::class, 'bistroToujours']);
     $r->post('/yummy/bistro-toujours/book-reservation', [YummyController::class, 'bookBistroToujoursReservation']);
 
-    $r->get('/stories', [HomeController::class, 'stories']);
-    $r->get('/stories/{slug}', [HomeController::class, 'storyDetail']);
+    $r->get('/stories', [StoriesController::class, 'index']);
+    $r->post('/stories/add-to-program', [StoriesController::class, 'addShowToProgram']);
     $r->get('/history', [HistoryController::class, 'index']);
     $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
     $r->post('/history/book-tour/add-to-program', [HistoryController::class, 'addTourToProgram']);
@@ -185,6 +195,16 @@ function createSectionService(): App\Services\PageSectionService
     );
 }
 
+function createDanceArtistService(): App\Services\DanceArtistService
+{
+    return new App\Services\DanceArtistService(new App\Repositories\DanceArtistRepository());
+}
+
+function createDanceScheduleService(): App\Services\DanceScheduleService
+{
+    return new App\Services\DanceScheduleService(new App\Repositories\DanceScheduleRepository());
+}
+
 function createController(string $controllerClass)
 {
 
@@ -210,7 +230,7 @@ function createController(string $controllerClass)
                 createPageService(),
                 createSectionService(),
                 new App\Services\ProgramService(),
-                new App\Services\ReservationEmailService(),
+                createReservationEmailService(),
                 createYummyReservationCatalogService()
             );
 
@@ -250,6 +270,24 @@ function createController(string $controllerClass)
                 new App\Services\ProgramService()
             );
 
+        case App\Controllers\DanceController::class:
+
+            return new App\Controllers\DanceController(
+                createPageService(),
+                createSectionService(),
+                createDanceArtistService(),
+                createDanceScheduleService()
+            );
+
+        case App\Controllers\StoriesController::class:
+
+            return new App\Controllers\StoriesController(
+                new App\Services\StoriesService(
+                    createPageService(),
+                    createSectionService(),
+                    new App\Repositories\StoriesRepository()
+                )
+            );
 
         case App\Controllers\ProgramController::class:
 
@@ -277,7 +315,9 @@ function createController(string $controllerClass)
                 $pageService,
                 $sectionService,
                 $userService,
-                createImageService()
+                createImageService(),
+                createOrderService(),
+                createAdminDanceAvailabilityService()
             );
 
         default:
@@ -288,6 +328,28 @@ function createController(string $controllerClass)
 function createOrderService(): App\Services\OrderService
 {
     return new App\Services\OrderService(new App\Repositories\OrderRepository());
+}
+
+function createMailer(): App\Services\IMailer
+{
+    return new App\Services\Mailer();
+}
+
+function createOrderEmailService(): App\Services\OrderEmailService
+{
+    return new App\Services\OrderEmailService(createMailer());
+}
+
+function createReservationEmailService(): App\Services\ReservationEmailService
+{
+    return new App\Services\ReservationEmailService(createMailer());
+}
+
+function createAdminDanceAvailabilityService(): App\Services\AdminDanceAvailabilityService
+{
+    return new App\Services\AdminDanceAvailabilityService(
+        new App\Repositories\AdminDanceAvailabilityRepository()
+    );
 }
 
 function createEventCatalogService(): App\Services\EventCatalogService
@@ -321,6 +383,7 @@ function createShopController(): App\Controllers\ShopController
         createOrderService(),
         createCheckoutValidationService(),
         new App\Services\StripePaymentService(),
-        new App\Repositories\PendingCheckoutRepository()
+        new App\Repositories\PendingCheckoutRepository(),
+        createOrderEmailService()
     );
 }

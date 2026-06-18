@@ -26,13 +26,23 @@ $isScan      = str_starts_with($current, '/admin/tickets');
                     </a>
                 </li>
                 <li>
-                    <a class="sidebar-link <?= $isPages ? 'active' : '' ?>" href="/admin/pages/viewPage">
+                    <a class="sidebar-link <?= $isPages ? 'active' : '' ?>" href="/admin/pages">
                         Pages
                     </a>
                 </li>
                 <li>
                     <a class="sidebar-link <?= $isUsers ? 'active' : '' ?>" href="/admin/users">
                         Users
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-link <?= $isOrders ? 'active' : '' ?>" href="/admin/orders">
+                        Orders
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-link <?= $isSeats ? 'active' : '' ?>" href="/admin/seats">
+                        Seats
                     </a>
                 </li>
             </ul>
