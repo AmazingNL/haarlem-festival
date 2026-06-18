@@ -203,7 +203,7 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
         $orders = [];
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             if (is_array($row)) {
-                $orders[] = $this->hydrateOrder($row);
+                $orders[] = $this->hydrateAdminOrderSummary($row);
             }
         }
 
@@ -291,6 +291,25 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
         ];
     }
 
+    private function hydrateAdminOrderSummary(array $row): array
+    {
+        return [
+            'order_id' => (int) ($row['order_id'] ?? 0),
+            'user_id' => (int) ($row['user_id'] ?? 0),
+            'total_price' => round((float) ($row['total_price'] ?? 0), 2),
+            'status' => (string) ($row['status'] ?? 'paid'),
+            'created_at' => (string) ($row['created_at'] ?? ''),
+            'provider' => (string) ($row['provider'] ?? ''),
+            'payment_status' => (string) ($row['payment_status'] ?? ''),
+            'paid_at' => (string) ($row['payment_paid_at'] ?? ''),
+            'stripe_session_id' => (string) ($row['stripe_session_id'] ?? ''),
+            'first_name' => (string) ($row['first_name'] ?? ''),
+            'last_name' => (string) ($row['last_name'] ?? ''),
+            'email' => (string) ($row['email'] ?? ''),
+            'phone' => (string) ($row['phone'] ?? ''),
+        ];
+    }
+
   /** @return list<array<string, mixed>> */
     private function fetchOrderLines(int $orderId): array
     {
@@ -335,11 +354,21 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
   /** @return list<array<string, mixed>> */
     private function fetchTicketsForOrder(int $orderId): array
     {
-        $sql = 'SELECT t.ticket_id, t.qr_token, t.status, ol.ticket_type_id
-            FROM order_line ol
-            INNER JOIN ticket t ON t.order_line_id = ol.order_line_id
-            WHERE ol.order_id = :order_id
-            ORDER BY t.ticket_id ASC';
+        if ($this->columnExists('ticket', 'order_line_id')) {
+            $sql = 'SELECT t.ticket_id, t.qr_token, t.status, ol.ticket_type_id
+                FROM order_line ol
+                INNER JOIN ticket t ON t.order_line_id = ol.order_line_id
+                WHERE ol.order_id = :order_id
+                ORDER BY t.ticket_id ASC';
+        } elseif ($this->columnExists('ticket', 'order_ticket_id')) {
+            $sql = 'SELECT t.ticket_id, t.qr_token, t.status, ot.ticket_type_id
+                FROM order_ticket ot
+                INNER JOIN ticket t ON t.order_ticket_id = ot.order_ticket_id
+                WHERE ot.order_id = :order_id
+                ORDER BY t.ticket_id ASC';
+        } else {
+            return [];
+        }
 
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute([':order_id' => $orderId]);
@@ -359,6 +388,23 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
         }
 
         return $tickets;
+    }
+
+    private function columnExists(string $tableName, string $columnName): bool
+    {
+        $sql = 'SELECT COUNT(*)
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE()
+              AND table_name = :table_name
+              AND column_name = :column_name';
+
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute([
+            ':table_name' => $tableName,
+            ':column_name' => $columnName,
+        ]);
+
+        return (int) $stmt->fetchColumn() > 0;
     }
 
     private function insertOrderLine(int $orderId, array $item): int

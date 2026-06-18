@@ -59,7 +59,13 @@ final class TicketController extends BaseController
      */
     public function scanPage(): void
     {
-        $this->view('admin_dashboard/scan_ticket', ['title' => 'Scan Ticket'], layout: 'admin_dashboard');
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        $scanBasePath = str_starts_with($uri, '/employee') ? '/employee/tickets' : '/admin/tickets';
+
+        $this->view('admin_dashboard/scan_ticket', [
+            'title' => 'Scan Ticket',
+            'scanBasePath' => $scanBasePath,
+        ], layout: 'admin_dashboard');
     }
 
     /**

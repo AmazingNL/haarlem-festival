@@ -7,12 +7,18 @@ $isPages     = str_starts_with($current, '/admin/pages') || str_starts_with($cur
 $isUsers     = str_starts_with($current, '/admin/users');
 $isOrders    = str_starts_with($current, '/admin/orders');
 $isSeats     = str_starts_with($current, '/admin/seats') || str_starts_with($current, '/admin/dance/seats');
-$isScan      = str_starts_with($current, '/admin/tickets');
+$isScan      = str_starts_with($current, '/admin/tickets')
+    || str_starts_with($current, '/employee/tickets')
+    || $current === '/employee/dashboard';
+$role = strtolower((string) ($_SESSION['user_role'] ?? ''));
+$isEmployeeOnly = $role === 'employee' && empty($_SESSION['admin']);
+$dashboardUrl = $isEmployeeOnly ? '/employee/dashboard' : '/admin/dashboard';
+$scanUrl = $isEmployeeOnly ? '/employee/tickets/scan' : '/admin/tickets/scan';
 ?>
 <aside class="col-md-3 mb-4">
     <div class="admin-sidebar">
         <div class="brand mb-3">
-            <a href="/admin/dashboard" style="text-decoration:none; color: var(--color-text-light);">
+            <a href="<?= htmlspecialchars($dashboardUrl, ENT_QUOTES, 'UTF-8') ?>" style="text-decoration:none; color: var(--color-text-light);">
                 <h5 class="m-0">HAARLEM</h5>
                 <small style="font-size:0.7rem; opacity:0.6;">Festival 2026 — Admin</small>
             </a>
@@ -20,6 +26,13 @@ $isScan      = str_starts_with($current, '/admin/tickets');
 
         <nav>
             <ul class="sidebar-nav">
+                <?php if ($isEmployeeOnly): ?>
+                <li>
+                    <a class="sidebar-link <?= $isScan ? 'active' : '' ?>" href="<?= htmlspecialchars($scanUrl, ENT_QUOTES, 'UTF-8') ?>">
+                        Scan Tickets
+                    </a>
+                </li>
+                <?php else: ?>
                 <li>
                     <a class="sidebar-link <?= $isDashboard ? 'active' : '' ?>" href="/admin/dashboard">
                         Dashboard
@@ -45,6 +58,12 @@ $isScan      = str_starts_with($current, '/admin/tickets');
                         Seats
                     </a>
                 </li>
+                <li>
+                    <a class="sidebar-link <?= $isScan ? 'active' : '' ?>" href="/admin/tickets/scan">
+                        Scan Tickets
+                    </a>
+                </li>
+                <?php endif; ?>
             </ul>
         </nav>
 

@@ -80,6 +80,8 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
 
     $r->post('/admin/media/upload', [CmsController::class, 'uploadImage']);
+    $r->get('/admin/tickets/scan', [TicketController::class, 'scanPage']);
+    $r->post('/admin/tickets/{token:[a-f0-9]{64}}/scan', [TicketController::class, 'scan']);
 
 
     $r->get('/registerForm', [AuthController::class, 'showRegisterForm']);
@@ -89,10 +91,14 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->post('/login', [AuthController::class, 'login']);
 
     $r->get('/logout', [AuthController::class, 'logout']);
+    $r->get('/employee/dashboard', [TicketController::class, 'scanPage']);
+    $r->get('/employee/tickets/scan', [TicketController::class, 'scanPage']);
+    $r->post('/employee/tickets/{token:[a-f0-9]{64}}/scan', [TicketController::class, 'scan']);
 
 
     $r->get('/', [HomeController::class, 'index']);
     $r->get('/home', [HomeController::class, 'index']);
+    $r->get('/qr/{token:[a-f0-9]{64}}', [TicketController::class, 'qrImage']);
     $r->get('/dance', [DanceController::class, 'index']);
     $r->get('/dance/artists/{slug:[a-z0-9-]+}', [DanceController::class, 'artistDetail']);
     $r->get('/events', [EventController::class, 'index']);
@@ -159,6 +165,20 @@ switch ($routeInfo[0]) {
         ) {
             header('Location: /admin/loginForm');
             exit;
+        }
+
+        if (str_starts_with($uri, '/employee')) {
+            if (empty($_SESSION['user_id'])) {
+                header('Location: /loginForm');
+                exit;
+            }
+
+            $role = strtolower((string) ($_SESSION['user_role'] ?? ''));
+            if (!in_array($role, ['employee', 'admin'], true)) {
+                http_response_code(403);
+                echo '403 - Forbidden';
+                exit;
+            }
         }
 
         $controller = createController($controllerClass);
