@@ -10,11 +10,12 @@ use chillerlan\QRCode\QROptions;
 final class OrderEmailService
 {
     private IMailer $mailer;
+    private OrderInvoiceService $invoiceService;
 
-    /** @param IMailer $mailer */
-    public function __construct(IMailer $mailer)
+    public function __construct(IMailer $mailer, OrderInvoiceService $invoiceService)
     {
         $this->mailer = $mailer;
+        $this->invoiceService = $invoiceService;
     }
 
     /**
@@ -26,23 +27,47 @@ final class OrderEmailService
      */
     public function sendOrderConfirmation(array $customer, array $order): void
     {
-        $email = trim((string) ($customer['email'] ?? ''));
-        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return;
+        $email = $this->resolveRecipientEmail($customer, $order);
+        if ($email === '') {
+            throw new \RuntimeException('Cannot send order email: no valid customer email on the order.');
         }
 
-        $firstName = trim((string) ($customer['first_name'] ?? ''));
-        $lastName  = trim((string) ($customer['last_name'] ?? ''));
+        $firstName = trim((string) ($customer['first_name'] ?? $order['first_name'] ?? ''));
+        $lastName  = trim((string) ($customer['last_name'] ?? $order['last_name'] ?? ''));
         $name      = trim($firstName . ' ' . $lastName) ?: 'Festival guest';
         $orderId   = (int) ($order['order_id'] ?? 0);
+
+        $attachments = [];
+        try {
+            $attachments[] = [
+                'filename' => $this->invoiceService->filename($orderId),
+                'content' => $this->invoiceService->generatePdf($order),
+                'mime' => 'application/pdf',
+            ];
+        } catch (\Throwable $e) {
+            error_log('Invoice PDF failed: ' . $e->getMessage());
+        }
 
         $this->mailer->send(
             $email,
             $name,
             'Haarlem Festival 2026 — Order #' . $orderId . ' confirmed',
             $this->buildHtml($name, $order),
-            $this->buildText($name, $order)
+            $this->buildText($name, $order),
+            $attachments
         );
+    }
+
+    private function resolveRecipientEmail(array $customer, array $order): string
+    {
+        foreach ([$customer['email'] ?? '', $order['email'] ?? ''] as $candidate) {
+            $email = trim((string) $candidate);
+            if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return $email;
+            }
+        }
+
+        return '';
     }
 
     /**
@@ -61,6 +86,8 @@ final class OrderEmailService
         $html .= '<p>Hello ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . ',</p>';
         $html .= '<p>Your payment for order <strong>#' . $orderId . '</strong> is confirmed.</p>';
         $html .= '<p><strong>Total paid: EUR ' . htmlspecialchars($total, ENT_QUOTES, 'UTF-8') . '</strong></p>';
+
+        $html .= '<p style="margin-top:16px;">Your invoice (PDF) is attached to this email.</p>';
 
         if ($tickets !== []) {
             $html .= '<p style="margin-top:24px;">Show the QR code(s) below at the venue entrance:</p>';
@@ -104,6 +131,7 @@ final class OrderEmailService
 
         return "Hello {$name},\n\n"
             . "Your payment for order #{$orderId} is confirmed. Total paid: EUR {$total}.\n\n"
+            . "Your invoice PDF is attached.\n\n"
             . ($count > 0 ? "You have {$count} ticket(s). Log in to view your QR codes:\n/orders/{$orderId}/success\n\n" : '')
             . "Haarlem Festival 2026";
     }

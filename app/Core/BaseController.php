@@ -1,18 +1,16 @@
 <?php
-// src/Http/BaseController.php
 
 declare(strict_types=1);
+
 namespace App\Core;
 
 use App\Support\SessionUser;
 
 abstract class BaseController
 {
-    // ---------- Views ----------
     protected function view(string $template, array $data = [], ?string $layout = 'main', int $status = 200): void
     {
         $data['csrf'] ??= $this->csrfToken();
-        // Read one-time session messages and also expose simple view variables.
         $data['flash'] = $data['flash'] ?? $this->getAllFlash();
         $data['errorMessage'] ??= is_string($data['flash']['error'] ?? null)
             ? (string) $data['flash']['error']
@@ -22,12 +20,12 @@ abstract class BaseController
             : '';
         extract($data, EXTR_SKIP);
 
-            $content = __DIR__ . '/../Views/' . $template. '.php';
+        $content = __DIR__ . '/../Views/' . $template . '.php';
         if (!is_file($content)) {
             $this->abort(500, "View not found: {$template}");
         }
 
-            $layout = __DIR__ . '/../Views/layout/' . ltrim($layout, '/') . '.php';
+        $layout = __DIR__ . '/../Views/layout/' . ltrim($layout, '/') . '.php';
         if (!is_file($layout)) {
             $this->abort(500, "Layout not found: {$layout}");
         }

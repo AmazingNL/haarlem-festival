@@ -17,47 +17,29 @@ function app_load_env(string $rootDir): void
         return;
     }
 
-    $loaded = false;
-    $parsed = parse_ini_file($envFile, false, INI_SCANNER_RAW);
-    if (is_array($parsed)) {
-        foreach ($parsed as $key => $value) {
-            if (!is_string($key) || !is_string($value)) {
-                continue;
-            }
-            $_ENV[$key] = $value;
-            putenv($key . '=' . $value);
-        }
-        $loaded = true;
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES);
+    if (!is_array($lines)) {
+        return;
     }
 
-    if (!$loaded) {
-        $lines = file($envFile, FILE_IGNORE_NEW_LINES);
-        if (is_array($lines)) {
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if ($line === '' || str_starts_with($line, '#')) {
-                    continue;
-                }
-                if (!str_contains($line, '=')) {
-                    continue;
-                }
-                [$key, $value] = explode('=', $line, 2);
-                $key = trim($key);
-                $value = trim($value, " \t\"'");
-                if ($key === '') {
-                    continue;
-                }
-                $_ENV[$key] = $value;
-                putenv($key . '=' . $value);
-            }
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#') || str_starts_with($line, ';')) {
+            continue;
         }
-    }
+        if (!str_contains($line, '=')) {
+            continue;
+        }
 
-    foreach (['APP_URL', 'APP_DEBUG', 'STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_DISPLAY_NAME', 'DB_USER', 'DB_PASS', 'DB_NAME'] as $envKey) {
-        $fromEnv = getenv($envKey);
-        if ($fromEnv !== false && $fromEnv !== '') {
-            $_ENV[$envKey] = (string) $fromEnv;
+        [$key, $value] = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value, " \t\"'\r\n");
+        if ($key === '') {
+            continue;
         }
+
+        $_ENV[$key] = $value;
+        putenv($key . '=' . $value);
     }
 }
 

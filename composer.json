@@ -8,6 +8,7 @@
         "phpmailer/phpmailer": "^6.9",
         "ezyang/htmlpurifier": "^4.19",
         "chillerlan/php-qrcode": "^6.0",
+        "dompdf/dompdf": "^3.1",
         "doctrine/instantiator": "^1.5"
     },
     "require-dev": {

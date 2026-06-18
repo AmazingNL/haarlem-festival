@@ -184,6 +184,7 @@ $executeSqlBatch = static function (string $sql) use ($pdo): void {
 
     $applyMigrations = static function (array $files, bool $allowBaselineForExistingSchema) use (
         $pdo,
+        $db,
         $executeSqlBatch,
         $extractUpSection,
         $ensureMigrationTable,
@@ -254,6 +255,7 @@ $executeSqlBatch = static function (string $sql) use ($pdo): void {
                 throw new RuntimeException("Unable to read migration file: {$file}");
             }
 
+            $pdo->exec("USE `{$db}`");
             $executeSqlBatch($extractUpSection($sql));
             $markMigrationApplied($name, $checksum);
             $applied[$name] = $checksum;

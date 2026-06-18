@@ -72,7 +72,8 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
             return $orderId;
         } catch (\Throwable $e) {
             $this->rollBack();
-            throw new RuntimeException('Failed to create paid order.', 0, $e);
+            error_log('createPaidOrder failed: ' . $e->getMessage());
+            throw new RuntimeException('Failed to create paid order: ' . $e->getMessage(), 0, $e);
         }
     }
 

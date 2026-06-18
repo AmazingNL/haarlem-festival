@@ -179,7 +179,8 @@ final class CmsController extends BaseController
             $this->redirect('/admin/pages/viewPage');
 
         } catch (Throwable $e) {
-            $this->setFlash('error', 'Something went wrong  ' . $e);
+            error_log('Delete page failed: ' . $e->getMessage());
+            $this->setFlash('error', 'Something went wrong.');
             $this->redirect('/admin/pages/viewPage');
         }
     }
@@ -201,7 +202,8 @@ final class CmsController extends BaseController
                 'admin_dashboard'
             );
         } catch (Throwable $e) {
-            $this->setFlash('error', 'Something went wrong' . $e);
+            error_log('Page section form failed: ' . $e->getMessage());
+            $this->setFlash('error', 'Something went wrong.');
             $this->redirect('/admin/pages/createPage');
         }
     }
@@ -223,12 +225,12 @@ final class CmsController extends BaseController
             $section = $this->pageSectionService->buildSectionFromDto($sectionInput);
             $this->pageSectionService->createSection($section);
 
-            $this->setFlash('success', 'Section created successful');
+            $this->setFlash('success', 'Section created successfully.');
             $this->redirect('/admin/pageSection/'. $pageId . '/viewPageSections');
         } catch (Throwable $e) {
             error_log('Section creation error: ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
             error_log('Stack trace: ' . $e->getTraceAsString());
-            $this->setFlash('error', 'Something went wrong: ' . $e);
+            $this->setFlash('error', 'Something went wrong.');
             $this->redirect('/admin/dashboard');
         }
     }
@@ -264,7 +266,8 @@ final class CmsController extends BaseController
                 'admin_dashboard'
             );
         } catch (Throwable $e) {
-            $this->setFlash('error', 'Something went wrong' . $e);
+            error_log('View page sections failed: ' . $e->getMessage());
+            $this->setFlash('error', 'Something went wrong.');
             $this->redirect('/admin/pages/' . $page_id . '/editForm');
         }
     }
@@ -302,8 +305,9 @@ final class CmsController extends BaseController
                 'admin_dashboard'
             );
         } catch (Throwable $e) {
-            $this->setFlash('error', 'Something went wrong: ' . $e->getMessage());
-            $this->redirect('/admin/page_section');
+            error_log('Edit section form failed: ' . $e->getMessage());
+            $this->setFlash('error', 'Something went wrong.');
+            $this->redirect('/admin/dashboard');
         }
     }
     //------------- POST Edit section -----------------//
@@ -328,7 +332,7 @@ final class CmsController extends BaseController
             $this->setFlash('success', 'Section updated successfully');
             $this->redirect('/admin/pageSection/' . $pageSection->page_id . '/viewPageSections');
         } catch (Throwable $e) {
-            $this->setFlash('error', 'Something went wrong while saving  ' . $e);
+            $this->setFlash('error', 'Something went wrong while saving.');
             $this->redirect('/admin/pageSection/' . $sectionId . '/editSectionForm');
         }
     }
