@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\ICmsService;
-use App\Services\IPageSectionService;
+use App\Services\Interfaces\ICmsService;
+use App\Services\Interfaces\IPageSectionService;
 
 final class HomeController extends BaseController
 {
@@ -43,6 +43,31 @@ final class HomeController extends BaseController
             ]);
         } catch (\Throwable $e) {
             $this->view('no_page/index', ['error' => 'Home page not available']);
+        }
+    }
+
+
+
+    public function stories(): void
+    {
+        try {
+            $page = $this->adminPageService->getPageBySlug('stories');
+            $pageId = $page->page_id ?? null;
+            $stories = $pageId === null ? [] : $this->pageSectionService->getSectionsByPageId($pageId);
+
+            if ($stories === []) {
+                $this->setErrorMessage('Stories page not available');
+                $this->redirect('/');
+                return;
+            }
+
+            $this->view('/stories/index', [
+                'section' => $stories,
+                'page' => $page,
+                'title' => 'Stories',
+            ]);
+        } catch (\Throwable $e) {
+            $this->view('no_page/index', ['error' => 'Stories page not available']);
         }
     }
 

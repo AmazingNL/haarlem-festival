@@ -22,4 +22,10 @@ interface IOrderRepository
     public function findByStripeSessionId(int $userId, string $stripeSessionId): ?array;
 
     public function getLatestOrderIdForUser(int $userId): int;
+
+    public function findOrdersForAdmin(): array;
+
+    public function findOrderForAdmin(int $orderId): ?array;
+
+    public function findOrderExportRows(): array;
 }

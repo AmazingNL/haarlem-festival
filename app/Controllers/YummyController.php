@@ -3,11 +3,12 @@
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\ICmsService;
-use App\Services\IPageSectionService;
-use App\Services\ProgramService;
-use App\Services\ReservationEmailService;
-use App\Services\YummyReservationCatalogService;
+use App\Services\Interfaces\ICmsService;
+use App\Services\Interfaces\IPageSectionService;
+use App\Services\Implementations\ProgramService;
+use App\Services\Implementations\ReservationEmailService;
+use App\Services\Implementations\Booking\RestaurantAvailabilityService;
+use App\Services\Implementations\Booking\RestaurantBookingService;
 use App\Support\SessionUser;
 
 final class YummyController extends BaseController
@@ -17,25 +18,29 @@ final class YummyController extends BaseController
     private IPageSectionService $pageSectionService;
     private ProgramService $programService;
     private ReservationEmailService $reservationEmailService;
-    private YummyReservationCatalogService $yummyReservationCatalogService;
+    private RestaurantBookingService $restaurantBookingService;
+    private RestaurantAvailabilityService $restaurantAvailability;
 
     public function __construct(
         ICmsService $adminPageService,
         IPageSectionService $pageSectionService,
         ProgramService $programService,
         ReservationEmailService $reservationEmailService,
-        YummyReservationCatalogService $yummyReservationCatalogService
+        RestaurantBookingService $restaurantBookingService,
+        RestaurantAvailabilityService $restaurantAvailability
     )
     {
         $this->adminPageService = $adminPageService;
         $this->pageSectionService = $pageSectionService;
         $this->programService = $programService;
         $this->reservationEmailService = $reservationEmailService;
-        $this->yummyReservationCatalogService = $yummyReservationCatalogService;
+        $this->restaurantBookingService = $restaurantBookingService;
+        $this->restaurantAvailability = $restaurantAvailability;
     }
 
     public function yummy(): void
     {
+        $this->rememberProgramReturnUrl($this->currentUrl());
         try {
             $page = $this->adminPageService->getPageBySlug('yummy');
             $page_id = $page->page_id ?? null;
@@ -54,7 +59,7 @@ final class YummyController extends BaseController
             }
             $this->view(
                 'yummy/index',
-                ['section' => $pageSection, 'title' => 'Yummy']
+                ['section' => $this->LiveCapacity($pageSection), 'title' => 'Yummy']
             );
 
         } catch (\Throwable $e) {
@@ -65,18 +70,52 @@ final class YummyController extends BaseController
         }
     }
 
+    
+    //Replace each restaurant card's static "Available Seats" with the live remaining
+    // count (real venue capacity minus the busiest booked slot), keeping the total for display.
+    /** 
+     * @param array<int, array<string, mixed>> $sections
+     * @return array<int, array<string, mixed>>
+     */
+    private function LiveCapacity(array $sections): array
+    {
+        foreach ($sections as &$section) {
+            if (($section['section_type'] ?? '') !== 'restaurant_card') {
+                continue;
+            }
+
+            $availability = $this->restaurantAvailability->availabilityForLink((string) ($section['button_link'] ?? ''));
+            if ($availability['has_venue']) {
+                $section['capacity'] = (string) $availability['remaining'];
+                $section['capacity_total'] = (string) $availability['capacity'];
+            }
+        }
+        unset($section);
+
+        return $sections;
+    }
+
     public function ratatouille(): void
     {
-        $this->restaurantDetail('ratatouille', 'Ratatouille', '/yummy', 'yummy/ratatouille/index');
+        $this->restaurantDetail(
+            'ratatouille', 
+            '/yummy', 
+            'yummy/ratatouille/index'
+        );
     }
 
     public function bistroToujours(): void
     {
-        $this->restaurantDetail('bistro-toujours', 'Bistro Toujours', '/yummy', 'yummy/bistro_toujours/index');
+        $this->restaurantDetail(
+            'bistro-toujours',
+            '/yummy', 
+            'yummy/bistro_toujours/index'
+        );
     }
 
-    private function restaurantDetail(string $slug, string $title, string $fallbackUrl, string $template): void
+    private function restaurantDetail(string $slug, string $fallbackUrl, string $template): void
     {
+        $this->rememberProgramReturnUrl($this->currentUrl());
         try {
             $page = $this->adminPageService->getPageBySlug($slug);
             $page_id = $page->page_id ?? null;
@@ -87,13 +126,13 @@ final class YummyController extends BaseController
             }
             $this->view(
                 $template,
-                ['section' => $sections, 'page' => $page, 'title' => $title]
+                ['section' => $sections, 'page' => $page, 'title' => $page->title]
             );
 
         } catch (\Exception $e) {
             $this->view(
                 template: 'no_page/index',
-                data: ['error' => $title . ' page not available']
+                data: ['error' => $page->title . ' page not available']
             );
 
         }
@@ -104,7 +143,11 @@ final class YummyController extends BaseController
         $this->ensureSession();
 
         if ($this->isPost()) {
-            $this->addReservationToProgram('bistro-toujours', '/yummy/bistro-toujours', 'Bistro Toujours');
+            $this->addReservationToProgram(
+                'bistro-toujours', 
+                '/yummy/bistro-toujours', 
+                'Bistro Toujours'
+            );
             return;
         }
 
@@ -116,7 +159,10 @@ final class YummyController extends BaseController
         $this->ensureSession();
 
         if ($this->isPost()) {
-            $this->addReservationToProgram('ratatouille', '/yummy/ratatouille', 'Ratatouille Food & Wine');
+            $this->addReservationToProgram(
+                'ratatouille', 
+                '/yummy/ratatouille', 
+                'Ratatouille Food & Wine');
             return;
         }
 
@@ -136,7 +182,7 @@ final class YummyController extends BaseController
             }
 
             $customer = SessionUser::customerData();
-            $item = $this->yummyReservationCatalogService->buildProgramItem(
+            $item = $this->restaurantBookingService->buildProgramItem(
                 $pageSlug,
                 $locationName,
                 $this->str('date'),
@@ -175,7 +221,6 @@ final class YummyController extends BaseController
             $this->reservationEmailService->sendReservationAdded($customer, $item);
             return true;
         } catch (\Throwable $e) {
-            error_log('Reservation email failed: ' . $e->getMessage());
             return false;
         }
     }

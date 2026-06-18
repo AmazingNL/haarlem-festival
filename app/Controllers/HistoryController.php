@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\ICmsService;
-use App\Services\IPageSectionService;
-use App\Services\ProgramService;
-use App\Services\HistoryBookingCatalogService;
+use App\Services\Interfaces\ICmsService;
+use App\Services\Interfaces\IPageSectionService;
+use App\Services\Implementations\ProgramService;
+use App\Services\Implementations\Booking\HistoryBookingService;
 
 final class HistoryController extends BaseController
 {
@@ -17,19 +17,19 @@ final class HistoryController extends BaseController
     private ICmsService $adminPageService;
     // Service for saving bookings into My Program.
     private ProgramService $programService;
-    private HistoryBookingCatalogService $historyBookingCatalogService;
+    private HistoryBookingService $historyBookingService;
 
     public function __construct(
         IPageSectionService $pageSectionService,
         ICmsService $adminPageService,
         ProgramService $programService,
-        HistoryBookingCatalogService $historyBookingCatalogService
+        HistoryBookingService $historyBookingService
     )
     {
         $this->pageSectionService = $pageSectionService;
         $this->adminPageService = $adminPageService;
         $this->programService = $programService;
-        $this->historyBookingCatalogService = $historyBookingCatalogService;
+        $this->historyBookingService = $historyBookingService;
     }
 
     // Show the main History overview page.
@@ -81,7 +81,7 @@ final class HistoryController extends BaseController
         try {
             $this->verifyCsrf();
 
-            $item = $this->historyBookingCatalogService->buildProgramItem(
+            $item = $this->historyBookingService->buildProgramItem(
                 $this->str('selected_day'),
                 $this->str('selected_time'),
                 $this->str('selected_language'),

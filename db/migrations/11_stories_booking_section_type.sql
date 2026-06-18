@@ -1,6 +1,7 @@
--- migrate:up
 USE haarlem_festival;
 
+-- Complete superset of section types (live ENUM + 'stories_booking').
+-- Must include every value in use or MariaDB truncates those rows on MODIFY.
 ALTER TABLE page_section
 MODIFY section_type ENUM(
   'cta',
@@ -17,9 +18,11 @@ MODIFY section_type ENUM(
   'two_image_row',
   'venue',
   'cards_grid',
-  'restaurant_card',
+  'restaurants_card',
   'welcome_banner',
+  'welcome_banner_card',
   'gallery',
+  'reservation',
   'stories_hero',
   'what_is_stories',
   'stories_preview',
@@ -75,7 +78,7 @@ MODIFY section_type ENUM(
   'two_image_row',
   'venue',
   'cards_grid',
-  'restaurant_card',
+  'restaurants_card',
   'welcome_banner',
   'gallery',
   'stories_hero',

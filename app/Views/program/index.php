@@ -44,6 +44,9 @@ $programCategory = static function (array $programItem): string {
     if ($type === 'yummy-reservation') {
         return 'Yummy';
     }
+    if ($type === 'stories-show') {
+        return 'Stories';
+    }
 
     $label = trim((string) ($programItem['category_label'] ?? ''));
     return $label !== '' ? $label : 'Festival';
