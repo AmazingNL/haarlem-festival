@@ -33,10 +33,19 @@ existing rows use, which truncates those rows and aborts. Fixed in `05–09`, `1
 `11_stories_booking`; any future ENUM change must include the full current value set.
 
 ## 5. Duplicate / renamed / stray tables (need reconciliation)
-- **`payment` vs `payments`** — both exist; `OrderRepository` uses `payment`, `PaymentRepository` uses `payments`. Pick one.
-- **`order_ticket` vs `order_item`** — dev code references `order_ticket`, but the live DB has `order_item`. (The order/booking refactor removes `order_ticket` in favour of a unified `order_line`.)
-- **`test_ok`** — stray table, drop it.
+- **`payment` vs `payments`** — both exist. `payment` is now the **canonical** order flow (`OrderRepository`); `payments` (plural) is only written by the **legacy** `PaymentController` → `StripeService` → `PaymentRepository` flow behind `/payments/checkout/{order_id}`. Consolidate onto `payment` and retire that legacy flow.
+- **`order_ticket` vs `order_item`** — dev code referenced `order_ticket`; the refactor unified everything on `order_line`. The live DB has `order_item` (0 rows), now **dead** — it is only reachable via the legacy payment flow above.
+- **`test_ok`** — genuine stray (not in `01_schema.sql`, `schema.sql`, or seeds). Safe to drop now → `22_cleanup_dead_artifacts.sql`.
+- **`program_item`** — NOT a stray: it is canonical schema (`01_schema.sql`, `schema.sql`, `seeds/01_sample_data.sql`) for an older "My Program" persistence idea. Current code keeps My Program in the session (`$_SESSION['program_items']`), so the table is unused but **must not be dropped** without a team decision.
 - **legacy `restaurant`** — was a misnamed reservation-shaped table (no name/slug); replaced by a real `restaurant` venue table in `18_order_booking_entities.sql`.
+
+## 6. Order/booking refactor — final schema (this branch)
+Entities the refactor added/normalised (idempotent migrations `18`–`21`):
+- `restaurant` — real venue (name, slug UNIQUE, capacity, location_id). Seeded `ratatouille`, `bistro-toujours`.
+- `reservation` — restaurant_id/user_id/order_id, date, session, adult/child counts, status. Capacity enforced at checkout (`ReservationService`).
+- `order_line` — unified line for every item type, with `vat_rate` (9% food/drink, 21% else), `reservation_id`, and a JSON `item_data` catch-all (still in use — do not drop).
+- `ticket.order_line_id` — tickets now attach to an order line (one QR per seat / per booking).
+- `order.invoice_number` + `invoice_issued_at` + `total_price` — sequential invoice number `HF-YYYY-NNNNNN`; PDF invoice emailed + downloadable.
 
 ## What was fixed (so `migrate up` runs clean)
 - `10_payments_table.sql` — added `USE`, removed destructive `-- migrate:down`.
@@ -46,4 +55,14 @@ existing rows use, which truncates those rows and aborts. Fixed in `05–09`, `1
 ## Still open (for the team)
 - Strip `-- migrate:down` from all files (or split up/down properly) so `reset` works.
 - Add `USE` to `11_history_tour_schedule_guides.sql`.
-- Reconcile `payment`/`payments`, remove `order_item`/`test_ok`, standardize the tool.
+- Standardize on one migration tool.
+
+### Cleanup plan (ordered by risk)
+1. **Safe now** — `test_ok` is dropped in `22_cleanup_dead_artifacts.sql` (stray, 0 rows, not in canonical schema/seeds).
+2. **Needs the legacy payment flow retired first** — once `/payments/checkout/{order_id}`
+   (`PaymentController` → `StripeService` → `PaymentRepository`) is folded into the canonical
+   `payment`/`OrderRepository` flow, drop `payments` (plural) and then `order_item` and the
+   legacy `order.amount` / `order.vat` columns and `ticket.order_item_id` (all 0 rows, only
+   reachable through that flow).
+3. **Team decision** — `program_item` is canonical schema (`01_schema.sql`, `schema.sql`,
+   `seeds`) but unused (My Program lives in the session). Keep or remove deliberately.
