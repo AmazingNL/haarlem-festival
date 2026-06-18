@@ -6,11 +6,17 @@ namespace App\Services\Implementations\Booking;
 
 use App\Models\ProgramItem;
 use App\Repositories\EventCatalogRepository;
+use App\Services\Interfaces\IBookingStrategy;
 
-final class EventBookingService
+final class EventBookingService implements IBookingStrategy
 {
     public function __construct(private EventCatalogRepository $eventCatalogRepository)
     {
+    }
+
+    public function handledType(): string
+    {
+        return 'event-ticket';
     }
 
     public function buildProgramItem(int $eventId, int $ticketTypeId, int $requestedQuantity): array
