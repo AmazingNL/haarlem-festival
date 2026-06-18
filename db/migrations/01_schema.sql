@@ -1,3 +1,4 @@
+-- migrate:up
 -- ============================================================
 -- Haarlem Festival Database
 -- Clean Restructured Version (Role inside user)
@@ -381,5 +382,21 @@ CREATE TABLE IF NOT EXISTS restaurant (
     ON UPDATE CURRENT_TIMESTAMP,
 
   PRIMARY KEY (restaurant_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci;
+
+-- migrate:down
+DROP TABLE IF EXISTS restaurant;
+DROP TABLE IF EXISTS program_item;
+DROP TABLE IF EXISTS payment;
+DROP TABLE IF EXISTS ticket;
+DROP TABLE IF EXISTS order_ticket;
+DROP TABLE IF EXISTS `order`;
+DROP TABLE IF EXISTS ticket_type;
+DROP TABLE IF EXISTS event;
+DROP TABLE IF EXISTS location;
+DROP TABLE IF EXISTS page_section_image;
+DROP TABLE IF EXISTS page_section;
+DROP TABLE IF EXISTS page;
+DROP TABLE IF EXISTS image;
+DROP TABLE IF EXISTS `user`;

@@ -15,8 +15,6 @@ final class RestaurantCard extends BaseSection
     public array $cuisine = [];
 
     public function __construct(
-        int $pageId = 0,
-        int $sectionId = 0,
         string $customClass = '',
         int $sortOrder = 0,
         string $title = '',
@@ -47,7 +45,7 @@ final class RestaurantCard extends BaseSection
             'event_id' => ['type' => 'number', 'label' => 'Event ID'],
             'capacity' => ['type' => 'number', 'label' => 'Capacity'],
             'section_image' => ['type' => 'image', 'label' => 'Background Image'],
-            'cuisine' => ['type' => 'textarea', 'label' => 'Cuisine (comma or new line separated)'],
+            'cuisine' => ['type' => 'textarea', 'label' => 'Cuisine (comma or new line separated)', 'multiple' => true],
             'button_text' => ['type' => 'text', 'label' => 'Button Text'],
             'button_link' => ['type' => 'text', 'label' => 'Button Link'],
             'custom_class' => ['type' => 'custom_class', 'label' => 'Custom CSS class (optional)']

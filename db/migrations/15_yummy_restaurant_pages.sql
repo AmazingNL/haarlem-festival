@@ -26,6 +26,7 @@ MODIFY section_type ENUM(
   'what_is_stories',
   'stories_preview',
   'storytelling_schedule',
+  'stories_booking',
   'haarlem_unique',
   'haarlem_taste',
   'history_hero',
@@ -124,18 +125,4 @@ SELECT @bistro_page_id, 'reservation', 'Book your table', JSON_OBJECT(
 WHERE @bistro_page_id IS NOT NULL
   AND NOT EXISTS (
     SELECT 1 FROM page_section WHERE page_id = @bistro_page_id AND section_type = 'reservation'
-  );
-
-INSERT INTO event (title, slug, description, start_datetime, end_datetime, location_id, image_id, is_published)
-SELECT 'Summer Dance Night', 'summer-dance-night',
-    'An evening of dance performances and DJs in Haarlem.',
-    '2026-07-23 20:00:00', '2026-07-23 23:00:00', 1, NULL, 1
-WHERE NOT EXISTS (SELECT 1 FROM event WHERE slug = 'summer-dance-night');
-
-INSERT INTO ticket_type (event_id, name, price, max_quantity)
-SELECT e.event_id, 'Regular', 22.00, 500
-FROM event e
-WHERE e.slug = 'summer-dance-night'
-  AND NOT EXISTS (
-    SELECT 1 FROM ticket_type tt WHERE tt.event_id = e.event_id AND tt.name = 'Regular'
   );

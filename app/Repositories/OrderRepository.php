@@ -47,10 +47,7 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
 
             foreach ($items as $item) {
                 $this->insertOrderLine($orderId, $item);
-                $ticketTypeId = (int) ($item['ticket_type_id'] ?? 0);
-                if ($ticketTypeId > 0) {
-                    $this->insertEventTickets($orderId, $item);
-                }
+                $this->insertTicketsForItem($orderId, $item);
             }
 
             $paymentSql = 'INSERT INTO payment
@@ -306,34 +303,25 @@ final class OrderRepository extends BaseRepository implements IOrderRepository
         ]);
     }
 
-    private function insertEventTickets(int $orderId, array $item): void
+    private function insertTicketsForItem(int $orderId, array $item): void
     {
-        $ticketTypeId = (int) ($item['ticket_type_id'] ?? 0);
-        $quantity = max(1, (int) ($item['quantity'] ?? 1));
+        $rawTypeId = (int) ($item['ticket_type_id'] ?? 0);
+        $ticketTypeId = $rawTypeId > 0 ? $rawTypeId : null;
+        // Event tickets: one QR per seat. Other items: one QR per booking.
+        $quantity = $ticketTypeId !== null ? max(1, (int) ($item['quantity'] ?? 1)) : 1;
         $unitPrice = round((float) ($item['unit_price'] ?? 0), 2);
 
-        $orderTicketSql = 'INSERT INTO order_ticket (order_id, ticket_type_id, quantity, unit_price_at_purchase)
-            VALUES (:order_id, :ticket_type_id, :quantity, :unit_price_at_purchase)';
-
-        $orderTicketStmt = $this->getConnection()->prepare($orderTicketSql);
-        $orderTicketStmt->execute([
-            ':order_id' => $orderId,
-            ':ticket_type_id' => $ticketTypeId,
-            ':quantity' => $quantity,
-            ':unit_price_at_purchase' => $unitPrice,
-        ]);
-
+        $stmt = $this->getConnection()->prepare(
+            'INSERT INTO order_ticket (order_id, ticket_type_id, quantity, unit_price_at_purchase) VALUES (?, ?, ?, ?)'
+        );
+        $stmt->execute([$orderId, $ticketTypeId, $quantity, $unitPrice]);
         $orderTicketId = (int) $this->getConnection()->lastInsertId();
 
-        $ticketSql = 'INSERT INTO ticket (order_ticket_id, qr_token, status) VALUES (:order_ticket_id, :qr_token, :status)';
-        $ticketStmt = $this->getConnection()->prepare($ticketSql);
-
-        for ($index = 0; $index < $quantity; $index++) {
-            $ticketStmt->execute([
-                ':order_ticket_id' => $orderTicketId,
-                ':qr_token' => bin2hex(random_bytes(32)),
-                ':status' => 'valid',
-            ]);
+        $ticketStmt = $this->getConnection()->prepare(
+            'INSERT INTO ticket (order_ticket_id, qr_token, status) VALUES (?, ?, ?)'
+        );
+        for ($i = 0; $i < $quantity; $i++) {
+            $ticketStmt->execute([$orderTicketId, bin2hex(random_bytes(32)), 'valid']);
         }
     }
 

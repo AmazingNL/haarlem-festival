@@ -84,6 +84,18 @@ cat backup.sql | docker compose exec -T mysql sh -c 'mariadb -uroot -psecret123 
 
 ---
 
+## Test Accounts
+
+Seeded by `db/seeds/01_sample_data.sql` — available after running migrations.
+
+| Role | Email | Username | Password |
+|---|---|---|---|
+| Admin | `admin@haarlemfest.test` | `admin` | `Test12345!` |
+| Employee | `employee@haarlemfest.test` | `eline` | `Test12345!` |
+| Customer | `customer1@haarlemfest.test` | `samj` | `Test12345!` |
+
+---
+
 ## Email
 
 All outgoing emails are captured by Mailpit — nothing is sent to a real inbox.

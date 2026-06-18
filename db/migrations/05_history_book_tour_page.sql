@@ -1,3 +1,4 @@
+-- migrate:up
 USE haarlem_festival;
 
 ALTER TABLE page_section
@@ -16,8 +17,10 @@ MODIFY section_type ENUM(
   'two_image_row',
   'venue',
   'cards_grid',
+  'restaurant_card',
   'restaurants_card',
   'welcome_banner',
+  'welcome_banner_card',
   'gallery',
   'stories_hero',
   'what_is_stories',
@@ -25,6 +28,7 @@ MODIFY section_type ENUM(
   'storytelling_schedule',
   'haarlem_unique',
   'haarlem_taste',
+  'reservation',
   'history_hero',
   'history_timeline',
   'history_gallery',
@@ -230,3 +234,5 @@ VALUES
   7,
   1
 );
+
+-- migrate:down
