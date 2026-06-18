@@ -21,6 +21,10 @@
             require __DIR__ . '/storytelling_schedule.php';
             break;
 
+        case 'stories_booking':
+            require __DIR__ . '/booking_card.php';
+            break;
+
         default:
             break;
 

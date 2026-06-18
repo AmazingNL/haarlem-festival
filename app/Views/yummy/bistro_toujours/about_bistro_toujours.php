@@ -14,7 +14,7 @@ $text = $s['article'] ?? '';
 
         <?php if (!empty($text)): ?>
           <p class="ratatouille-body-copy">
-            <?= $text ?>
+            <?= \App\Support\Html::clean($text ?? '') ?>
           </p>
         <?php endif; ?>
 
@@ -30,7 +30,7 @@ $text = $s['article'] ?? '';
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                   <span>
-                    <?= $item['info'] ?>
+                    <?= \App\Support\Html::clean($item['info'] ?? '') ?>
                   </span>
                 </div>
               <?php endforeach; ?>

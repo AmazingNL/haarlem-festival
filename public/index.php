@@ -13,8 +13,11 @@ use App\Controllers\DanceController;
 use App\Controllers\EventController;
 use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
-use App\Controllers\ProgramController;
+use App\Controllers\StoriesController;
+use App\Controllers\PaymentController;
 use App\Controllers\ShopController;
+use App\Controllers\ProgramController;
+use App\Controllers\TicketController;
 
 require __DIR__ . '/../app/bootstrap.php';
 require __DIR__ . '/../vendor/autoload.php';
@@ -57,19 +60,14 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->post('/admin/pageSection/{section_id:\d+}/editSection', [CmsController::class, 'editSection']);
 
     $r->get('/admin/pageSection/{page_id:\d+}/viewPageSections', [CmsController::class, 'viewPageSections']);
+    $r->get('/admin/pageSection/editPage', [CmsController::class, 'updatePageSection']);
     $r->get('/admin/pageSection/{section_id:\d+}/deleteSection', [CmsController::class, 'deleteSection']);
 
 
     $r->get('/admin/users', [CmsController::class, 'manageUsersPage']);
-    $r->get('/admin/orders/export', [CmsController::class, 'exportOrders']);
-    $r->get('/admin/orders', [CmsController::class, 'viewOrders']);
-    $r->get('/admin/orders/{order_id:\d+}', [CmsController::class, 'viewOrderDetail']);
-    $r->get('/admin/seats', [CmsController::class, 'viewSeatsOverview']);
-    $r->get('/admin/dance/seats', [CmsController::class, 'viewDanceSeatOverview']);
-    $r->get('/admin/dance/seats/{event_id:\d+}', [CmsController::class, 'viewDanceEventSeats']);
-    $r->post('/admin/dance/seats/{event_id:\d+}', [CmsController::class, 'updateDanceEventSeats']);
 
     $r->get('/admin/events/{event_id:\d+}', [CmsController::class, 'viewEventPage']);
+    $r->get('/admin/events/{event_id:\d+}/delete', [CmsController::class, 'deleteEventPage']);
     $r->get('/admin/events/{event_id:\d+}/edit', [CmsController::class, 'updateEventPage']);
 
 
@@ -87,8 +85,6 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     $r->get('/', [HomeController::class, 'index']);
     $r->get('/home', [HomeController::class, 'index']);
-    $r->get('/dance', [DanceController::class, 'index']);
-    $r->get('/dance/artists/{slug:[a-z0-9-]+}', [DanceController::class, 'artistDetail']);
     $r->get('/events', [EventController::class, 'index']);
     $r->post('/events/add-to-program', [EventController::class, 'addToProgram']);
     $r->get('/checkout', [ShopController::class, 'checkout']);
@@ -176,7 +172,7 @@ function createImageService(): App\Services\ImageService
     return new App\Services\ImageService(new App\Repositories\ImageRepository());
 }
 
-function createPageService(): App\Services\ICmsService
+function createPageService(): App\Services\CmsService
 {
     return new App\Services\CmsService(new App\Repositories\CmsRepository());
 }
@@ -189,18 +185,18 @@ function createSectionService(): App\Services\PageSectionService
     );
 }
 
-function createDanceArtistService(): App\Services\DanceArtistService
-{
-    return new App\Services\DanceArtistService(new App\Repositories\DanceArtistRepository());
-}
-
-function createDanceScheduleService(): App\Services\DanceScheduleService
-{
-    return new App\Services\DanceScheduleService(new App\Repositories\DanceScheduleRepository());
-}
-
 function createController(string $controllerClass)
 {
+
+    $pageRepo = new App\Repositories\CmsRepository();
+    $pageService = new App\Services\CmsService($pageRepo);
+
+    $imageRepo = new App\Repositories\ImageRepository();
+    $imageService = new App\Services\ImageService($imageRepo);
+
+    $sectionRepo = new App\Repositories\PageSectionRepository();
+    $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
+
 
     switch ($controllerClass) {
 
@@ -221,12 +217,17 @@ function createController(string $controllerClass)
 
         case App\Controllers\HistoryController::class:
 
-            return new App\Controllers\HistoryController(
-                createSectionService(),
-                createPageService(),
-                new App\Services\ProgramService(),
-                createHistoryBookingCatalogService()
-            );
+            $pageRepo = new App\Repositories\CmsRepository();
+            $pageService = new App\Services\CmsService($pageRepo);
+
+            $imageRepo = new App\Repositories\ImageRepository();
+            $imageService = new App\Services\ImageService($imageRepo);
+
+            $sectionRepo = new App\Repositories\PageSectionRepository();
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
+            $programService = new App\Services\ProgramService();
+
+            return new App\Controllers\HistoryController($sectionService, $pageService, $programService, createHistoryBookingCatalogService());
 
 
         case App\Controllers\AuthController::class:
@@ -249,14 +250,6 @@ function createController(string $controllerClass)
                 new App\Services\ProgramService()
             );
 
-        case DanceController::class:
-
-            return new DanceController(
-                createPageService(),
-                createSectionService(),
-                createDanceArtistService(),
-                createDanceScheduleService()
-            );
 
         case App\Controllers\ProgramController::class:
 
@@ -268,16 +261,23 @@ function createController(string $controllerClass)
 
         case App\Controllers\CmsController::class:
 
+            $pageRepo = new App\Repositories\CmsRepository();
+            $pageService = new App\Services\CmsService($pageRepo);
+
             $userRepo = new App\Repositories\UserRepository();
             $userService = new App\Services\UserService($userRepo);
 
+            $imageRepo = new App\Repositories\ImageRepository();
+            $imageService = new App\Services\ImageService($imageRepo);
+
+            $sectionRepo = new App\Repositories\PageSectionRepository();
+            $sectionService = new App\Services\PageSectionService($sectionRepo, $imageService);
+
             return new App\Controllers\CmsController(
-                createPageService(),
-                createSectionService(),
+                $pageService,
+                $sectionService,
                 $userService,
-                createImageService(),
-                createOrderService(),
-                createAdminDanceAvailabilityService()
+                createImageService()
             );
 
         default:
@@ -288,13 +288,6 @@ function createController(string $controllerClass)
 function createOrderService(): App\Services\OrderService
 {
     return new App\Services\OrderService(new App\Repositories\OrderRepository());
-}
-
-function createAdminDanceAvailabilityService(): App\Services\AdminDanceAvailabilityService
-{
-    return new App\Services\AdminDanceAvailabilityService(
-        new App\Repositories\AdminDanceAvailabilityRepository()
-    );
 }
 
 function createEventCatalogService(): App\Services\EventCatalogService

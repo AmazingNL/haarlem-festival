@@ -13,6 +13,5 @@ interface IImageService
     public function getAllImage(): array;
     public function storeUploadedImage(array $file, array $options = []): string;
     public function validateUpload(array $file): array;
-    public function extractUrls(string $html): array;
 
 }

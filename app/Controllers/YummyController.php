@@ -148,9 +148,13 @@ final class YummyController extends BaseController
             );
 
             $this->programService->addItem($item);
-            $this->reservationEmailService->sendReservationAdded($customer, $item);
+            $emailSent = $this->sendReservationEmail($customer, $item);
 
-            $this->setSuccessMessage('Your ' . $locationName . ' reservation was added to My Program. A confirmation email has been sent.');
+            $message = 'Your ' . $locationName . ' reservation was added to My Program.';
+            if ($emailSent) {
+                $message .= ' A confirmation email has been sent.';
+            }
+            $this->setSuccessMessage($message);
             $this->redirect('/program');
         } catch (\InvalidArgumentException $e) {
             $this->setErrorMessage($e->getMessage());
@@ -158,6 +162,21 @@ final class YummyController extends BaseController
         } catch (\Throwable $e) {
             $this->setErrorMessage('Your reservation could not be booked right now.');
             $this->redirect($fallbackUrl);
+        }
+    }
+
+    /**
+     * Send the reservation confirmation email as a best-effort side effect: a mail
+     * failure must never roll back a reservation that was already added to the program.
+     */
+    private function sendReservationEmail(array $customer, array $item): bool
+    {
+        try {
+            $this->reservationEmailService->sendReservationAdded($customer, $item);
+            return true;
+        } catch (\Throwable $e) {
+            error_log('Reservation email failed: ' . $e->getMessage());
+            return false;
         }
     }
 }

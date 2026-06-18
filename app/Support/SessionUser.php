@@ -7,29 +7,20 @@ namespace App\Support;
 use App\Models\User;
 use App\Repositories\UserRepository;
 
-/**
- * Keeps session user fields in sync with the database and resolves a display name.
- */
+/** Stores and reads the logged-in user from the PHP session. */
 final class SessionUser
 {
     public static function hydrateFromDatabaseIfNeeded(): void
     {
-        if (session_status() !== PHP_SESSION_ACTIVE || empty($_SESSION['user_id'])) {
+        if (!self::isLoggedIn()) {
             return;
         }
 
         try {
-            $userId = (int) $_SESSION['user_id'];
-            if ($userId <= 0) {
-                return;
+            $user = (new UserRepository())->findUserById((int) $_SESSION['user_id']);
+            if ($user !== null) {
+                self::storeInSession($user);
             }
-
-            $user = (new UserRepository())->findUserById($userId);
-            if ($user === null) {
-                return;
-            }
-
-            self::storeInSession($user);
         } catch (\Throwable $e) {
             error_log('Session user hydration failed: ' . $e->getMessage());
         }
@@ -37,16 +28,16 @@ final class SessionUser
 
     public static function storeInSession(User $user): void
     {
-        $roleValue = $user->role instanceof \App\Models\Enum\UserRole
+        $role = $user->role instanceof \App\Models\Enum\UserRole
             ? $user->role->value
             : strtolower((string) $user->role);
 
         $_SESSION['user_id'] = $user->user_id;
-        $_SESSION['user_role'] = $roleValue;
+        $_SESSION['user_role'] = $role;
         $_SESSION['user_username'] = trim($user->username);
         $_SESSION['user_first_name'] = trim($user->first_name);
         $_SESSION['user_last_name'] = trim($user->last_name);
-        $_SESSION['user_name'] = self::buildFullName($user);
+        $_SESSION['user_name'] = self::fullName($user->first_name, $user->last_name, $user->username, $user->email);
         $_SESSION['user_email'] = trim($user->email);
         $_SESSION['user_phone'] = $user->phone;
     }
@@ -56,21 +47,18 @@ final class SessionUser
         return session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id']);
     }
 
-    /** Full name from profile, then username, then email. */
     public static function displayName(): string
     {
         if (!self::isLoggedIn()) {
             return '';
         }
 
-        $fullName = self::buildFullNameFromSession();
+        $fullName = self::fullName(
+            (string) ($_SESSION['user_first_name'] ?? ''),
+            (string) ($_SESSION['user_last_name'] ?? '')
+        );
         if ($fullName !== '') {
             return $fullName;
-        }
-
-        $storedName = trim((string) ($_SESSION['user_name'] ?? ''));
-        if ($storedName !== '') {
-            return $storedName;
         }
 
         $username = trim((string) ($_SESSION['user_username'] ?? ''));
@@ -83,11 +71,7 @@ final class SessionUser
 
     public static function email(): string
     {
-        if (!self::isLoggedIn()) {
-            return '';
-        }
-
-        return trim((string) ($_SESSION['user_email'] ?? ''));
+        return self::isLoggedIn() ? trim((string) ($_SESSION['user_email'] ?? '')) : '';
     }
 
     /** Profile fields used at checkout and for reservations. */
@@ -101,34 +85,28 @@ final class SessionUser
         ];
     }
 
-    private static function buildFullName(User $user): string
+    private static function fullName(string $firstName, string $lastName, string $fallback = '', string $email = ''): string
     {
-        $fullName = self::joinNameParts(trim($user->first_name), trim($user->last_name));
-        if ($fullName !== '') {
-            return $fullName;
-        }
+        $firstName = trim($firstName);
+        $lastName = trim($lastName);
 
-        if ($user->username !== '') {
-            return trim($user->username);
-        }
-
-        return trim($user->email);
-    }
-
-    private static function buildFullNameFromSession(): string
-    {
-        return self::joinNameParts(
-            trim((string) ($_SESSION['user_first_name'] ?? '')),
-            trim((string) ($_SESSION['user_last_name'] ?? ''))
-        );
-    }
-
-    private static function joinNameParts(string $firstName, string $lastName): string
-    {
         if ($firstName !== '' && $lastName !== '') {
             return $firstName . ' ' . $lastName;
         }
 
-        return $firstName !== '' ? $firstName : $lastName;
+        if ($firstName !== '') {
+            return $firstName;
+        }
+
+        if ($lastName !== '') {
+            return $lastName;
+        }
+
+        $fallback = trim($fallback);
+        if ($fallback !== '') {
+            return $fallback;
+        }
+
+        return trim($email);
     }
 }

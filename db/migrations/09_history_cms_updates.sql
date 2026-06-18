@@ -1,3 +1,4 @@
+-- migrate:up
 USE haarlem_festival;
 
 ALTER TABLE page_section
@@ -26,6 +27,7 @@ MODIFY section_type ENUM(
   'storytelling_schedule',
   'haarlem_unique',
   'haarlem_taste',
+  'reservation',
   'history_hero',
   'history_timeline',
   'history_gallery',
@@ -133,3 +135,5 @@ SET ps.content = JSON_SET(
 )
 WHERE p.slug = 'history-route-map'
   AND ps.section_type = 'history_route_map_stops';
+
+-- migrate:down

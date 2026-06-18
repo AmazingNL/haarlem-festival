@@ -45,11 +45,16 @@ use App\Schemas\yummy\RestaurantCard;
 use App\Schemas\yummy\TextBlock;
 use App\Schemas\yummy\WelcomeBanner;
 use App\Schemas\yummy\WelcomeBannerCard;
+use App\Schemas\stories\StoriesHero;
+use App\Schemas\stories\WhatIsStories;
+use App\Schemas\stories\StoriesPreview;
+use App\Schemas\stories\StorytellingSchedule;
+use App\Schemas\stories\StoriesBooking;
 
 // Map a section type string to the ViewModel class that defines its CMS fields.
 class SectionFactory
 {
-    // Return the correct ViewModel class for the requested section type.
+    // Return the correct Schema class for the requested section type.
     public static function returnSectionClass(string $type): ?string
     {
         $map = [
@@ -95,7 +100,12 @@ class SectionFactory
             'history_molen_article' => HistoryMolenArticle::class,
             'history_molen_sidebar' => HistoryMolenSidebar::class,
             'history_molen_route_cta' => HistoryMolenRouteCta::class,
-            'reservation' => Reservation::class
+            'reservation'           => Reservation::class,
+            'stories_hero'          => StoriesHero::class,
+            'what_is_stories'       => WhatIsStories::class,
+            'stories_preview'       => StoriesPreview::class,
+            'storytelling_schedule' => StorytellingSchedule::class,
+            'stories_booking'       => StoriesBooking::class,
         ];
 
         return $map[$type] ?? null;

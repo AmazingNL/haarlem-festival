@@ -7,6 +7,7 @@ $isPages     = str_starts_with($current, '/admin/pages') || str_starts_with($cur
 $isUsers     = str_starts_with($current, '/admin/users');
 $isOrders    = str_starts_with($current, '/admin/orders');
 $isSeats     = str_starts_with($current, '/admin/seats') || str_starts_with($current, '/admin/dance/seats');
+$isScan      = str_starts_with($current, '/admin/tickets');
 ?>
 <aside class="col-md-3 mb-4">
     <div class="admin-sidebar">
@@ -32,16 +33,6 @@ $isSeats     = str_starts_with($current, '/admin/seats') || str_starts_with($cur
                 <li>
                     <a class="sidebar-link <?= $isUsers ? 'active' : '' ?>" href="/admin/users">
                         Users
-                    </a>
-                </li>
-                <li>
-                    <a class="sidebar-link <?= $isOrders ? 'active' : '' ?>" href="/admin/orders">
-                        Orders
-                    </a>
-                </li>
-                <li>
-                    <a class="sidebar-link <?= $isSeats ? 'active' : '' ?>" href="/admin/seats">
-                        Seats
                     </a>
                 </li>
             </ul>

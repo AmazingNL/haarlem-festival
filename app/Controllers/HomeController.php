@@ -47,31 +47,6 @@ final class HomeController extends BaseController
     }
 
 
-
-    public function stories(): void
-    {
-        try {
-            $page = $this->adminPageService->getPageBySlug('stories');
-            $pageId = $page->page_id ?? null;
-            $stories = $pageId === null ? [] : $this->pageSectionService->getSectionsByPageId($pageId);
-
-            if ($stories === []) {
-                $this->setErrorMessage('Stories page not available');
-                $this->redirect('/');
-                return;
-            }
-
-            $this->view('/stories/index', [
-                'section' => $stories,
-                'page' => $page,
-                'title' => 'Stories',
-            ]);
-        } catch (\Throwable $e) {
-            $this->view('no_page/index', ['error' => 'Stories page not available']);
-        }
-    }
-
-
     private function mergeSectionContent(array $sections): array
     {
         return array_map(

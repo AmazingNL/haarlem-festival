@@ -134,33 +134,4 @@ final class ImageService implements IImageService
 
         return $value;
     }
-
-    public function extractUrls(string $html): array
-    {
-        if ($html === '') {
-            return [];
-        }
-
-        $urls = [];
-        $previous = libxml_use_internal_errors(true);
-
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<!DOCTYPE html><html><body>' . $html . '</body></html>', LIBXML_NOERROR | LIBXML_NOWARNING);
-        $images = $dom->getElementsByTagName('img');
-        foreach ($images as $img) {
-            if (!($img instanceof \DOMElement)) {
-                continue;
-            }
-            $src = trim($img->getAttribute('src'));
-            if ($src === '' || str_starts_with($src, 'data:')) {
-                continue;
-            }
-            $urls[] = $src;
-        }
-
-        libxml_clear_errors();
-        libxml_use_internal_errors($previous);
-
-        return array_values(array_unique($urls));
-    }
 }
