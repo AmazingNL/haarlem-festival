@@ -7,7 +7,6 @@ namespace App\Controllers;
 use App\Core\BaseController;
 use App\Models\Enum\UserRole;
 use App\Models\User;
-use App\Services\Interfaces\IAccountEmailService;
 use App\Services\Interfaces\IUserService;
 use App\Support\SessionUser;
 
