@@ -63,6 +63,33 @@ final class StoriesRepository extends BaseRepository implements IStoriesReposito
         }
     }
 
+    public function getPublishedShowsForPageId(int $pageId): array
+    {
+        if ($pageId <= 0) {
+            return [];
+        }
+
+        try {
+            $stmt = $this->getConnection()->prepare(
+                'SELECT * FROM ' . self::TABLE . '
+                 WHERE page_id = ? AND section_type = ? AND is_published = 1
+                 ORDER BY sort_order ASC, section_id ASC'
+            );
+            $stmt->execute([$pageId, 'stories_booking']);
+
+            $shows = [];
+            foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+                if (is_array($row)) {
+                    $shows[] = $this->mergeJsonContent($row);
+                }
+            }
+
+            return $shows;
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to retrieve stories shows. ' . $e->getMessage());
+        }
+    }
+
     /**
      * Decode and merge the JSON content column into the row array.
      *

@@ -533,8 +533,8 @@
     display: block;
     width: 100%;
     padding: 10px 8px;
-    background: #7f1414;
-    color: #fff;
+    background: transparent;
+    color: #2c1410;
     text-align: center;
     border-radius: 8px;
     font-size: 0.75rem;
@@ -543,13 +543,13 @@
     letter-spacing: 0.07em;
     text-decoration: none;
     margin-top: auto;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
     cursor: pointer;
-    border: none;
+    border: 1.5px solid #2c1410;
     font-family: inherit;
 }
 
-.sched-card-btn:hover { background: #a01a1a; color: #fff; }
+.sched-card-btn:hover { background: #7f1414; color: #fff; border-color: #7f1414; }
 
 .sched-card-btn--disabled {
     background: transparent;

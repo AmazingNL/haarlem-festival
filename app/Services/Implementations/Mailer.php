@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Implementations;
 
+use App\Services\Interfaces\IMailer;
 use PHPMailer\PHPMailer\Exception as MailerException;
 use PHPMailer\PHPMailer\PHPMailer;
 

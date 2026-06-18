@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\AuthController;
 use App\Controllers\CmsController;
+use App\Controllers\DanceController;
 use App\Controllers\EventController;
 use App\Controllers\HistoryController;
 use App\Controllers\HomeController;
@@ -12,6 +13,19 @@ use App\Controllers\ShopController;
 use App\Controllers\StoriesController;
 use App\Controllers\TicketController;
 use App\Controllers\YummyController;
+use App\Services\Implementations\Booking\CheckoutValidationService;
+use App\Services\Implementations\Booking\EventBookingService;
+use App\Services\Implementations\Booking\HistoryBookingService;
+use App\Services\Implementations\Booking\ReservationService;
+use App\Services\Implementations\Booking\RestaurantAvailabilityService;
+use App\Services\Implementations\Booking\RestaurantBookingService;
+use App\Services\Implementations\Booking\StoriesBookingService;
+use App\Services\Implementations\Catalog\EventCatalogService;
+use App\Services\Implementations\OrderEmailService;
+use App\Services\Implementations\OrderService;
+use App\Services\Implementations\ProgramService;
+use App\Services\Implementations\StripePaymentService;
+use App\Services\OrderInvoiceService;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use function FastRoute\simpleDispatcher;
@@ -77,7 +91,11 @@ $dispatcher = simpleDispatcher(static function (RouteCollector $r): void {
     $r->post('/yummy/bistro-toujours/book-reservation', [YummyController::class, 'bookBistroToujoursReservation']);
 
     $r->get('/stories', [StoriesController::class, 'index']);
+    $r->get('/stories/{slug}', [StoriesController::class, 'detail']);
     $r->post('/stories/add-to-program', [StoriesController::class, 'addShowToProgram']);
+
+    $r->get('/dance', [DanceController::class, 'index']);
+    $r->get('/dance/artists/{slug}', [DanceController::class, 'artistDetail']);
 
     $r->get('/history', [HistoryController::class, 'index']);
     $r->get('/history/book-tour', [HistoryController::class, 'bookTour']);
@@ -92,6 +110,11 @@ $dispatcher = simpleDispatcher(static function (RouteCollector $r): void {
     $r->get('/qr/{token:[a-f0-9]{64}}', [TicketController::class, 'qrImage']);
     $r->get('/admin/tickets/scan', [TicketController::class, 'scanPage']);
     $r->post('/admin/tickets/{token:[a-f0-9]{64}}/scan', [TicketController::class, 'scan']);
+
+    $r->get('/admin/seats', [CmsController::class, 'viewSeatsOverview']);
+    $r->get('/admin/dance/seats', [CmsController::class, 'viewDanceSeatOverview']);
+    $r->get('/admin/dance/seats/{event_id:\d+}', [CmsController::class, 'viewDanceEventSeats']);
+    $r->post('/admin/dance/seats/{event_id:\d+}', [CmsController::class, 'updateDanceEventSeats']);
 });
 
 $httpMethod = $_SERVER['REQUEST_METHOD'];
@@ -146,26 +169,68 @@ switch ($routeInfo[0]) {
         break;
 }
 
-function createImageService(): App\Services\ImageService
+function createImageService(): App\Services\Interfaces\IImageService
 {
-    return new App\Services\ImageService(new App\Repositories\ImageRepository());
+    return new App\Services\Implementations\ImageService(new App\Repositories\ImageRepository());
 }
 
-function createMailer(): App\Services\IMailer
+function createMailer(): App\Services\Interfaces\IMailer
 {
-    return new App\Services\Mailer();
+    return new App\Services\Implementations\Mailer();
 }
 
-function createPageService(): App\Services\CmsService
+function createPageService(): App\Services\Interfaces\ICmsService
 {
-    return new App\Services\CmsService(new App\Repositories\CmsRepository());
+    return new App\Services\Implementations\CmsService(new App\Repositories\CmsRepository());
 }
 
-function createSectionService(): App\Services\PageSectionService
+function createSectionService(): App\Services\Interfaces\IPageSectionService
 {
-    return new App\Services\PageSectionService(
+    return new App\Services\Implementations\PageSectionService(
         new App\Repositories\PageSectionRepository(),
         createImageService()
+    );
+}
+
+function createProgramService(): ProgramService
+{
+    return new ProgramService();
+}
+
+function createReservationService(): ReservationService
+{
+    return new ReservationService(
+        new App\Repositories\RestaurantRepository(),
+        new App\Repositories\ReservationRepository()
+    );
+}
+
+function createStoriesRepository(): App\Repositories\StoriesRepository
+{
+    return new App\Repositories\StoriesRepository();
+}
+
+function createStoriesBookingService(): StoriesBookingService
+{
+    return new StoriesBookingService(createStoriesRepository());
+}
+
+function createCheckoutValidationService(): CheckoutValidationService
+{
+    return new CheckoutValidationService([
+        new EventBookingService(new App\Repositories\EventCatalogRepository()),
+        new HistoryBookingService(createPageService(), createSectionService()),
+        new RestaurantBookingService(createPageService(), createSectionService(), createReservationService()),
+        createStoriesBookingService(),
+    ]);
+}
+
+function createStoriesService(): App\Services\Interfaces\IStoriesService
+{
+    return new App\Services\Implementations\StoriesService(
+        createPageService(),
+        createSectionService(),
+        createStoriesRepository()
     );
 }
 
@@ -179,51 +244,75 @@ function createController(string $controllerClass)
             return new YummyController(
                 createPageService(),
                 createSectionService(),
-                new App\Services\ProgramService(),
-                new App\Services\ReservationEmailService(createMailer()),
-                createYummyReservationCatalogService()
+                createProgramService(),
+                new App\Services\Implementations\ReservationEmailService(createMailer()),
+                new RestaurantBookingService(createPageService(), createSectionService(), createReservationService()),
+                new RestaurantAvailabilityService(
+                    new App\Repositories\RestaurantRepository(),
+                    new App\Repositories\ReservationRepository()
+                )
             );
 
         case HistoryController::class:
             return new HistoryController(
                 createSectionService(),
                 createPageService(),
-                new App\Services\ProgramService(),
-                createHistoryBookingCatalogService()
+                createProgramService(),
+                new HistoryBookingService(createPageService(), createSectionService())
             );
 
         case AuthController::class:
-            return new AuthController(new App\Services\UserService(new App\Repositories\UserRepository()));
+            return new AuthController(
+                new App\Services\Implementations\UserService(new App\Repositories\UserRepository())
+            );
 
         case ShopController::class:
             return createShopController();
 
         case EventController::class:
             return new EventController(
-                createEventCatalogService(),
-                new App\Services\ProgramService()
+                new EventCatalogService(new App\Repositories\EventCatalogRepository()),
+                new EventBookingService(new App\Repositories\EventCatalogRepository()),
+                createProgramService()
             );
 
         case StoriesController::class:
-            return new StoriesController(createStoriesService());
+            return new StoriesController(
+                createStoriesService(),
+                createStoriesBookingService(),
+                createProgramService()
+            );
+
+        case DanceController::class:
+            return new DanceController(
+                createPageService(),
+                createSectionService(),
+                new App\Services\Implementations\DanceArtistService(
+                    new App\Repositories\DanceArtistRepository()
+                ),
+                new App\Services\Implementations\DanceScheduleService(
+                    new App\Repositories\DanceScheduleRepository()
+                )
+            );
 
         case ProgramController::class:
-            return new ProgramController(
-                new App\Services\ProgramService(),
-                createOrderService()
-            );
+            return new ProgramController(createProgramService(), new OrderService(new App\Repositories\OrderRepository()));
 
         case TicketController::class:
             return new TicketController(
-                new App\Services\TicketService(new App\Repositories\TicketRepository())
+                new App\Services\Implementations\TicketService(new App\Repositories\TicketRepository())
             );
 
         case CmsController::class:
             return new CmsController(
                 createPageService(),
                 createSectionService(),
-                new App\Services\UserService(new App\Repositories\UserRepository()),
-                createImageService()
+                new App\Services\Implementations\UserService(new App\Repositories\UserRepository()),
+                createImageService(),
+                new OrderService(new App\Repositories\OrderRepository()),
+                new App\Services\Implementations\AdminDanceAvailabilityService(
+                    new App\Repositories\AdminDanceAvailabilityRepository()
+                )
             );
 
         default:
@@ -231,55 +320,17 @@ function createController(string $controllerClass)
     }
 }
 
-function createOrderService(): App\Services\OrderService
-{
-    return new App\Services\OrderService(new App\Repositories\OrderRepository());
-}
-
-function createEventCatalogService(): App\Services\EventCatalogService
-{
-    return new App\Services\EventCatalogService(new App\Repositories\EventCatalogRepository());
-}
-
-function createStoriesService(): App\Services\StoriesService
-{
-    return new App\Services\StoriesService(
-        createPageService(),
-        createSectionService(),
-        new App\Repositories\StoriesRepository()
-    );
-}
-
-function createHistoryBookingCatalogService(): App\Services\HistoryBookingCatalogService
-{
-    return new App\Services\HistoryBookingCatalogService(createPageService(), createSectionService());
-}
-
-function createYummyReservationCatalogService(): App\Services\YummyReservationCatalogService
-{
-    return new App\Services\YummyReservationCatalogService(createPageService(), createSectionService());
-}
-
-function createCheckoutValidationService(): App\Services\CheckoutValidationService
-{
-    return new App\Services\CheckoutValidationService(
-        createEventCatalogService(),
-        createHistoryBookingCatalogService(),
-        createYummyReservationCatalogService()
-    );
-}
-
 function createShopController(): ShopController
 {
-    $invoiceService = new App\Services\OrderInvoiceService();
+    $invoiceService = new OrderInvoiceService();
 
     return new ShopController(
-        new App\Services\ProgramService(),
-        createOrderService(),
+        createProgramService(),
+        new OrderService(new App\Repositories\OrderRepository()),
         createCheckoutValidationService(),
-        new App\Services\StripePaymentService(),
+        new StripePaymentService(),
         new App\Repositories\PendingCheckoutRepository(),
-        new App\Services\OrderEmailService(createMailer(), $invoiceService),
+        new OrderEmailService(createMailer(), $invoiceService),
         $invoiceService
     );
 }
