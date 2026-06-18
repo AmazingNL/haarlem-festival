@@ -9,12 +9,20 @@ $selectedDanceFilter = static function (string $name) use ($danceFilters): strin
 $danceFilterSelected = static function (string $name, string $value) use ($selectedDanceFilter): string {
     return $selectedDanceFilter($name) === $value ? ' selected' : '';
 };
+
+$escapeDanceFilter = static fn(mixed $value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+$filtersKicker = trim((string) ($filtersKicker ?? 'Find Your Session'));
+$filtersTitle = trim((string) ($filtersTitle ?? 'Filter Dance Sessions'));
+$filtersIntro = trim((string) ($filtersIntro ?? 'Use the filters to narrow the official Dance programme by date, venue, artist, or session type.'));
 ?>
 
 <section class="dance-filters" id="dance-filters" aria-labelledby="dance-filters-title">
     <div class="dance-filters__header">
-        <p class="dance-kicker">Find Your Session</p>
-        <h2 id="dance-filters-title">Filter Dance Sessions</h2>
+        <p class="dance-kicker"><?= $escapeDanceFilter($filtersKicker !== '' ? $filtersKicker : 'Find Your Session') ?></p>
+        <h2 id="dance-filters-title"><?= $escapeDanceFilter($filtersTitle !== '' ? $filtersTitle : 'Filter Dance Sessions') ?></h2>
+        <?php if ($filtersIntro !== ''): ?>
+            <p><?= $escapeDanceFilter($filtersIntro) ?></p>
+        <?php endif; ?>
     </div>
 
     <form class="dance-filters__form" method="get" action="/dance#dance-tickets">

@@ -10,6 +10,7 @@ if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['program_items']
 
 $isLoggedIn = SessionUser::isLoggedIn();
 $loggedInUserLabel = SessionUser::displayName();
+$isAdminUser = $isLoggedIn && strtolower((string) ($_SESSION['user_role'] ?? '')) === 'admin';
 $authLabel = $isLoggedIn ? 'Logout' : 'Login';
 $authHref = $isLoggedIn ? '/logout' : '/loginForm';
 $isAuthPage = $currentPath === '/loginForm' || $currentPath === '/registerForm';
@@ -109,6 +110,12 @@ $headerIcons = [
                         <span class="navbar-user__greeting">Hi,</span>
                         <span class="navbar-user__name"><?= htmlspecialchars($loggedInUserLabel, ENT_QUOTES, 'UTF-8') ?></span>
                     </span>
+                <?php endif; ?>
+
+                <?php if ($isAdminUser): ?>
+                    <a href="/admin/dashboard" class="auth-link">
+                        CMS
+                    </a>
                 <?php endif; ?>
 
                 <a href="<?= htmlspecialchars($authHref, ENT_QUOTES, 'UTF-8') ?>" class="auth-link <?= $isAuthPage && !$isLoggedIn ? 'active' : '' ?>">

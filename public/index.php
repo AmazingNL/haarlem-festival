@@ -19,7 +19,7 @@ use App\Controllers\ShopController;
 require __DIR__ . '/../app/bootstrap.php';
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../app/Models/Enum.php';
-require_once __DIR__ . '/../app/config.php';
+require_once __DIR__ . '/../app/Config.php';
 
 \App\Support\SessionUser::hydrateFromDatabaseIfNeeded();
 
@@ -64,6 +64,10 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/admin/orders/export', [CmsController::class, 'exportOrders']);
     $r->get('/admin/orders', [CmsController::class, 'viewOrders']);
     $r->get('/admin/orders/{order_id:\d+}', [CmsController::class, 'viewOrderDetail']);
+    $r->get('/admin/seats', [CmsController::class, 'viewSeatsOverview']);
+    $r->get('/admin/dance/seats', [CmsController::class, 'viewDanceSeatOverview']);
+    $r->get('/admin/dance/seats/{event_id:\d+}', [CmsController::class, 'viewDanceEventSeats']);
+    $r->post('/admin/dance/seats/{event_id:\d+}', [CmsController::class, 'updateDanceEventSeats']);
 
     $r->get('/admin/events/{event_id:\d+}', [CmsController::class, 'viewEventPage']);
     $r->get('/admin/events/{event_id:\d+}/edit', [CmsController::class, 'updateEventPage']);
@@ -272,7 +276,8 @@ function createController(string $controllerClass)
                 createSectionService(),
                 $userService,
                 createImageService(),
-                createOrderService()
+                createOrderService(),
+                createAdminDanceAvailabilityService()
             );
 
         default:
@@ -283,6 +288,13 @@ function createController(string $controllerClass)
 function createOrderService(): App\Services\OrderService
 {
     return new App\Services\OrderService(new App\Repositories\OrderRepository());
+}
+
+function createAdminDanceAvailabilityService(): App\Services\AdminDanceAvailabilityService
+{
+    return new App\Services\AdminDanceAvailabilityService(
+        new App\Repositories\AdminDanceAvailabilityRepository()
+    );
 }
 
 function createEventCatalogService(): App\Services\EventCatalogService

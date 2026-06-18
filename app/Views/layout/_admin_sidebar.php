@@ -6,6 +6,7 @@ $isDashboard = ($current === '/admin' || $current === '/admin/dashboard');
 $isPages     = str_starts_with($current, '/admin/pages') || str_starts_with($current, '/admin/pageSection');
 $isUsers     = str_starts_with($current, '/admin/users');
 $isOrders    = str_starts_with($current, '/admin/orders');
+$isSeats     = str_starts_with($current, '/admin/seats') || str_starts_with($current, '/admin/dance/seats');
 ?>
 <aside class="col-md-3 mb-4">
     <div class="admin-sidebar">
@@ -36,6 +37,11 @@ $isOrders    = str_starts_with($current, '/admin/orders');
                 <li>
                     <a class="sidebar-link <?= $isOrders ? 'active' : '' ?>" href="/admin/orders">
                         Orders
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-link <?= $isSeats ? 'active' : '' ?>" href="/admin/seats">
+                        Seats
                     </a>
                 </li>
             </ul>

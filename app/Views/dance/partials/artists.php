@@ -2,13 +2,16 @@
 $artists = is_array($artists ?? null) ? array_values($artists) : [];
 
 $escapeArtist = static fn(mixed $value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+$artistsKicker = trim((string) ($artistsKicker ?? 'Line-up'));
+$artistsTitle = trim((string) ($artistsTitle ?? 'Meet the Artists'));
+$artistsIntro = trim((string) ($artistsIntro ?? 'Explore the DJs shaping the Dance weekend and jump into their latest festival session.'));
 ?>
 
 <section class="dance-artists" id="dance-artists" aria-labelledby="dance-artists-title">
     <div class="dance-artists__header">
-        <p class="dance-kicker">Line-up</p>
-        <h2 id="dance-artists-title">Meet the Artists</h2>
-        <p>Explore the DJs shaping the Dance weekend and jump into their latest festival session.</p>
+        <p class="dance-kicker"><?= $escapeArtist($artistsKicker !== '' ? $artistsKicker : 'Line-up') ?></p>
+        <h2 id="dance-artists-title"><?= $escapeArtist($artistsTitle !== '' ? $artistsTitle : 'Meet the Artists') ?></h2>
+        <p><?= $escapeArtist($artistsIntro !== '' ? $artistsIntro : 'Explore the DJs shaping the Dance weekend and jump into their latest festival session.') ?></p>
     </div>
 
     <?php if ($artists === []): ?>

@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Enum\PageStatus;
 use App\Models\Enum\SectionType;
 use App\Models\Enum\UserRole;
+use App\Services\AdminDanceAvailabilityService;
 use App\Services\ICmsService;
 use App\Services\IPageSectionService;
 use App\Services\OrderService;
@@ -29,6 +30,7 @@ final class CmsController extends BaseController
     private IUserService $userService;
     private IImageService $imageService;
     private OrderService $orderService;
+    private AdminDanceAvailabilityService $adminDanceAvailabilityService;
 
     public function __construct(
         ICmsService $cmsService,
@@ -36,12 +38,14 @@ final class CmsController extends BaseController
         IUserService $userService,
         IImageService $imageService,
         OrderService $orderService,
+        AdminDanceAvailabilityService $adminDanceAvailabilityService,
     ) {
         $this->cmsService = $cmsService;
         $this->pageSectionService = $pageSectionService;
         $this->userService = $userService;
         $this->imageService = $imageService;
         $this->orderService = $orderService;
+        $this->adminDanceAvailabilityService = $adminDanceAvailabilityService;
     }
 
     public function index(): void
@@ -285,7 +289,7 @@ final class CmsController extends BaseController
                 return;
             }
             $sectionTypeValue = $pageSection->section_type instanceof SectionType
-                ? $pageSection->section_type->value : (string) $pageSection->section_type;
+                ? $pageSection->section_type->value : (string)  $pageSection->section_type;
             if ($sectionTypeValue === '') {
                 $this->setFlash('error', 'No Section Type found');
                 $this->redirect('/admin/pageSection/' . $section_id . '/editSectionForm');
@@ -593,6 +597,61 @@ final class CmsController extends BaseController
 
         fclose($output);
         exit;
+    }
+
+    public function viewSeatsOverview(): void
+    {
+        $this->view(
+            'admin/seats',
+            [
+                'title' => 'Seats Management',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function viewDanceSeatOverview(): void
+    {
+        $this->view(
+            'admin/dance_seats',
+            [
+                'events' => $this->adminDanceAvailabilityService->getDanceEventsWithTicketTypes(),
+                'title' => 'Dance Ticket Availability',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function viewDanceEventSeats(int $event_id): void
+    {
+        $event = $this->adminDanceAvailabilityService->getDanceEventWithTicketTypes($event_id);
+        if ($event === null) {
+            $this->setFlash('error', 'Dance event not found.');
+            $this->redirect('/admin/dance/seats');
+            return;
+        }
+
+        $this->view(
+            'admin/dance_event_seats',
+            [
+                'event' => $event,
+                'title' => 'Dance Ticket Availability',
+            ],
+            'admin_dashboard'
+        );
+    }
+
+    public function updateDanceEventSeats(int $event_id): void
+    {
+        try {
+            $this->verifyCsrf();
+            $this->adminDanceAvailabilityService->updateTicketQuantities($event_id, $_POST);
+            $this->setFlash('success', 'Dance ticket availability updated.');
+        } catch (Throwable $e) {
+            $this->setFlash('error', $e->getMessage());
+        }
+
+        $this->redirect('/admin/dance/seats/' . $event_id);
     }
 
     // minimal stubs for routes referenced in Router

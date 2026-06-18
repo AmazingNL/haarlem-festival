@@ -137,6 +137,18 @@ final class DanceArtistService
 
         $images = [];
         foreach ($decoded as $image) {
+            if (is_string($image)) {
+                $src = $this->clean($image);
+                if ($src !== '') {
+                    $images[] = [
+                        'src' => $src,
+                        'alt' => 'Dance artist gallery image',
+                    ];
+                }
+
+                continue;
+            }
+
             if (!is_array($image)) {
                 continue;
             }
