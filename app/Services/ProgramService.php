@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\ProgramItem;
+
 final class ProgramService
 {
     private const ITEMS_KEY = 'program_items';
@@ -116,48 +118,10 @@ final class ProgramService
         return round($total, 2);
     }
 
-    // Normalize one program item so event tickets and history bookings share one consistent structure.
+    // Normalize one program item via the ProgramItem model so every item shares one consistent structure.
     private function normalizeItem(array $item): array
     {
-        $quantity = max(1, min(10, (int) ($item['quantity'] ?? 1)));
-        $unitPrice = round((float) ($item['unit_price'] ?? 0), 2);
-        $type = trim((string) ($item['type'] ?? 'history-book-tour'));
-        if ($type === '') {
-            $type = 'history-book-tour';
-        }
-
-        return [
-            'id' => trim((string) ($item['id'] ?? '')) !== ''
-                ? trim((string) $item['id'])
-                : bin2hex(random_bytes(8)),
-            'type' => $type,
-            'event_id' => max(0, (int) ($item['event_id'] ?? 0)),
-            'ticket_type_id' => max(0, (int) ($item['ticket_type_id'] ?? 0)),
-            'title' => trim((string) ($item['title'] ?? 'Festival Booking')),
-            'day' => trim((string) ($item['day'] ?? '')),
-            'time' => trim((string) ($item['time'] ?? '')),
-            'language' => trim((string) ($item['language'] ?? '')),
-            'ticket_key' => trim((string) ($item['ticket_key'] ?? '')),
-            'ticket_title' => trim((string) ($item['ticket_title'] ?? '')),
-            'quantity' => $quantity,
-            'unit_price' => $unitPrice,
-            'total_price' => round($unitPrice * $quantity, 2),
-            'selection_text' => trim((string) ($item['selection_text'] ?? '')),
-            'ticket_summary_text' => trim((string) ($item['ticket_summary_text'] ?? '')),
-            'location_name' => trim((string) ($item['location_name'] ?? 'Bavo Church')),
-            'category_label' => trim((string) ($item['category_label'] ?? 'Festival')),
-            'special_requests' => trim((string) ($item['special_requests'] ?? '')),
-            'customer_name' => trim((string) ($item['customer_name'] ?? '')),
-            'customer_email' => trim((string) ($item['customer_email'] ?? '')),
-            'customer_phone' => trim((string) ($item['customer_phone'] ?? '')),
-            'page_slug' => trim((string) ($item['page_slug'] ?? '')),
-            'adult_count' => max(0, (int) ($item['adult_count'] ?? 0)),
-            'child_count' => max(0, (int) ($item['child_count'] ?? 0)),
-            'adult_price' => round((float) ($item['adult_price'] ?? 0), 2),
-            'child_price' => round((float) ($item['child_price'] ?? 0), 2),
-            'starts_at' => trim((string) ($item['starts_at'] ?? '')),
-            'ends_at' => trim((string) ($item['ends_at'] ?? '')),
-        ];
+        return ProgramItem::fromArray($item)->toArray();
     }
 
     // Remove duplicates so the same selection is stored only once.
