@@ -409,14 +409,202 @@
     color: #8a6a6a;
 }
 
+/* ===== Artist detail page ===== */
+/* Hero: "Go Back" pinned top-left, artist name at the bottom. */
+.jazz-artist__hero {
+    align-items: stretch;
+}
+
+.jazz-artist__hero-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: 22px;
+    padding-bottom: 30px;
+}
+
+.jazz-goback {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    background: rgba(20, 8, 8, 0.55);
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.jazz-goback:hover {
+    background: rgba(20, 8, 8, 0.82);
+}
+
+/* Career highlight: text + image, two columns (reuses the "what to expect" feel). */
+.jazz-artist__career-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.jazz-artist__career-media img {
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+/* Essential works: soft-pink block of alternating album rows. */
+.jazz-artist__works {
+    background: #fce8ea;
+}
+
+.jazz-artist__albums {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.jazz-album {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    padding: 22px 26px;
+    background: #f7c9cf;
+    border-radius: 16px;
+}
+
+.jazz-album--reverse {
+    flex-direction: row-reverse;
+}
+
+.jazz-album__media {
+    flex: 0 0 160px;
+}
+
+.jazz-album__media img {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.jazz-album__body {
+    flex: 1 1 auto;
+}
+
+.jazz-album__title {
+    margin: 0 0 10px;
+    text-align: center;
+    font-family: "Bebas Neue", var(--font-primary), sans-serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #410606;
+}
+
+.jazz-album__text {
+    margin: 0;
+    color: #5b3a3a;
+    font-size: 0.92rem;
+}
+
+/* Give em a listen: a single track card with a play badge over the artwork. */
+.jazz-listen {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    max-width: 640px;
+    padding: 20px 22px;
+    background: #f7c9cf;
+    border-radius: 16px;
+}
+
+.jazz-listen__media {
+    position: relative;
+    flex: 0 0 180px;
+    display: block;
+}
+
+.jazz-listen__media img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+}
+
+.jazz-listen__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    color: #410606;
+    font-size: 1.3rem;
+    padding-left: 4px;
+}
+
+.jazz-listen__info p {
+    margin: 0 0 4px;
+    color: #5b3a3a;
+}
+
+.jazz-listen__track {
+    font-weight: 700;
+    color: #410606;
+}
+
+/* Schedule: a single-column list of the artist's bookable shows. */
+.jazz-artist__schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.jazz-artist__event {
+    min-height: 120px;
+    justify-content: center;
+}
+
+/* Closing tagline. */
+.jazz-artist__closing {
+    text-align: center;
+}
+
+.jazz-artist__closing-text {
+    margin: 0;
+    font-family: "Bebas Neue", var(--font-primary), sans-serif;
+    font-size: 1.9rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #410606;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 860px) {
 
     .jazz-expect__grid,
     .jazz-featured__grid,
     .jazz-agenda__grid,
-    .jazz-contact__grid {
+    .jazz-contact__grid,
+    .jazz-artist__career-grid {
         grid-template-columns: 1fr;
+    }
+
+    .jazz-album,
+    .jazz-album--reverse,
+    .jazz-listen {
+        flex-direction: column;
+        text-align: center;
     }
 
     .jazz-section {

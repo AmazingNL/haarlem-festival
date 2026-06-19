@@ -56,6 +56,14 @@ final class PageSectionService implements IPageSectionService
         return $sectionId > 0;
     }
 
+    // Update an existing section from submitted form data (mirrors createSection).
+    // The DTO's sectionId decides which row is updated.
+    public function updateSectionFromDto(SectionInputDTO $input): bool
+    {
+        $section = $this->buildSectionFromDto($input);
+        return $this->pageSectionRepository->updateSection($section);
+    }
+
     // Update an existing section in the database.
     public function updateSection(PageSection $section): bool
     {
@@ -146,7 +154,7 @@ final class PageSectionService implements IPageSectionService
                 continue;
             }
 
-            $fieldValue = (string) ($post[$fieldName] ?? '');
+            $fieldValue = (string) ($fields[$fieldName] ?? '');
 
             // List fields (declared with 'multiple' in the schema) become normalized arrays.
             if (!empty($config['multiple'])) {
@@ -255,8 +263,13 @@ final class PageSectionService implements IPageSectionService
     private function normalizeImageField(string $fieldName, array $fields, array $files, array &$content, array &$sectionImages): void
     {
         $content[$fieldName] = (string) ($fields[$fieldName] ?? '');
-        $content[$fieldName . '_alt_text'] = trim((string) ($post[$fieldName . '_alt_text'] ?? ''));
-        $content[$fieldName . '_caption'] = trim((string) ($post[$fieldName . '_caption'] ?? ''));
+        // On edit the file input is empty, so keep the existing image that the
+        // form carries in "<field>_current" instead of wiping it.
+        if ($content[$fieldName] === '') {
+            $content[$fieldName] = (string) ($fields[$fieldName . '_current'] ?? '');
+        }
+        $content[$fieldName . '_alt_text'] = trim((string) ($fields[$fieldName . '_alt_text'] ?? ''));
+        $content[$fieldName . '_caption'] = trim((string) ($fields[$fieldName . '_caption'] ?? ''));
 
         if (!empty($files[$fieldName]) && (($files[$fieldName]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK)) {
             $filePath = $this->imageService->storeUploadedImage($files[$fieldName]);

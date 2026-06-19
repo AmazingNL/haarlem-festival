@@ -97,6 +97,7 @@ $dispatcher = simpleDispatcher(static function (RouteCollector $r): void {
 
     $r->get('/jazz', [JazzController::class, 'loadLandingPage']);
     $r->post('/jazz/add-to-program', [JazzController::class, 'addToProgram']);
+    $r->get('/jazz/artists/{slug}', [JazzController::class, 'artistDetail']);
     $r->get('/yummy', [YummyController::class, 'yummy']);
     $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
     $r->post('/yummy/ratatouille/book-reservation', [YummyController::class, 'bookReservation']);
@@ -230,7 +231,7 @@ function createStoriesBookingService(): StoriesBookingService
 
 function createJazzBookingService(): JazzBookingService
 {
-    return new JazzBookingService(createPageService(), createSectionService());
+    return new JazzBookingService(createSectionService());
 }
 
 function createCheckoutValidationService(): CheckoutValidationService

@@ -4,28 +4,27 @@ declare(strict_types=1);
 
 namespace App\Services\Implementations\Booking;
 
+use App\Models\Enum\SectionType;
 use App\Models\ProgramItem;
 use App\Services\Interfaces\IBookingStrategy;
-use App\Services\Interfaces\ICmsService;
 use App\Services\Interfaces\IPageSectionService;
 
 /**
  * Zero-database booking for a Jazz agenda performance.
  *
  * Each performance is a CMS "jazz_agenda_event" page section (added/removed by
- * admins in the dashboard). This strategy re-reads that section by id — both
- * when adding to My Program and again at checkout — and derives the price and
- * title straight from the CMS, never trusting the cart. There is no event or
+ * admins in the dashboard) — these live on the Jazz landing page and on the
+ * artist detail pages. This strategy re-reads that section by id — both when
+ * adding to My Program and again at checkout — and derives the price and title
+ * straight from the CMS, never trusting the cart. There is no event or
  * ticket_type row behind a performance.
  */
 final class JazzBookingService implements IBookingStrategy
 {
-    private ICmsService $adminPageService;
     private IPageSectionService $pageSectionService;
 
-    public function __construct(ICmsService $adminPageService, IPageSectionService $pageSectionService)
+    public function __construct(IPageSectionService $pageSectionService)
     {
-        $this->adminPageService = $adminPageService;
         $this->pageSectionService = $pageSectionService;
     }
 
@@ -84,30 +83,29 @@ final class JazzBookingService implements IBookingStrategy
         return $built;
     }
 
-    /** Find one published jazz_agenda_event section by its id (JSON already flattened). */
+    /**
+     * Find one published jazz_agenda_event section by its id, on any page (the
+     * Jazz landing page or an artist detail page). Returns the section's content
+     * fields (price, title, venue, ...) as a flat array, or [] when not bookable.
+     */
     private function getPerformanceSection(int $sectionId): array
     {
         if ($sectionId <= 0) {
             return [];
         }
 
-        $page = $this->adminPageService->getPageBySlug('jazz');
-        $pageId = $page->page_id ?? null;
-        if ($pageId === null) {
+        $section = $this->pageSectionService->getSectionById($sectionId);
+        if (
+            $section === null
+            || $section->section_type !== SectionType::JAZZ_AGENDA_EVENT
+            || !$section->is_published
+        ) {
             return [];
         }
 
-        foreach ($this->pageSectionService->getSectionsByPageId((int) $pageId) as $section) {
-            if (
-                (int) ($section['section_id'] ?? 0) === $sectionId
-                && ($section['section_type'] ?? '') === 'jazz_agenda_event'
-                && !empty($section['is_published'])
-            ) {
-                return $section;
-            }
-        }
+        $content = json_decode((string) $section->content, true);
 
-        return [];
+        return is_array($content) ? $content : [];
     }
 
     private function parseMoney(string $value): float

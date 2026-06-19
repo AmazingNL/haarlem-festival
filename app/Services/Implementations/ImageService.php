@@ -80,7 +80,9 @@ final class ImageService implements IImageService
         $folder = $this->sanitizeFolder((string) ($options['folder'] ?? 'admin'));
         $prefix = $this->slugify((string) ($options['prefix'] ?? ''));
 
-        $uploadDir = dirname(__DIR__, 2) . '/public/assets/images/' . $folder . '/';
+        // ImageService lives at app/Services/Implementations, so the project root
+        // (which holds the web-served public/ dir) is three levels up, not two.
+        $uploadDir = dirname(__DIR__, 3) . '/public/assets/images/' . $folder . '/';
         if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
             throw new Exception('Upload directory not writable', 500);
         }

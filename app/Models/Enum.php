@@ -112,4 +112,5 @@ enum SectionType: string
     case JAZZ_AGENDA_EVENT = 'jazz_agenda_event';
     case JAZZ_PASSES = 'jazz_passes';
     case JAZZ_LOCATION_CONTACT = 'jazz_location_contact';
+    case JAZZ_ARTIST = 'jazz_artist';
 }

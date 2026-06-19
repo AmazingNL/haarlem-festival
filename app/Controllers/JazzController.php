@@ -60,6 +60,42 @@ final class JazzController extends BaseController
         }
     }
 
+    // Show one artist detail page, built from the CMS sections of the page whose
+    // slug matches the URL (e.g. /jazz/artists/gare-du-nord -> the "gare-du-nord"
+    // page). Admins create these pages in the dashboard, no code change needed.
+    public function artistDetail(string $slug): void
+    {
+        try {
+            // Remember this page so "My Program" can send the visitor back here.
+            $this->rememberProgramReturnUrl($this->currentUrl());
+
+            $page = $this->adminPageService->getPageBySlug($slug);
+            $pageId = $page->page_id ?? null;
+
+            if ($pageId === null) {
+                http_response_code(404);
+                $this->view('no_page/index', ['error' => 'Artist not found', 'title' => 'Artist not found']);
+                return;
+            }
+
+            $sections = $this->pageSectionService->getSectionsByPageId($pageId);
+            if ($sections === []) {
+                http_response_code(404);
+                $this->view('no_page/index', ['error' => 'Artist not found', 'title' => 'Artist not found']);
+                return;
+            }
+
+            $this->view('jazz/artist_detail', [
+                'section' => $sections,
+                'page' => $page,
+                'title' => $page->title,
+            ]);
+        } catch (\Throwable $e) {
+            http_response_code(404);
+            $this->view('no_page/index', ['error' => 'Artist not found', 'title' => 'Artist not found']);
+        }
+    }
+
     // Add a jazz performance to My Program. The performance is pure CMS content:
     // we look it up by its section id and re-derive the price server-side.
     public function addToProgram(): void

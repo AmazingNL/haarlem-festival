@@ -54,6 +54,7 @@ use App\Schemas\jazz\JazzAgendaIntro;
 use App\Schemas\jazz\JazzAgendaEvent;
 use App\Schemas\jazz\JazzPasses;
 use App\Schemas\jazz\JazzLocationContact;
+use App\Schemas\jazz\JazzArtist;
 
 // Map a section type string to the ViewModel class that defines its CMS fields.
 class SectionFactory
@@ -114,6 +115,7 @@ class SectionFactory
             'jazz_agenda_event' => JazzAgendaEvent::class,
             'jazz_passes' => JazzPasses::class,
             'jazz_location_contact' => JazzLocationContact::class,
+            'jazz_artist' => JazzArtist::class,
         ];
 
         return $map[$type] ?? null;

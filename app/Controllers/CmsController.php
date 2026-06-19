@@ -324,21 +324,29 @@ final class CmsController extends BaseController
         try {
             $this->verifyCsrf();
             $existingSection = $this->pageSectionService->getSectionById($sectionId);
+            if ($existingSection === null) {
+                $this->setFlash('error', 'No section found');
+                $this->redirect('/admin/dashboard');
+                return;
+            }
             $pageId = (int) $existingSection->page_id;
             $sectionType = $this->str('section_type');
             $sectionField = $this->pageSectionService->resolveSectionFormFields($sectionType);
-            $sectionInput = $this->mapSectionInputDTO($pageId, $sectionField);
 
-            $updated = $this->pageSectionService->updateSection($pageSection);
+            $sectionInput = $this->mapSectionInputDTO($pageId, $sectionField);
+            // Update the row named in the URL, regardless of what the form posted.
+            $sectionInput->sectionId = $sectionId;
+
+            $updated = $this->pageSectionService->updateSectionFromDto($sectionInput);
             if ($updated === false) {
                 $this->setFlash('error', 'Section not saving');
                 $this->redirect('/admin/pageSection/' . $sectionId . '/editSectionForm');
                 return;
             }
             $this->setFlash('success', 'Section updated successfully');
-            $this->redirect('/admin/pageSection/' . $pageSection->page_id . '/viewPageSections');
+            $this->redirect('/admin/pageSection/' . $pageId . '/viewPageSections');
         } catch (Throwable $e) {
-            $this->setFlash('error', 'Something went wrong while saving  ' . $e);
+            $this->setFlash('error', 'Something went wrong while saving.');
             $this->redirect('/admin/pageSection/' . $sectionId . '/editSectionForm');
         }
     }
@@ -422,6 +430,7 @@ final class CmsController extends BaseController
 
             if ($fieldType === 'image') {
                 $fields[$fieldName] = $this->str($fieldName);
+                $fields[$fieldName . '_current'] = $this->str($fieldName . '_current');
                 $fields[$fieldName . '_alt_text'] = $this->str($fieldName . '_alt_text');
                 $fields[$fieldName . '_caption'] = $this->str($fieldName . '_caption');
                 continue;

@@ -9,6 +9,7 @@ interface IPageSectionService
     public function resolveSectionFormFields(string $sectionType): array;
     // public function buildSectionFromDto(SectionInputDTO $input): PageSection;
     public function createSection(SectionInputDTO $section): bool;
+    public function updateSectionFromDto(SectionInputDTO $input): bool;
     public function updateSection(PageSection $section): bool;
     public function deleteSection(int $sectionId): bool;
 }

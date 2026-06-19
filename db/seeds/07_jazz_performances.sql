@@ -27,7 +27,7 @@ VALUES
     'time_text', '18:00 - 19:00',
     'description', 'Iconic Dutch-Belgian jazz-lounge band blending smooth jazz, funky grooves, and soul into a stylish, feel-good sound. With a 2001 debut with cult hit Pablo''s Blues and breakthrough album Sex ''n'' Jazz, they''re known for a creative fusion of genres that keeps audiences moving.',
     'price', '15',
-    'image', '/assets/images/jazz/jazz-agenda.jpg',
+    'image', '/assets/images/jazz/gare-du-nord-agenda.jpg',
     'learn_more_link', '#'
   ),
   7,
@@ -43,7 +43,7 @@ VALUES
     'time_text', '21:00 - 22:00',
     'description', 'Soul/pop band from Haarlem delivering feel-good grooves and uplifting rhythms rooted in classic soul and modern pop. With engaging live energy and warm, danceable tunes, Soul Six brings crowd-friendly performances that blend timeless soul vibes with contemporary charm.',
     'price', '15',
-    'image', '/assets/images/jazz/jazz-agenda.jpg',
+    'image', '/assets/images/jazz/soul-six-agenda.jpg',
     'learn_more_link', '#'
   ),
   8,
