@@ -297,6 +297,14 @@
     line-height: 1.6;
 }
 
+.shop-status-note--success {
+    color: #1f6b43;
+}
+
+.shop-status-note--error {
+    color: #8a2a2a;
+}
+
 .shop-total-banner {
     padding: 22px;
     border: 2px solid #2a8a56;

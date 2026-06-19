@@ -26,4 +26,11 @@ interface IStoriesRepository
      * @return array|null       Associative row with JSON content merged, or null if not found.
      */
     public function getShowBySlug(string $slug): ?array;
+
+    /**
+     * Fetch all published stories_booking sections for a page.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function getPublishedShowsForPageId(int $pageId): array;
 }

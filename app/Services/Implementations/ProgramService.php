@@ -174,6 +174,11 @@ final class ProgramService
 
         $leftType = trim((string) ($left['type'] ?? ''));
         $rightType = trim((string) ($right['type'] ?? ''));
+        if ($leftType === 'stories-show' || $rightType === 'stories-show') {
+            return $leftType === $rightType
+                && (int) ($left['show_id'] ?? 0) === (int) ($right['show_id'] ?? 0);
+        }
+
         if ($leftType === 'yummy-reservation' || $rightType === 'yummy-reservation') {
             $keys = ['type', 'page_slug', 'title', 'day', 'time', 'location_name'];
         } else {

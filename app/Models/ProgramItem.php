@@ -8,7 +8,7 @@ namespace App\Models;
  * A single line in a visitor's "My Program" (the session cart).
  *
  * Program items are polymorphic: the {@see self::$type} discriminator
- * ("event-ticket", "yummy-reservation", "history-book-tour") decides which
+ * ("event-ticket", "yummy-reservation", "history-book-tour", "stories-show") decides which
  * fields are meaningful. This model is the single normalization authority —
  * {@see self::fromArray()} clamps and defaults raw input, and {@see self::toArray()}
  * produces the canonical array shape the session, views, and checkout consume.
@@ -23,6 +23,8 @@ final class ProgramItem
         public int $event_id = 0,
         public int $ticket_type_id = 0,
         public int $section_id = 0,
+        public int $show_id = 0,
+        public string $slug = '',
         public string $title = 'Festival Booking',
         public string $day = '',
         public string $time = '',
@@ -76,6 +78,8 @@ final class ProgramItem
             event_id: max(0, (int) ($data['event_id'] ?? 0)),
             ticket_type_id: max(0, (int) ($data['ticket_type_id'] ?? 0)),
             section_id: max(0, (int) ($data['section_id'] ?? 0)),
+            show_id: max(0, (int) ($data['show_id'] ?? 0)),
+            slug: trim((string) ($data['slug'] ?? '')),
             title: trim((string) ($data['title'] ?? 'Festival Booking')),
             day: trim((string) ($data['day'] ?? '')),
             time: trim((string) ($data['time'] ?? '')),
@@ -116,6 +120,8 @@ final class ProgramItem
             'event_id' => $this->event_id,
             'ticket_type_id' => $this->ticket_type_id,
             'section_id' => $this->section_id,
+            'show_id' => $this->show_id,
+            'slug' => $this->slug,
             'title' => $this->title,
             'day' => $this->day,
             'time' => $this->time,

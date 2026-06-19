@@ -51,7 +51,7 @@
 
   <div class="right-panel">
     <div class="form-container">
-      <a href="/loginForm<?= !empty($next) ? '?next=' . urlencode((string) $next) : '' ?>" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Login</a>
+      <a href="<?= htmlspecialchars((string) ($loginPath ?? '/loginForm'), ENT_QUOTES, 'UTF-8') ?>" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Login</a>
 
       <h2>Create Account</h2>
       <p class="subtitle">Register to access all of Haarlem's features.</p>
@@ -60,7 +60,7 @@
         <div class="error-msg"><?= htmlspecialchars((string) $errorMessage, ENT_QUOTES, 'UTF-8') ?></div>
       <?php endif; ?>
 
-      <form action="/register" method="POST" autocomplete="on">
+      <form action="<?= htmlspecialchars((string) ($formAction ?? '/register'), ENT_QUOTES, 'UTF-8') ?>" method="POST" autocomplete="on">
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars((string) ($csrf ?? ''), ENT_QUOTES, 'UTF-8') ?>">
         <input type="hidden" name="next" value="<?= htmlspecialchars((string) ($next ?? ''), ENT_QUOTES, 'UTF-8') ?>">
 
@@ -121,7 +121,7 @@
 
         <button type="submit" class="btn-signin">Create Account</button>
 
-        <p class="signup-prompt">Already have an account? <a href="/loginForm<?= !empty($next) ? '?next=' . urlencode((string) $next) : '' ?>">Sign in</a></p>
+        <p class="signup-prompt">Already have an account? <a href="<?= htmlspecialchars((string) ($loginPath ?? '/loginForm'), ENT_QUOTES, 'UTF-8') ?>">Sign in</a></p>
       </form>
     </div>
   </div>

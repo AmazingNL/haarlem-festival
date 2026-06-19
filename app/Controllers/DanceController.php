@@ -34,15 +34,14 @@ final class DanceController extends BaseController
         $this->rememberProgramReturnUrl($this->currentUrl());
 
         $sections = $this->loadDanceSections();
-        $filterOptions = $this->danceScheduleService->getFilterOptions();
-        $filters = $this->danceScheduleService->getFiltersFromQuery($_GET, $filterOptions);
+        ['filterOptions' => $filterOptions, 'filters' => $filters, 'events' => $events] = $this->loadScheduleData();
 
         $this->view('dance/index', [
             'title' => 'Dance',
             'sections' => $sections,
             'hasCmsContent' => $sections !== [],
             'artists' => $this->loadDanceArtists(),
-            'events' => $this->danceScheduleService->getPublishedDanceSessions($filters),
+            'events' => $events,
             'danceFilters' => $filters,
             'danceFilterOptions' => $filterOptions,
             'hasActiveDanceFilters' => $this->danceScheduleService->hasActiveFilters($filters),
@@ -91,8 +90,41 @@ final class DanceController extends BaseController
     {
         try {
             return $this->danceArtistService->getPublishedArtists();
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return [];
+        }
+    }
+
+    private function loadScheduleData(): array
+    {
+        $emptyFilters = [
+            'date' => '',
+            'venue' => '',
+            'artist' => '',
+            'session' => '',
+            'location_id' => 0,
+            'ticket_type_name' => '',
+            'invalid' => false,
+        ];
+        $emptyOptions = ['dates' => [], 'venues' => [], 'artists' => [], 'sessions' => []];
+
+        try {
+            $filterOptions = $this->danceScheduleService->getFilterOptions();
+            $filters = $this->danceScheduleService->getFiltersFromQuery($_GET, $filterOptions);
+
+            return [
+                'filterOptions' => $filterOptions,
+                'filters' => $filters,
+                'events' => $this->danceScheduleService->getPublishedDanceSessions($filters),
+            ];
+        } catch (\Throwable $e) {
+            error_log('Dance schedule load failed: ' . $e->getMessage());
+
+            return [
+                'filterOptions' => $emptyOptions,
+                'filters' => $emptyFilters,
+                'events' => [],
+            ];
         }
     }
 }
