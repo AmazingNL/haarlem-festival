@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Implementations;
 
-use App\Repositories\DanceScheduleRepository;
+use App\Repositories\IDanceScheduleRepository;
+use App\Services\Interfaces\IDanceScheduleService;
 
-final class DanceScheduleService
+final class DanceScheduleService implements IDanceScheduleService
 {
-    public function __construct(private DanceScheduleRepository $danceScheduleRepository)
+    public function __construct(private IDanceScheduleRepository $danceScheduleRepository)
     {
     }
 

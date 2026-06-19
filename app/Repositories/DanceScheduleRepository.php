@@ -7,7 +7,7 @@ namespace App\Repositories;
 use App\Core\BaseRepository;
 use PDO;
 
-final class DanceScheduleRepository extends BaseRepository
+final class DanceScheduleRepository extends BaseRepository implements IDanceScheduleRepository
 {
     public function findPublishedDanceEventRows(array $criteria = []): array
     {

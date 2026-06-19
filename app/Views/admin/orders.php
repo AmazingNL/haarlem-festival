@@ -1,10 +1,18 @@
 <?php
 $orders = is_array($orders ?? null) ? array_values($orders) : [];
+
 $escape = static fn(mixed $value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-$formatMoney = static fn(mixed $amount): string => 'EUR ' . number_format((float) $amount, 2, '.', ',');
+$formatMoney = static fn(mixed $amount): string => 'EUR ' . number_format((float) $amount, 2);
 $formatDate = static function (mixed $value): string {
     $timestamp = strtotime((string) $value);
     return $timestamp ? date('Y-m-d H:i', $timestamp) : '-';
+};
+$getOrderValue = static fn(mixed $order, string $key): mixed => is_array($order) ? ($order[$key] ?? '') : '';
+$getOrderText = static fn(mixed $order, string $key): string => (string) $getOrderValue($order, $key);
+$formatCustomerName = static function (mixed $order) use ($getOrderText): string {
+    $customerName = trim($getOrderText($order, 'first_name') . ' ' . $getOrderText($order, 'last_name'));
+
+    return $customerName !== '' ? $customerName : 'Unknown customer';
 };
 ?>
 
@@ -48,22 +56,23 @@ $formatDate = static function (mixed $value): string {
                 <?php else: ?>
                     <?php foreach ($orders as $order): ?>
                         <?php
-                        $orderId = (int) ($order['order_id'] ?? 0);
-                        $customerName = trim((string) ($order['first_name'] ?? '') . ' ' . (string) ($order['last_name'] ?? ''));
-                        if ($customerName === '') {
-                            $customerName = 'Unknown customer';
-                        }
+                        $orderId = (int) $getOrderValue($order, 'order_id');
+                        $rowCells = [
+                            '#' . $orderId,
+                            $formatCustomerName($order),
+                            $getOrderText($order, 'email'),
+                            $formatMoney($getOrderValue($order, 'total_price')),
+                            $getOrderText($order, 'status'),
+                            $getOrderText($order, 'payment_status'),
+                            $getOrderText($order, 'provider'),
+                            $formatDate($getOrderValue($order, 'created_at')),
+                            $formatDate($getOrderValue($order, 'paid_at')),
+                        ];
                         ?>
                         <tr>
-                            <td>#<?= $orderId ?></td>
-                            <td><?= $escape($customerName) ?></td>
-                            <td><?= $escape($order['email'] ?? '') ?></td>
-                            <td><?= $escape($formatMoney($order['total_price'] ?? 0)) ?></td>
-                            <td><?= $escape($order['status'] ?? '') ?></td>
-                            <td><?= $escape($order['payment_status'] ?? '') ?></td>
-                            <td><?= $escape($order['provider'] ?? '') ?></td>
-                            <td><?= $escape($formatDate($order['created_at'] ?? '')) ?></td>
-                            <td><?= $escape($formatDate($order['paid_at'] ?? '')) ?></td>
+                            <?php foreach ($rowCells as $cell): ?>
+                                <td><?= $escape($cell) ?></td>
+                            <?php endforeach; ?>
                             <td>
                                 <a href="/admin/orders/<?= $orderId ?>" class="btn-secondary">View</a>
                             </td>

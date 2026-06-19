@@ -5,23 +5,24 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Services\Implementations\DanceArtistService;
-use App\Services\Implementations\DanceScheduleService;
 use App\Services\Interfaces\ICmsService;
+use App\Services\Interfaces\IDanceArtistService;
+use App\Services\Interfaces\IDanceScheduleService;
 use App\Services\Interfaces\IPageSectionService;
+use App\ViewModels\dance\DancePageViewModel;
 
 final class DanceController extends BaseController
 {
     private ICmsService $adminPageService;
     private IPageSectionService $pageSectionService;
-    private DanceArtistService $danceArtistService;
-    private DanceScheduleService $danceScheduleService;
+    private IDanceArtistService $danceArtistService;
+    private IDanceScheduleService $danceScheduleService;
 
     public function __construct(
         ICmsService $adminPageService,
         IPageSectionService $pageSectionService,
-        DanceArtistService $danceArtistService,
-        DanceScheduleService $danceScheduleService
+        IDanceArtistService $danceArtistService,
+        IDanceScheduleService $danceScheduleService
     ) {
         $this->adminPageService = $adminPageService;
         $this->pageSectionService = $pageSectionService;
@@ -36,7 +37,7 @@ final class DanceController extends BaseController
         $sections = $this->loadDanceSections();
         ['filterOptions' => $filterOptions, 'filters' => $filters, 'events' => $events] = $this->loadScheduleData();
 
-        $this->view('dance/index', [
+        $viewData = [
             'title' => 'Dance',
             'sections' => $sections,
             'hasCmsContent' => $sections !== [],
@@ -45,7 +46,9 @@ final class DanceController extends BaseController
             'danceFilters' => $filters,
             'danceFilterOptions' => $filterOptions,
             'hasActiveDanceFilters' => $this->danceScheduleService->hasActiveFilters($filters),
-        ]);
+        ];
+
+        $this->view('dance/index', (new DancePageViewModel($viewData))->toArray());
     }
 
     public function artistDetail(string $slug): void

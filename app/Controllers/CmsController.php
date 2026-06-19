@@ -318,7 +318,7 @@ final class CmsController extends BaseController
         }
     }
     //------------- POST Edit section -----------------//
-    public function editSection(int|string $sectionId): void
+    public function editSection(int|string $sectionId, $pageSection): void
     {
         $sectionId = (int) $sectionId;
         try {
