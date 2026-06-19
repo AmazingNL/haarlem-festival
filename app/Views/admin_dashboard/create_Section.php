@@ -71,11 +71,9 @@ use App\Schemas\SectionFactory;
                 const html = await file.text();
                 sections.innerHTML = html;
 
-                // Section fields are injected dynamically, so I re-initialized TinyMCE.
+                // New textareas were injected, so re-bind the editors. This event also
+                // lazy-loads TinyMCE if the CDN script hasn't finished loading yet.
                 document.dispatchEvent(new CustomEvent('cms:content-updated'));
-                if (typeof window.initTinyMceEditors === 'function') {
-                    window.initTinyMceEditors();
-                }
             }
             catch (error) {
                 sections.innerHTML = 'Section fields could not be loaded';
