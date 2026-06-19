@@ -18,7 +18,7 @@ $langMap = ['nl' => 'Dutch', 'en' => 'English', 'eng' => 'English'];
 
         <div class="sched-filters" aria-label="Filter sessions">
             <div class="sched-filter-row">
-                <span class="sched-filter-label">Filter:</span>
+                <span class="sched-filter-label">FILTER:</span>
                 <div class="sched-filter-group" data-filter="lang">
                     <span class="sched-filter-sublabel">Language:</span>
                     <button class="sched-filter-pill active" type="button" data-value="all">All</button>
@@ -80,8 +80,6 @@ $langMap = ['nl' => 'Dutch', 'en' => 'English', 'eng' => 'English'];
                     </div>
                     <?php if ($detailUrl !== ''): ?>
                         <a href="<?= $detailUrl ?>" class="sched-card-btn">Read Full Story</a>
-                    <?php else: ?>
-                        <button class="sched-card-btn sched-card-btn--disabled" disabled aria-disabled="true">Read Full Story</button>
                     <?php endif; ?>
                 </article>
             <?php endforeach; ?>
