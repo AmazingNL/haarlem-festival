@@ -57,7 +57,16 @@ $dispatcher = simpleDispatcher(static function (RouteCollector $r): void {
     $r->post('/admin/pages/create', [CmsController::class, 'createPage']);
     $r->get('/admin/pages/{page_id:\d+}/editForm', [CmsController::class, 'editPageForm']);
     $r->post('/admin/pages/{page_id:\d+}/edit', [CmsController::class, 'editPage']);
+    $r->get('/admin/pages', [CmsController::class, 'viewPages']);
     $r->get('/admin/pages/viewPage', [CmsController::class, 'viewPages']);
+    $r->get('/admin/orders', [CmsController::class, 'viewOrders']);
+    $r->get('/admin/orders/export', [CmsController::class, 'exportOrders']);
+    $r->get('/admin/orders/{order_id:\d+}', [CmsController::class, 'viewOrderDetail']);
+    $r->get('/admin/users/create', [CmsController::class, 'createUserForm']);
+    $r->post('/admin/users/create', [CmsController::class, 'createUser']);
+    $r->get('/admin/users/{user_id:\d+}/edit', [CmsController::class, 'editUserForm']);
+    $r->post('/admin/users/{user_id:\d+}/edit', [CmsController::class, 'editUser']);
+    $r->get('/admin/users/{user_id:\d+}/delete', [CmsController::class, 'deleteUser']);
     $r->get('/admin/pageSection/{page_id:\d+}/pageSectionForm', [CmsController::class, 'pageSectionForm']);
     $r->post('/admin/pageSection/{page_id:\d+}/createPage', [CmsController::class, 'createPageSection']);
     $r->get('/admin/pageSection/render-fields', [CmsController::class, 'renderSectionForm']);
