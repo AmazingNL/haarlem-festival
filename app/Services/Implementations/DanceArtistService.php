@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services\Implementations;
 
-use App\Repositories\DanceArtistRepository;
+use App\Repositories\IDanceArtistRepository;
+use App\Services\Interfaces\IDanceArtistService;
 
-final class DanceArtistService
+final class DanceArtistService implements IDanceArtistService
 {
     private const FALLBACK_IMAGE = '/assets/images/home/home-dance.jpg';
 
-    public function __construct(private DanceArtistRepository $danceArtistRepository)
+    public function __construct(private IDanceArtistRepository $danceArtistRepository)
     {
 
     }

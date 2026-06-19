@@ -7,7 +7,7 @@ namespace App\Repositories;
 use App\Core\BaseRepository;
 use PDO;
 
-final class DanceArtistRepository extends BaseRepository
+final class DanceArtistRepository extends BaseRepository implements IDanceArtistRepository
 {
     public function findPublishedArtists(): array
     {

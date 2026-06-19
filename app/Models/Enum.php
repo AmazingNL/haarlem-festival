@@ -71,6 +71,12 @@ enum SectionType: string
     case STORIES_PREVIEW = 'stories_preview';
     case STORYTELLING_SCHEDULE = 'storytelling_schedule';
     case STORIES_BOOKING = 'stories_booking';
+    case DANCE_HERO = 'dance_hero';
+    case DANCE_WELCOME = 'dance_welcome';
+    case DANCE_ARTISTS_INTRO = 'dance_artists_intro';
+    case DANCE_FILTERS_INTRO = 'dance_filters_intro';
+    case DANCE_EVENTS_INTRO = 'dance_events_intro';
+    case DANCE_PRACTICAL_INFO = 'dance_practical_info';
     case HAARLEM_UNIQUE = 'haarlem_unique';
     case HAARLEM_TASTE = 'haarlem_taste';
     case HISTORY_HERO = 'history_hero';
