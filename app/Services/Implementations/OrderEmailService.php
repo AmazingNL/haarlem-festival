@@ -135,11 +135,7 @@ final class OrderEmailService
 
         return "Hello {$name},\n\n"
             . "Your payment for order #{$orderId} is confirmed. Total paid: EUR {$total}.\n\n"
-<<<<<<< HEAD:app/Services/OrderEmailService.php
-            . "Your invoice PDF is attached.\n\n"
-=======
             . "Your invoice (PDF) is attached to this email.\n\n"
->>>>>>> origin/dev:app/Services/Implementations/OrderEmailService.php
             . ($count > 0 ? "You have {$count} ticket(s). Log in to view your QR codes:\n/orders/{$orderId}/success\n\n" : '')
             . "Haarlem Festival 2026";
     }
