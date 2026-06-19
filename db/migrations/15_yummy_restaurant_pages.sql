@@ -26,6 +26,7 @@ MODIFY section_type ENUM(
   'what_is_stories',
   'stories_preview',
   'storytelling_schedule',
+  'stories_booking',
   'haarlem_unique',
   'haarlem_taste',
   'history_hero',
@@ -126,10 +127,19 @@ WHERE @bistro_page_id IS NOT NULL
     SELECT 1 FROM page_section WHERE page_id = @bistro_page_id AND section_type = 'reservation'
   );
 
+-- Ensure the venue exists before linking the event to it. Fresh installs run
+-- migrations before seeds, so we cannot rely on the sample-data location rows;
+-- create the venue here (idempotently, by name) and look up its id.
+INSERT INTO location (name, address, city, capacity)
+SELECT 'Patronaat', 'Zijlsingel 2', 'Haarlem', 1500
+WHERE NOT EXISTS (SELECT 1 FROM location WHERE name = 'Patronaat');
+
 INSERT INTO event (title, slug, description, start_datetime, end_datetime, location_id, image_id, is_published)
 SELECT 'Summer Dance Night', 'summer-dance-night',
     'An evening of dance performances and DJs in Haarlem.',
-    '2026-07-23 20:00:00', '2026-07-23 23:00:00', 1, NULL, 1
+    '2026-07-23 20:00:00', '2026-07-23 23:00:00',
+    (SELECT location_id FROM location WHERE name = 'Patronaat' ORDER BY location_id LIMIT 1),
+    NULL, 1
 WHERE NOT EXISTS (SELECT 1 FROM event WHERE slug = 'summer-dance-night');
 
 INSERT INTO ticket_type (event_id, name, price, max_quantity)
