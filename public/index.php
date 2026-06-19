@@ -112,6 +112,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->get('/orders/{orderId:\d+}/success', [ShopController::class, 'success']);
     $r->get('/orders/{orderId:\d+}/invoice', [ShopController::class, 'invoice']);
     $r->get('/jazz', [JazzController::class, 'loadLandingPage']);
+    $r->post('/jazz/add-to-program', [JazzController::class, 'addToProgram']);
     $r->get('/yummy', [YummyController::class, 'yummy']);
     $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
     $r->post('/yummy/ratatouille/book-reservation', [YummyController::class, 'bookReservation']);
@@ -264,7 +265,12 @@ function createController(string $controllerClass)
 
         case App\Controllers\JazzController::class:
 
-            return new App\Controllers\JazzController(createSectionService(), createPageService());
+            return new App\Controllers\JazzController(
+                createSectionService(),
+                createPageService(),
+                new App\Services\Implementations\ProgramService(),
+                createJazzBookingService()
+            );
 
         case App\Controllers\YummyController::class:
 
@@ -411,6 +417,11 @@ function createHistoryBookingService(): App\Services\Implementations\Booking\His
     return new App\Services\Implementations\Booking\HistoryBookingService(createPageService(), createSectionService());
 }
 
+function createJazzBookingService(): App\Services\Implementations\Booking\JazzBookingService
+{
+    return new App\Services\Implementations\Booking\JazzBookingService(createPageService(), createSectionService());
+}
+
 function createRestaurantBookingService(): App\Services\Implementations\Booking\RestaurantBookingService
 {
     return new App\Services\Implementations\Booking\RestaurantBookingService(createPageService(), createSectionService(), createReservationService());
@@ -439,6 +450,7 @@ function createCheckoutValidationService(): App\Services\Implementations\Booking
             createEventBookingService(),
             createHistoryBookingService(),
             createRestaurantBookingService(),
+            createJazzBookingService(),
         ]
     );
 }

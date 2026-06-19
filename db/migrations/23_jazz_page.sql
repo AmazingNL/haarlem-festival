@@ -222,22 +222,18 @@ VALUES
   'one_text', 'Dutch downtempo jazz project blending smooth grooves, jazz, soul, and electronic textures into elegant, late-night lounge music with a cool, cinematic feel.',
   'one_image', '/assets/images/jazz/artist-gare-du-nord.jpg',
   'one_button_text', 'Learn More',
-  'one_button_link', '#agenda',
+  'one_button_link', '/jazz/artists/gare-du-nord',
   'two_name', 'The Nordanians',
   'two_text', 'Phenomenal Dutch instrumental group that blends jazz, funk, and soul into some energetic, groove-driven music with a playful and modern edge. You won''t want to miss them!',
   'two_image', '/assets/images/jazz/artist-the-nordanians.jpg',
   'two_button_text', 'Learn More',
-  'two_button_link', '#agenda',
+  'two_button_link', '/jazz/artists/the-nordanians',
   'three_name', 'Uncle Sue',
   'three_text', 'Dutch indie folk band crafting bright melodies, warm harmonies, and feel-good, guitar-driven songs. Their upbeat sound blends folk and pop influences into music made for smiling crowds and lively sing-alongs.',
   'three_image', '/assets/images/jazz/artist-uncle-sue.jpg',
-  'three_button_text', 'Learn More',
-  'three_button_link', '#agenda',
   'four_name', 'Gumbo Kings',
   'four_text', 'High-energy Dutch band bringing the spirit of New Orleans to the stage with swinging jazz, funky grooves, and infectious rhythms. The Gumbo Kings deliver a mix of jazz, blues, and soul that''ll get you moving!',
-  'four_image', '/assets/images/jazz/artist-gumbo-kings.jpg',
-  'four_button_text', 'Learn More',
-  'four_button_link', '#agenda'
+  'four_image', '/assets/images/jazz/artist-gumbo-kings.jpg'
 ), 4, 1),
 
 (@jazz_page_id, 'jazz_more_artists', JSON_OBJECT(

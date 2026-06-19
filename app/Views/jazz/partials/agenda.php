@@ -49,9 +49,8 @@ $csrfToken = (string) ($csrf ?? '');
                             $title = trim((string) ($event['title'] ?? ''));
                             $timeText = trim((string) ($event['time_text'] ?? ''));
                             $description = (string) ($event['description'] ?? '');
-                            $priceLabel = trim((string) ($event['price_label'] ?? ''));
-                            $eventId = (int) ($event['event_id'] ?? 0);
-                            $ticketTypeId = (int) ($event['ticket_type_id'] ?? 0);
+                            $price = trim((string) ($event['price'] ?? ''));
+                            $sectionId = (int) ($event['section_id'] ?? 0);
                             $learnMore = trim((string) ($event['learn_more_link'] ?? ''));
                             $cardImage = $jazzImage($event['image'] ?? '');
                             ?>
@@ -68,16 +67,15 @@ $csrfToken = (string) ($csrf ?? '');
                                 <?php if (trim($description) !== ''): ?>
                                     <p class="jazz-event__text"><?= $jazzText($description) ?></p>
                                 <?php endif; ?>
-                                <?php if ($priceLabel !== ''): ?>
-                                    <p class="jazz-event__price"><?= htmlspecialchars($priceLabel, ENT_QUOTES, 'UTF-8') ?></p>
+                                <?php if ($price !== ''): ?>
+                                    <p class="jazz-event__price">&euro;<?= htmlspecialchars($price, ENT_QUOTES, 'UTF-8') ?></p>
                                 <?php endif; ?>
 
                                 <div class="jazz-event__actions">
-                                    <?php if ($eventId > 0 && $ticketTypeId > 0): ?>
-                                        <form method="post" action="/events/add-to-program" class="jazz-event__form">
+                                    <?php if ($sectionId > 0 && $price !== ''): ?>
+                                        <form method="post" action="/jazz/add-to-program" class="jazz-event__form">
                                             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
-                                            <input type="hidden" name="event_id" value="<?= $eventId ?>">
-                                            <input type="hidden" name="ticket_type_id" value="<?= $ticketTypeId ?>">
+                                            <input type="hidden" name="section_id" value="<?= $sectionId ?>">
                                             <input type="hidden" name="quantity" value="1">
                                             <button type="submit" class="jazz-button jazz-button--add">Add to My Programs</button>
                                         </form>

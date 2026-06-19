@@ -21,10 +21,8 @@ final class JazzAgendaEvent extends BaseSection
             'title' => ['type' => 'text', 'label' => 'Artist / Performance Title', 'required' => true],
             'time_text' => ['type' => 'text', 'label' => 'Time (e.g. 18:00 - 19:00)'],
             'description' => ['type' => 'textarea', 'label' => 'Description'],
-            'price_label' => ['type' => 'text', 'label' => 'Price Label (e.g. €15)'],
+            'price' => ['type' => 'number', 'label' => 'Price in euros (e.g. 15)'],
             'image' => ['type' => 'image', 'label' => 'Card Background Image (optional)'],
-            'event_id' => ['type' => 'number', 'label' => 'Event ID (for booking)'],
-            'ticket_type_id' => ['type' => 'number', 'label' => 'Ticket Type ID (for booking)'],
             'learn_more_link' => ['type' => 'text', 'label' => 'Learn More Link (artist page)'],
         ];
     }
