@@ -13,11 +13,13 @@ use App\Services\Implementations\Booking\ReservationService;
 use App\Services\Implementations\Booking\RestaurantAvailabilityService;
 use App\Services\Implementations\Booking\RestaurantBookingService;
 use App\Services\Implementations\Catalog\EventCatalogService;
+use App\Services\Implementations\CheckoutFinalizer;
 use App\Services\Implementations\OrderEmailService;
 use App\Services\Implementations\OrderService;
 use App\Services\Implementations\ProgramService;
 use App\Services\Implementations\StripePaymentService;
 use App\Services\OrderInvoiceService;
+use App\Support\CheckoutErrorPresenter;
 use App\Support\PaymentProvider;
 use App\Support\SessionUser;
 use Stripe\Exception\ApiErrorException;
@@ -31,6 +33,7 @@ final class ShopController extends BaseController
     private PendingCheckoutRepository $pendingCheckoutRepository;
     private OrderEmailService $orderEmailService;
     private OrderInvoiceService $orderInvoiceService;
+    private CheckoutFinalizer $checkoutFinalizer;
 
     public function __construct(
         ProgramService $programService,
@@ -39,7 +42,8 @@ final class ShopController extends BaseController
         StripePaymentService $stripePaymentService,
         PendingCheckoutRepository $pendingCheckoutRepository,
         OrderEmailService $orderEmailService,
-        OrderInvoiceService $orderInvoiceService
+        OrderInvoiceService $orderInvoiceService,
+        CheckoutFinalizer $checkoutFinalizer
     ) {
         $this->programService = $programService;
         $this->orderService = $orderService;
@@ -48,6 +52,7 @@ final class ShopController extends BaseController
         $this->pendingCheckoutRepository = $pendingCheckoutRepository;
         $this->orderEmailService = $orderEmailService;
         $this->orderInvoiceService = $orderInvoiceService;
+        $this->checkoutFinalizer = $checkoutFinalizer;
     }
 
     public function pay(): void
@@ -55,35 +60,15 @@ final class ShopController extends BaseController
         $this->ensureSession();
         $this->verifyCsrf();
 
-        if (!$this->isLoggedIn()) {
-            $_SESSION['auth_redirect'] = '/program';
-            $this->redirect('/loginForm');
+        if (!$this->requireLogin('/program')) {
             return;
         }
-
-        if (!\App\Support\StripeConfig::isConfigured()) {
-            $this->setErrorMessage('Payments are not configured. Set STRIPE_SECRET_KEY in .env.');
-            $this->redirect('/program');
+        if (!$this->requireStripeConfigured()) {
             return;
         }
 
         try {
-            $validatedItems = $this->checkoutValidationService->validateAndNormalize($this->programService->getItems());
-            $provider = PaymentProvider::normalize((string) $this->input('payment_provider', 'ideal'));
-            $customer = SessionUser::customerData();
-            $userId = (int) $this->currentUserId();
-
-            $checkoutSession = $this->stripePaymentService->createCheckoutSession(
-                $userId,
-                $provider,
-                $validatedItems,
-                $customer
-            );
-
-            $sessionId = (string) $checkoutSession->id;
-            $this->pendingCheckoutRepository->store($sessionId, $userId, $customer, $validatedItems, $provider);
-
-            $this->redirect((string) $checkoutSession->url, 303);
+            $this->redirect($this->startStripeCheckout(), 303);
         } catch (ApiErrorException $e) {
             error_log('Stripe checkout failed: ' . $e->getMessage());
             $this->setErrorMessage('The secure payment page could not be opened.');
@@ -93,7 +78,7 @@ final class ShopController extends BaseController
             $this->redirect('/program');
         } catch (\Throwable $e) {
             error_log('Checkout error: ' . $e->getMessage());
-            $this->setErrorMessage($this->paymentErrorMessage($e, 'start'));
+            $this->setErrorMessage(CheckoutErrorPresenter::message($e, 'start'));
             $this->redirect('/program');
         }
     }
@@ -109,16 +94,12 @@ final class ShopController extends BaseController
             return;
         }
 
-        if (!$this->isLoggedIn()) {
-            $_SESSION['auth_redirect'] = '/checkout/success?session_id=' . urlencode($sessionId);
-            $this->redirect('/loginForm');
+        if (!$this->requireLogin('/checkout/success?session_id=' . urlencode($sessionId))) {
             return;
         }
 
         $userId = (int) $this->currentUserId();
-        $existingOrder = $this->orderService->findByStripeSessionId($userId, $sessionId);
-        if ($existingOrder !== null) {
-            $this->redirect('/orders/' . (int) ($existingOrder['order_id'] ?? 0) . '/success');
+        if ($this->redirectToExistingOrder($userId, $sessionId)) {
             return;
         }
 
@@ -131,13 +112,12 @@ final class ShopController extends BaseController
         } catch (\Throwable $e) {
             error_log('Checkout success failed: ' . $e->getMessage());
 
-            $existingOrder = $this->orderService->findByStripeSessionId($userId, $sessionId);
-            if ($existingOrder !== null) {
-                $this->redirect('/orders/' . (int) ($existingOrder['order_id'] ?? 0) . '/success');
+            // A concurrent webhook may have already created the order — use it if so.
+            if ($this->redirectToExistingOrder($userId, $sessionId)) {
                 return;
             }
 
-            $this->setErrorMessage($this->paymentErrorMessage($e, 'complete'));
+            $this->setErrorMessage(CheckoutErrorPresenter::message($e, 'complete'));
             $this->redirect('/program');
         }
     }
@@ -229,60 +209,17 @@ final class ShopController extends BaseController
         ?string $providerPaymentId = null,
         bool $clearCart = false
     ): int {
-        $existingOrder = $this->orderService->findByStripeSessionId($userId, $sessionId);
-        if ($existingOrder !== null) {
-            return (int) ($existingOrder['order_id'] ?? 0);
+        $result = $this->checkoutFinalizer->finalize($sessionId, $userId, $providerPaymentId, $clearCart);
+
+        // Email only a freshly-created order; an already-existing one was emailed on its first finalize.
+        if ($result['created']) {
+            $order = $this->orderService->findOrderForUser($result['order_id'], $userId);
+            if ($order !== null) {
+                $this->sendOrderConfirmationEmail($result['customer'], $order);
+            }
         }
 
-        $pendingCheckout = $this->pendingCheckoutRepository->find($sessionId);
-        if ($pendingCheckout === null || (int) ($pendingCheckout['user_id'] ?? 0) !== $userId) {
-            throw new \RuntimeException('Checkout session could not be matched.');
-        }
-
-        $storedItems = is_array($pendingCheckout['items'] ?? null) ? $pendingCheckout['items'] : [];
-        if ($storedItems === []) {
-            throw new \RuntimeException('Checkout session had no items.');
-        }
-
-        try {
-            $items = $this->checkoutValidationService->validateAndNormalize($storedItems);
-        } catch (\Throwable $e) {
-            error_log('Checkout re-validation failed, using stored items: ' . $e->getMessage());
-            $items = $storedItems;
-        }
-
-        $expectedTotalCents = $this->checkoutValidationService->calculateTotalCents($items);
-        $checkoutSession = $this->stripePaymentService->retrieveCheckoutSession($sessionId);
-        $this->stripePaymentService->verifyPaidSession($checkoutSession, $userId, $expectedTotalCents);
-
-        $customer = is_array($pendingCheckout['customer'] ?? null) ? $pendingCheckout['customer'] : SessionUser::customerData();
-        $provider = PaymentProvider::normalize((string) ($pendingCheckout['provider'] ?? 'ideal'));
-
-        if ($providerPaymentId === null || $providerPaymentId === '') {
-            $providerPaymentId = (string) ($checkoutSession->payment_intent ?? '');
-        }
-
-        $orderId = $this->orderService->completePaidCheckout(
-            $userId,
-            $customer,
-            $provider,
-            $items,
-            $sessionId,
-            $providerPaymentId !== '' ? $providerPaymentId : null
-        );
-
-        $this->pendingCheckoutRepository->delete($sessionId);
-
-        if ($clearCart) {
-            $this->programService->removeItemsByIds(array_column($items, 'id'));
-        }
-
-        $order = $this->orderService->findOrderForUser($orderId, $userId);
-        if ($order !== null) {
-            $this->sendOrderConfirmationEmail($customer, $order);
-        }
-
-        return $orderId;
+        return $result['order_id'];
     }
 
     private function ensureOrderConfirmationEmailSent(array $order): void
@@ -323,9 +260,7 @@ final class ShopController extends BaseController
     {
         $this->ensureSession();
 
-        if (!$this->isLoggedIn()) {
-            $_SESSION['auth_redirect'] = $redirectPath;
-            $this->redirect('/loginForm');
+        if (!$this->requireLogin($redirectPath)) {
             return null;
         }
 
@@ -337,43 +272,64 @@ final class ShopController extends BaseController
         return $order;
     }
 
-    private function paymentErrorMessage(\Throwable $e, string $phase): string
+    /**
+     * Require a logged-in visitor; if not, remember where to return and send them
+     * to the login form. Returns false when the caller should stop.
+     */
+    private function requireLogin(string $returnTo): bool
     {
-        $message = $e->getMessage();
-
-        if (stripos($message, 'Stripe secret key') !== false) {
-            return 'Payments are not configured. Set STRIPE_SECRET_KEY in .env.';
+        if ($this->isLoggedIn()) {
+            return true;
         }
 
-        if (stripos($message, 'pending_stripe_checkout') !== false) {
-            return 'Payment tables are missing. Run: docker compose exec php php /app/migrate.php up';
+        $_SESSION['auth_redirect'] = $returnTo;
+        $this->redirect('/loginForm');
+
+        return false;
+    }
+
+    /** Require Stripe to be configured; otherwise message the visitor. Returns false to stop. */
+    private function requireStripeConfigured(): bool
+    {
+        if (\App\Support\StripeConfig::isConfigured()) {
+            return true;
         }
 
-        if ($phase === 'start' && (stripos($message, 'unit_amount') !== false || stripos($message, 'minimum') !== false)) {
-            return 'One of the items has an invalid price. Remove it from My Program and add it again.';
+        $this->setErrorMessage('Payments are not configured. Set STRIPE_SECRET_KEY in .env.');
+        $this->redirect('/program');
+
+        return false;
+    }
+
+    /**
+     * Validate the cart, open a Stripe Checkout session and park it for finalising,
+     * returning the URL the visitor should be sent to. Throws on any failure.
+     */
+    private function startStripeCheckout(): string
+    {
+        $validatedItems = $this->checkoutValidationService->validateAndNormalize($this->programService->getItems());
+        $provider = PaymentProvider::normalize((string) $this->input('payment_provider', 'ideal'));
+        $customer = SessionUser::customerData();
+        $userId = (int) $this->currentUserId();
+
+        $checkoutSession = $this->stripePaymentService->createCheckoutSession($userId, $provider, $validatedItems, $customer);
+
+        $this->pendingCheckoutRepository->store((string) $checkoutSession->id, $userId, $customer, $validatedItems, $provider);
+
+        return (string) $checkoutSession->url;
+    }
+
+    /** If this session already produced an order, redirect to its success page. Returns true if it did. */
+    private function redirectToExistingOrder(int $userId, string $sessionId): bool
+    {
+        $existingOrder = $this->orderService->findByStripeSessionId($userId, $sessionId);
+        if ($existingOrder === null) {
+            return false;
         }
 
-        if ($phase === 'complete') {
-            if (stripos($message, 'order_ticket') !== false || stripos($message, 'ticket_type_id') !== false) {
-                return 'Ticket tables need updating. Run: docker compose exec php php /app/migrate.php up';
-            }
+        $this->redirect('/orders/' . (int) ($existingOrder['order_id'] ?? 0) . '/success');
 
-            if (stripos($message, 'Checkout session could not be matched') !== false) {
-                return 'We could not match your payment session. Please contact support with your payment confirmation.';
-            }
-
-            if (stripos($message, 'amount mismatch') !== false) {
-                return 'The paid amount did not match your cart. Contact support if money was taken.';
-            }
-        }
-
-        if (($_ENV['APP_DEBUG'] ?? 'false') === 'true' && $message !== '') {
-            return ($phase === 'complete' ? 'The order could not be completed: ' : 'Payment could not start: ') . $message;
-        }
-
-        return $phase === 'complete'
-            ? 'The order could not be completed right now.'
-            : 'The payment could not be started right now.';
+        return true;
     }
 
     private function shouldShowMailpitLink(): bool
