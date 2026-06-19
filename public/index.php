@@ -351,14 +351,28 @@ function createController(string $controllerClass)
 function createShopController(): ShopController
 {
     $invoiceService = new OrderInvoiceService();
+    $orderService = new OrderService(new App\Repositories\OrderRepository());
+    $validationService = createCheckoutValidationService();
+    $stripePaymentService = new StripePaymentService();
+    $pendingCheckoutRepository = new App\Repositories\PendingCheckoutRepository();
+    $programService = createProgramService();
+
+    $checkoutFinalizer = new App\Services\Implementations\CheckoutFinalizer(
+        $orderService,
+        $validationService,
+        $stripePaymentService,
+        $pendingCheckoutRepository,
+        $programService
+    );
 
     return new ShopController(
-        createProgramService(),
-        new OrderService(new App\Repositories\OrderRepository()),
-        createCheckoutValidationService(),
-        new StripePaymentService(),
-        new App\Repositories\PendingCheckoutRepository(),
+        $programService,
+        $orderService,
+        $validationService,
+        $stripePaymentService,
+        $pendingCheckoutRepository,
         new OrderEmailService(createMailer(), $invoiceService),
-        $invoiceService
+        $invoiceService,
+        $checkoutFinalizer
     );
 }
