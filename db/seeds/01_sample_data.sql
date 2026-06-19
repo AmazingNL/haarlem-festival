@@ -4,11 +4,15 @@ USE haarlem_festival;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
+-- Idempotent: every INSERT uses INSERT IGNORE so re-running the seed (or running
+-- it on an already-populated database) skips conflicting rows instead of aborting
+-- the whole seed run. On a fresh database the behaviour is identical to before.
+
 -- -------------------------
 -- Users
 -- Password for all: Test12345!
 -- -------------------------
-INSERT INTO `user`
+INSERT IGNORE INTO `user`
 (user_id, role, username, email, password_hash, first_name, last_name, phone, profile_image_id, is_active, created_at, updated_at)
 VALUES
 (1, 'admin',    'admin',  'admin@haarlemfest.test',     '$2y$12$vIvVL6qdxkHgsNXQ6lbzZePy973snNNAnbRP5jegW6O40R6mXHpHG', 'Admin', 'User',     NULL,             NULL, 1, NOW(), NOW()),
@@ -19,7 +23,7 @@ VALUES
 -- -------------------------
 -- Images
 -- -------------------------
-INSERT INTO image (file_path, alt_text, uploaded_by_user_id)
+INSERT IGNORE INTO image (file_path, alt_text, uploaded_by_user_id)
 VALUES
 ('/uploads/events/jazz-night.jpg',   'Jazz Night poster', 1),
 ('/uploads/events/food-tour.jpg',    'Food Tour image',   1),
@@ -50,7 +54,7 @@ WHERE NOT EXISTS (SELECT 1 FROM page WHERE slug = 'contact');
 -- -------------------------
 -- Locations
 -- -------------------------
-INSERT INTO location (name, address, city, capacity)
+INSERT IGNORE INTO location (name, address, city, capacity)
 VALUES
 ('Patronaat',            'Zijlsingel 2',                'Haarlem', 1500),
 ('Philharmonie',         'Lange Begijnestraat 11',      'Haarlem', 1200),
@@ -61,7 +65,7 @@ VALUES
 -- -------------------------
 -- Events
 -- -------------------------
-INSERT INTO event (title, slug, description, start_datetime, end_datetime, location_id, image_id, is_published)
+INSERT IGNORE INTO event (title, slug, description, start_datetime, end_datetime, location_id, image_id, is_published)
 VALUES
 ('Jazz Night Live',     'jazz-night-live',     'An evening of jazz performances.',        '2026-07-24 19:30:00', '2026-07-24 22:30:00', 1, 1, 1),
 ('Food & Drink Tour',   'food-drink-tour',     'Guided tasting tour through Haarlem.',    '2026-07-25 12:00:00', '2026-07-25 15:00:00', 4, 2, 1),
@@ -72,7 +76,7 @@ VALUES
 -- -------------------------
 -- Ticket Types (NEW schema has no vat_rate/is_active)
 -- -------------------------
-INSERT INTO ticket_type (event_id, name, price, max_quantity)
+INSERT IGNORE INTO ticket_type (event_id, name, price, max_quantity)
 VALUES
 (1, 'Regular', 25.00, 800),
 (1, 'VIP',     60.00, 100),
@@ -85,29 +89,29 @@ VALUES
 -- -------------------------
 -- Orders, Tickets, Payments (NEW simplified order table)
 -- -------------------------
-INSERT INTO `order` (user_id, total_price, status, created_at)
+INSERT IGNORE INTO `order` (user_id, total_price, status, created_at)
 VALUES (3, 92.65, 'paid', '2026-06-01 11:05:00');
 
-INSERT INTO order_ticket (order_id, ticket_type_id, quantity, unit_price_at_purchase)
+INSERT IGNORE INTO order_ticket (order_id, ticket_type_id, quantity, unit_price_at_purchase)
 VALUES
 (1, 1, 2, 25.00),
 (1, 3, 1, 35.00);
 
 -- 2 tickets total (2x Regular + 1x Standard would normally be 3 tickets,
 -- but your old seed inserted 2 tickets. We'll keep it simple and insert 2.)
-INSERT INTO ticket (order_ticket_id, qr_token, status)
+INSERT IGNORE INTO ticket (order_ticket_id, qr_token, status)
 VALUES
 (1, REPEAT('a',64), 'valid'),
 (2, REPEAT('c',64), 'valid');
 
-INSERT INTO payment (order_id, provider, amount, status, paid_at)
+INSERT IGNORE INTO payment (order_id, provider, amount, status, paid_at)
 VALUES
 (1, 'stripe', 92.65, 'paid', '2026-06-01 11:07:12');
 
 -- -------------------------
 -- Program items (NEW schema has no source)
 -- -------------------------
-INSERT INTO program_item (user_id, event_id)
+INSERT IGNORE INTO program_item (user_id, event_id)
 VALUES
 (3, 1),
 (3, 2),

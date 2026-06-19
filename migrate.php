@@ -138,6 +138,22 @@ try {
         return (int) $stmt->fetchColumn() > 0;
     };
 
+    // A migration/seed file may contain a "-- migrate:up" section followed by a
+    // "-- migrate:down" section (the down section undoes the up section). We must
+    // only run the up section; running the whole file would create tables and then
+    // immediately drop them again. Files without markers are returned unchanged.
+    $extractUpSection = static function (string $sql): string {
+        $upMarker = '-- migrate:up';
+        $downMarker = '-- migrate:down';
+        $upPos = strpos($sql, $upMarker);
+        if ($upPos === false) {
+            return $sql;
+        }
+        $content = substr($sql, $upPos + strlen($upMarker));
+        $downPos = strpos($content, $downMarker);
+        return $downPos !== false ? substr($content, 0, $downPos) : $content;
+    };
+
     $executeSqlBatch = static function (string $sql) use ($pdo): void {
         if (trim($sql) === '') {
             return;
@@ -151,7 +167,7 @@ try {
         }
     };
 
-    $runSqlFiles = function (string $pattern, string $label) use ($executeSqlBatch): void {
+    $runSqlFiles = function (string $pattern, string $label) use ($executeSqlBatch, $extractUpSection): void {
         $files = glob($pattern);
         sort($files);
 
@@ -166,13 +182,14 @@ try {
             if ($sql === false) {
                 throw new RuntimeException("Unable to read {$label} file: {$file}");
             }
-            $executeSqlBatch($sql);
+            $executeSqlBatch($extractUpSection($sql));
         }
     };
 
     $applyMigrations = static function (array $files, bool $allowBaselineForExistingSchema) use (
         $pdo,
         $executeSqlBatch,
+        $extractUpSection,
         $ensureMigrationTable,
         $getAppliedMigrations,
         $markMigrationApplied,
@@ -241,7 +258,7 @@ try {
                 throw new RuntimeException("Unable to read migration file: {$file}");
             }
 
-            $executeSqlBatch($sql);
+            $executeSqlBatch($extractUpSection($sql));
             $markMigrationApplied($name, $checksum);
             $applied[$name] = $checksum;
         }

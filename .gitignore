@@ -34,3 +34,4 @@ docker/php.ini
 # Database backups (created by team-sync reset)
 backup-*.sql
 backup.sql
+db/backups/
