@@ -43,8 +43,8 @@ $mainNavigation = [
     ],
     [
         'label' => 'Jazz',
-        'href' => '/events?tag=jazz',
-        'active' => $currentPath === '/events' && strtolower(trim((string) ($_GET['tag'] ?? ''))) === 'jazz',
+        'href' => '/jazz',
+        'active' => $isSectionActive('/jazz') !== '',
     ],
 ];
 

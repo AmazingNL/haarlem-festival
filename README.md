@@ -29,7 +29,13 @@ Wait until all services are running (first build takes a minute).
 ### 3. Run the database migrations
 
 ```bash
-docker compose run --rm dbmate up
+docker compose exec php php /app/migrate.php up
+```
+
+To also load sample data (test accounts and seed content):
+
+```bash
+docker compose exec php php /app/migrate.php seed
 ```
 
 ### 4. Open in browser
@@ -47,8 +53,8 @@ docker compose run --rm dbmate up
 After pulling new changes from the team:
 
 ```bash
-docker compose up          # start containers if not running
-docker compose run --rm dbmate up   # apply any new migrations
+docker compose up -d                              # start containers if not running
+docker compose exec php php /app/migrate.php up   # apply any new migrations
 ```
 
 Or use the sync script which handles both:

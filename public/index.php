@@ -13,9 +13,11 @@ use App\Controllers\ShopController;
 use App\Controllers\StoriesController;
 use App\Controllers\TicketController;
 use App\Controllers\YummyController;
+use App\Controllers\JazzController;
 use App\Services\Implementations\Booking\CheckoutValidationService;
 use App\Services\Implementations\Booking\EventBookingService;
 use App\Services\Implementations\Booking\HistoryBookingService;
+use App\Services\Implementations\Booking\JazzBookingService;
 use App\Services\Implementations\Booking\ReservationService;
 use App\Services\Implementations\Booking\RestaurantAvailabilityService;
 use App\Services\Implementations\Booking\RestaurantBookingService;
@@ -93,6 +95,9 @@ $dispatcher = simpleDispatcher(static function (RouteCollector $r): void {
     $r->get('/orders/{orderId:\d+}/success', [ShopController::class, 'success']);
     $r->get('/orders/{orderId:\d+}/invoice', [ShopController::class, 'invoice']);
 
+    $r->get('/jazz', [JazzController::class, 'loadLandingPage']);
+    $r->post('/jazz/add-to-program', [JazzController::class, 'addToProgram']);
+    $r->get('/jazz/artists/{slug}', [JazzController::class, 'artistDetail']);
     $r->get('/yummy', [YummyController::class, 'yummy']);
     $r->get('/yummy/ratatouille', [YummyController::class, 'ratatouille']);
     $r->post('/yummy/ratatouille/book-reservation', [YummyController::class, 'bookReservation']);
@@ -224,6 +229,11 @@ function createStoriesBookingService(): StoriesBookingService
     return new StoriesBookingService(createStoriesRepository());
 }
 
+function createJazzBookingService(): JazzBookingService
+{
+    return new JazzBookingService(createSectionService());
+}
+
 function createCheckoutValidationService(): CheckoutValidationService
 {
     return new CheckoutValidationService([
@@ -231,6 +241,7 @@ function createCheckoutValidationService(): CheckoutValidationService
         new HistoryBookingService(createPageService(), createSectionService()),
         new RestaurantBookingService(createPageService(), createSectionService(), createReservationService()),
         createStoriesBookingService(),
+        createJazzBookingService(),
     ]);
 }
 
@@ -248,6 +259,14 @@ function createController(string $controllerClass)
     switch ($controllerClass) {
         case HomeController::class:
             return new HomeController(createSectionService(), createPageService());
+
+        case JazzController::class:
+            return new JazzController(
+                createSectionService(),
+                createPageService(),
+                createProgramService(),
+                createJazzBookingService()
+            );
 
         case YummyController::class:
             return new YummyController(

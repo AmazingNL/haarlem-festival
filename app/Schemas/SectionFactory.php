@@ -45,6 +45,16 @@ use App\Schemas\yummy\RestaurantCard;
 use App\Schemas\yummy\TextBlock;
 use App\Schemas\yummy\WelcomeBanner;
 use App\Schemas\yummy\WelcomeBannerCard;
+use App\Schemas\jazz\JazzHero;
+use App\Schemas\jazz\JazzIntro;
+use App\Schemas\jazz\JazzWhatToExpect;
+use App\Schemas\jazz\JazzFeaturedArtists;
+use App\Schemas\jazz\JazzMoreArtists;
+use App\Schemas\jazz\JazzAgendaIntro;
+use App\Schemas\jazz\JazzAgendaEvent;
+use App\Schemas\jazz\JazzPasses;
+use App\Schemas\jazz\JazzLocationContact;
+use App\Schemas\jazz\JazzArtist;
 
 // Map a section type string to the ViewModel class that defines its CMS fields.
 class SectionFactory
@@ -95,7 +105,17 @@ class SectionFactory
             'history_molen_article' => HistoryMolenArticle::class,
             'history_molen_sidebar' => HistoryMolenSidebar::class,
             'history_molen_route_cta' => HistoryMolenRouteCta::class,
-            'reservation' => Reservation::class
+            'reservation' => Reservation::class,
+            'jazz_hero' => JazzHero::class,
+            'jazz_intro' => JazzIntro::class,
+            'jazz_what_to_expect' => JazzWhatToExpect::class,
+            'jazz_featured_artists' => JazzFeaturedArtists::class,
+            'jazz_more_artists' => JazzMoreArtists::class,
+            'jazz_agenda_intro' => JazzAgendaIntro::class,
+            'jazz_agenda_event' => JazzAgendaEvent::class,
+            'jazz_passes' => JazzPasses::class,
+            'jazz_location_contact' => JazzLocationContact::class,
+            'jazz_artist' => JazzArtist::class,
         ];
 
         return $map[$type] ?? null;

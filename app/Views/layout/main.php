@@ -6,6 +6,9 @@
     <meta name="viewport" content="initial-scale=1, width=device-width">
     <title><?= htmlspecialchars((string) ($title ?? 'Haarlem Festival'), ENT_QUOTES, 'UTF-8') ?></title>
     <meta name="description" content="Haarlem Festival - events, programs and city guides" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/output.css" />
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/home.css" />
@@ -17,6 +20,7 @@
     <link rel="stylesheet" href="/assets/css/yummy/index.css" />
     <link rel="stylesheet" href="/assets/css/yummy/restaurant_card.css" />
     <link rel="stylesheet" href="/assets/css/yummy/ratatouille.css" />
+    <link rel="stylesheet" href="/assets/css/jazz/index.css" />
     <link rel="stylesheet" href="/assets/css/tickets/index.css" />
 </head>
 
@@ -64,6 +68,7 @@
     <script src="/assets/js/home.js"></script>
     <script src="/assets/js/history-book-tour.js"></script>
     <script src="/assets/js/stories.js"></script>
+    <script src="/assets/js/jazz.js"></script>
 </body>
 
 </html>
